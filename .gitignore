@@ -1,0 +1,7 @@
+
+#Intellj Dir
+.idea/
+#Gradle Dir
+.gradle/
+#Output Dir
+run/
