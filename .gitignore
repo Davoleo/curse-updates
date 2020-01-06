@@ -3,5 +3,8 @@
 .idea/
 #Gradle Dir
 .gradle/
-#Output Dir
+#Output Dirs
+build/
 run/
+#Bot Token Configuration File
+src/main/resources/config.json
