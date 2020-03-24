@@ -26,7 +26,7 @@ public class CurseUpdates {
                 .subscribe(event -> {
                     final String message = event.getMessage().getContent().orElse("");
                     for (final Map.Entry<String, Command> entry : Commands.commands.entrySet()) {
-                        if (message.startsWith(Commands.PREFIX + entry.getKey())) {
+                        if (message.startsWith(Commands.prefix + entry.getKey())) {
                             entry.getValue().execute(event);
                             break;
                         }
