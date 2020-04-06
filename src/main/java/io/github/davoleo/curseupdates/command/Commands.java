@@ -8,7 +8,8 @@
 
 package io.github.davoleo.curseupdates.command;
 
-import io.github.davoleo.curseupdates.EmbedHelper;
+import io.github.davoleo.curseupdates.utils.EmbedHelper;
+import io.github.davoleo.curseupdates.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class Commands {
 
     public static final Map<String, Command> commands = new HashMap<>();
-    public static char prefix = '|';
+    public static char prefix;
 
     static {
         //noinspection ConstantConditions
@@ -31,6 +32,7 @@ public class Commands {
                     event.getMessage().getChannel().block().createMessage("You can only assign a string of one character as prefix!").block();
                 } else {
                     prefix = message.charAt(0);
+                    Utils.savePrefix(prefix);
                     event.getMessage().getChannel().block().createMessage("`" + prefix + "` is now the current prefix for commands").block();
                 }
                 System.out.println(message);

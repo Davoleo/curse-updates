@@ -1,10 +1,4 @@
-package io.github.davoleo.curseupdates;/* -----------------------------------
- * Author: Davoleo
- * Date / Hour: 09/03/2020 / 22:09
- * Class: io.github.davoleo.curseupdates.EmbedHelper
- * Project: curse-updates
- * Copyright - © - Davoleo - 2020
- * ----------------------------------- */
+package io.github.davoleo.curseupdates.utils;
 
 import discord4j.core.spec.EmbedCreateSpec;
 import io.github.davoleo.curseupdates.command.Commands;
