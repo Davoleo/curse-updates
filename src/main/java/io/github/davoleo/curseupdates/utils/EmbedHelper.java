@@ -23,7 +23,7 @@ public class EmbedHelper {
     public static Consumer<EmbedCreateSpec> helpEmbed = spec -> {
         spec.setTitle("Commands");
         spec.addField(Commands.prefix + "ping", "sends a message with information about the latency of the bot response", false);
-        spec.addField(Commands.prefix + "changeprefix `<prefix>`", "changes the command prefix of the bot to the char passed as argument - the prefix is reset as `|` after a bot restart", false);
+        spec.addField(Commands.prefix + "changeprefix `<prefix>`", "changes the command prefix of the bot to the char passed as argument - the prefix is reset to `|` after a bot restart", false);
         spec.addField(Commands.prefix + "help", "shows this embed with a list of all the available commands and their usage and descriptions", false);
     };
 

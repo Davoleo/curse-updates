@@ -16,16 +16,21 @@ import java.io.IOException;
 public class Utils {
 
     public static void savePrefix(char prefix) {
-        if (CurseUpdates.prefixFile.exists()) {
-            try {
-                FileWriter writer = new FileWriter(CurseUpdates.prefixFile, false);
-                writer.write(prefix);
-                writer.close();
-            } catch (IOException e) {
-                System.out.println("COULDN'T FIND THE PREFIX FILE :(\n\n");
-                e.printStackTrace();
-            }
+        CurseUpdates.prefixFile.getParentFile().mkdirs();
+
+        try {
+            CurseUpdates.prefixFile.createNewFile();
+            FileWriter writer = new FileWriter(CurseUpdates.prefixFile, false);
+            writer.write(prefix);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("COULDN'T WRITE TO THE PREFIX FILE :(\n\n");
+            e.printStackTrace();
         }
+    }
+
+    public static String getResourcesDirPath() {
+        return CurseUpdates.class.getResource("/dummy_resource.txt").getPath().replace("dummy_resource.txt", "");
     }
 
 }
