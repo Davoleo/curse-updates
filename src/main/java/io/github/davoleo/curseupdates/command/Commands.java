@@ -8,6 +8,7 @@
 
 package io.github.davoleo.curseupdates.command;
 
+import io.github.davoleo.curseupdates.parse.PHPBridge;
 import io.github.davoleo.curseupdates.utils.EmbedHelper;
 import io.github.davoleo.curseupdates.utils.Utils;
 
@@ -37,6 +38,11 @@ public class Commands {
                 }
                 System.out.println(message);
             }
+        });
+
+        commands.put("test", event -> {
+            PHPBridge.request("metallurgy-4-reforged");
+            event.getMessage().getChannel().block().createMessage("Request was successful");
         });
 
         commands.put("help", event -> event.getMessage().getChannel().block()

@@ -8,7 +8,6 @@ import io.github.davoleo.curseupdates.command.Commands;
 import io.github.davoleo.curseupdates.utils.Utils;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Scanner;
 
