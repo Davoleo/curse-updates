@@ -8,36 +8,32 @@
 
 package io.github.davoleo.curseupdates.parse;
 
-import php.java.bridge.http.JavaBridgeRunner;
+import io.github.davoleo.curseupdates.parse.bypass.CHttpRequester;
+import org.jsoup.nodes.Document;
 
+import javax.script.ScriptException;
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
 
 public class PHPBridge {
 
-    public static final String PHP_PORT = "3333";
-
-    private static final JavaBridgeRunner runner = JavaBridgeRunner.getInstance(PHP_PORT);
-
     // TODO: 08/04/2020 Runtime.getRuntime().exec() (?)
-    public static void request(String slug) {
+    public static String request(String slug) {
 
-        URL url = null;
+        CHttpRequester requester = new CHttpRequester();
+        String url;
 
         try {
-            url = new URL("https://www.curseforge.com/minecraft/mc-mods/" + slug + "/files");
-            runner.waitFor();
+            url = "https://www.curseforge.com/minecraft/mc-mods/" + slug + "/files";
+            Document document = requester.get(url);
+            return document.outerHtml();
         } catch (MalformedURLException e) {
             System.out.println("The URL is malformed");
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            //When the runner is interrupted
+        } catch (IOException | URISyntaxException | InterruptedException | ScriptException e) {
             e.printStackTrace();
         }
+        return "fuori dal try";
     }
-
-    public void hello(String[] args) {
-        System.out.println("Hello " + args[0]);
-    }
-
 }

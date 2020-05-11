@@ -21,9 +21,8 @@ use CloudflareBypass\Model\UAMOptions;
 $url = "https://predb.me/?search=720p";
 $ch = curl_init($url);
 
-// Want to cache clearance cookies ?
-//curl_setopt($ch, CURLOPT_COOKIEJAR, "cookies.txt");
-//curl_setopt($ch, CURLOPT_COOKIEFILE, "cookies.txt");
+curl_setopt($ch, CURLOPT_COOKIEJAR, "cookies.txt");
+curl_setopt($ch, CURLOPT_COOKIEFILE, "cookies.txt");
 
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -44,9 +43,9 @@ $cfOptions->setVerbose(true);
 
 try {
     $page = $cfCurl->exec($ch, $cfOptions);
+    file_put_contents("page.html", $page);
 
-    // Want to get clearance cookies ?
-    //$cookies = curl_getinfo($ch, CURLINFO_COOKIELIST);
+    $cookies = curl_getinfo($ch, CURLINFO_COOKIELIST);
 
 } catch (ErrorException $ex) {
     echo "Unknown error -> " . $ex->getMessage();

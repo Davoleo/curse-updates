@@ -41,8 +41,8 @@ public class Commands {
         });
 
         commands.put("test", event -> {
-            PHPBridge.request("metallurgy-4-reforged");
-            event.getMessage().getChannel().block().createMessage("Request was successful");
+            String resultMsg = PHPBridge.request("metallurgy-4-reforged");
+            event.getMessage().getChannel().block().createMessage(resultMsg);
         });
 
         commands.put("help", event -> event.getMessage().getChannel().block()
