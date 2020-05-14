@@ -7,3 +7,6 @@
 build/
 run/
 libs/
+
+#Node Modules
+node_modules/
