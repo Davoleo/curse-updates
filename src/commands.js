@@ -19,8 +19,30 @@ commands.set('changeprefix', (msg) => {
 			Utils.savePrefix(message);
 			msg.channel.send('`' + message + '` is now the current prefix for commands');
 		}
-		console.log(message);
 	}
+});
+
+// commands.set('cflatest')
+
+commands.set('help', (message) => {
+	const embed = Utils.createEmbed();
+
+	embed.addFields([
+		{
+			name: config.prefix + 'ping',
+			value: 'Sends a message with information about the latency of the bot response',
+		},
+		{
+			name: config.prefix + 'changeprefix `<prefix>`',
+			value: 'Changes the command prefix of the bot to the char passed as argument - the prefix is reset to `|` after a bot restart',
+		},
+		{
+			name: config.prefix + 'help',
+			value: 'Shows this embed with a list of all the available commands and their usage and descriptions',
+		},
+	]);
+
+	message.channel.send(embed);
 });
 
 exports.commands = commands;
