@@ -4,7 +4,7 @@
   "description": "A Discord Bot that posts update notifications every time a new project update is released on curseforge.com",
   "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bot": "node src/main.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   "devDependencies": {},
   "dependencies": {
     "@types/node": "^14.0.1",
+    "cloudscraper": "^4.6.0",
     "discord.js": "^12.2.0",
     "eslint": "^7.0.0",
     "jquery": "^3.5.1"
