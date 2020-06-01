@@ -10,3 +10,6 @@ libs/
 
 #Node Modules
 node_modules/
+
+# Configuration File
+cfg.json

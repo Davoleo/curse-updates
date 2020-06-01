@@ -1,4 +1,5 @@
 const config = require('./cfg.json');
+const { CFQuery } = require('./query');
 const { Utils } = require('./utils');
 
 const commands = new Map();
@@ -12,8 +13,8 @@ commands.set('changeprefix', (msg) => {
 	if (message !== '') {
 		// Trim out everything that is not the new prefix
 		message = message.replace(config.prefix + 'changeprefix ', '');
-		if (message.length > 1) {
-			msg.channel.send('You can only assign a string of one character as prefix!');
+		if (message.length > 3) {
+			msg.channel.send('You can assign a string of up to 3 characters as prefix!');
 		}
 		else {
 			Utils.savePrefix(message);
@@ -22,7 +23,17 @@ commands.set('changeprefix', (msg) => {
 	}
 });
 
-// commands.set('cflatest')
+commands.set('cflatest', (message) => {
+	const id = message.content.replace(config.prefix + 'cflatest ', '');
+
+	if (id !== '') {
+		const response = CFQuery.queryLatest(message, id);
+
+		if (response !== undefined && response !== null) {
+			message.channel.send(response);
+		}
+	}
+});
 
 commands.set('help', (message) => {
 	const embed = Utils.createEmbed();
@@ -35,6 +46,10 @@ commands.set('help', (message) => {
 		{
 			name: config.prefix + 'changeprefix `<prefix>`',
 			value: 'Changes the command prefix of the bot to the char passed as argument - the prefix is reset to `|` after a bot restart',
+		},
+		{
+			name: config.prefix + 'cflatest `<projectID>`',
+			value: 'Queries Curseforge to get the latest version of a mod or modpack',
 		},
 		{
 			name: config.prefix + 'help',
