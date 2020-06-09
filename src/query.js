@@ -2,18 +2,26 @@ const { Utils } = require('./utils');
 
 const cf = require('mc-curseforge-api');
 
-class CFQuery {
+exports.cfquery = {
 
-	static queryLatest(message, id) {
+	queryLatest(id) {
 		cf.getMod(id).then((mod) => {
 			const latestFile = mod.latestFiles[mod.latestFiles.length - 1];
 			const embed = Utils.buildModEmbed(mod, latestFile);
-			message.channel.send(embed);
+			return embed;
 		},
 		(error) => {
-			message.channel.send('Error: ' + error + '!');
+			return 'Error: ' + error + '!';
 		});
-	}
-}
+	},
 
-exports.CFQuery = CFQuery;
+	getModById(id) {
+		cf.getMod(id).then((mod) => {
+			return mod;
+		},
+		() => {
+			return null;
+		},
+		);
+	},
+};

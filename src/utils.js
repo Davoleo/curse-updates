@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
-const config = require('./cfg.json');
+const { cfquery } = require('./query');
+const config = require('../cfg.json');
 const embedColors = [
 	'404040',
 	'FEBC11',
@@ -15,9 +16,27 @@ const releaseColors = {
 
 class Utils {
 	static savePrefix(prefix) {
-		const newConfig = config;
-		newConfig.prefix = prefix;
+		config.prefix = prefix;
+		this.updateJSONConfig();
+	}
 
+	static addProjectToConfig(guildId, projectId) {
+		config.serverConfig[guildId].projects.push(projectId);
+		this.updateJSONConfig();
+	}
+
+	static initSaveGuild(id) {
+		if(!(id in config.serverConfig)) {
+			console.log('GUILD INIT');
+			config.serverConfig[id] = {
+				releasesChannel: 'none',
+				projects: [],
+			};
+			this.updateJSONConfig();
+		}
+	}
+
+	static updateJSONConfig() {
 		fs.writeFile('./cfg.json', JSON.stringify(config, null, 2), function writeJSON(e) {
 			if (e) {
 				return console.log(e);
@@ -38,6 +57,30 @@ class Utils {
 
 		// Set a Random Embed Color
 		embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+
+		return embed;
+	}
+
+	static buildScheduleEmbed(guildId) {
+		const idNamePairs = [];
+
+		config.serverConfig[guildId].projects.forEach(projectId => {
+			const mod = cfquery.getModById(projectId);
+			idNamePairs.push({
+				name: projectId,
+				value: mod !== null ? mod.name : 'error',
+			});
+		});
+
+		const embed = new MessageEmbed();
+		embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+		embed.addField('Annoucements Channel:', config.serverConfig[guildId].releasesChannel);
+		if (idNamePairs.length > 0) {
+			embed.addFields(idNamePairs);
+		}
+		else {
+			embed.setTitle('No Projects have been Scheduled on this server');
+		}
 
 		return embed;
 	}
@@ -81,7 +124,6 @@ class Utils {
 			return 'Alpha';
 		}
 	}
-
 }
 
 exports.Utils = Utils;

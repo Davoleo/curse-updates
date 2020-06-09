@@ -1,5 +1,5 @@
-const config = require('./cfg.json');
-const { CFQuery } = require('./query');
+const config = require('../cfg.json');
+const { cfquery } = require('./query');
 const { Utils } = require('./utils');
 
 const commands = new Map();
@@ -23,15 +23,37 @@ commands.set('changeprefix', (msg) => {
 	}
 });
 
-commands.set('cflatest', (message) => {
-	const id = message.content.replace(config.prefix + 'cflatest ', '');
+commands.set('latest', (message) => {
+	const id = message.content.replace(config.prefix + 'latest ', '');
 
 	if (id !== '') {
-		const response = CFQuery.queryLatest(message, id);
+		const response = cfquery.queryLatest(id);
 
 		if (response !== undefined && response !== null) {
 			message.channel.send(response);
 		}
+	}
+});
+
+commands.set('schedule add', (message) => {
+	if(message.guild != undefined && message.guild.available) {
+		Utils.initSaveGuild(message.guild.id);
+		const projectID = message.content.replace(config.prefix + 'schedule add ', '');
+		Utils.addProjectToConfig(message.guild.id, projectID);
+	}
+});
+
+commands.set('schedule show', (message) => {
+	if(message.guild != undefined && message.guild.available) {
+		Utils.initSaveGuild(message.guild.id);
+		const scheduledProjects = Utils.buildScheduleEmbed(message.guild.id);
+		message.channel.send(scheduledProjects);
+	}
+});
+
+commands.set('test', (message) => {
+	if(message.guild != undefined && message.guild.available) {
+		Utils.initSaveGuild(message.guild.id);
 	}
 });
 
@@ -48,8 +70,12 @@ commands.set('help', (message) => {
 			value: 'Changes the command prefix of the bot to the char passed as argument - the prefix is reset to `|` after a bot restart',
 		},
 		{
-			name: config.prefix + 'cflatest `<projectID>`',
+			name: config.prefix + 'latest `<projectID>`',
 			value: 'Queries Curseforge to get the latest version of a mod or modpack',
+		},
+		{
+			name: config.prefix + 'schedule add `<projectID>`',
+			value: 'Adds a Curseforge project to the scheduled check that runs once every 15 minutes per entry',
 		},
 		{
 			name: config.prefix + 'help',
