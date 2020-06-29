@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "target": "es5",
+        "outDir": "./dist/no-min",
+        "noImplicitReturns": true
+    },
+
+    "include": [
+        "./src/**/*"
+    ]
+}

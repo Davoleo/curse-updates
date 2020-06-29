@@ -4,7 +4,8 @@
   "description": "A Discord Bot that posts update notifications every time a new project update is released on curseforge.com",
   "main": "src/main.js",
   "scripts": {
-    "bot": "node src/main.js"
+    "bot": "node dist/main.min.js",
+    "build": "build.sh"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
     "url": "https://github.com/Davoleo/curse-updates/issues"
   },
   "homepage": "https://github.com/Davoleo/curse-updates#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  },
   "dependencies": {
     "@types/node": "^14.0.1",
     "cloudscraper": "^4.6.0",
