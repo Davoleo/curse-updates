@@ -1,5 +1,4 @@
 const config = require('../cfg.json');
-const { CFQuery } = require('./query');
 const { Utils } = require('./utils');
 
 const commands = new Map();
@@ -32,7 +31,7 @@ commands.set('latest', (message) => {
 	const id = message.content.replace(config.prefix + 'latest ', '');
 
 	if (id !== '') {
-		CFQuery.queryLatest(id)
+		Utils.queryLatest(id)
 			.then((response) => {
 				if (response !== undefined && response !== null && response !== '') {
 					message.channel.send(response);
@@ -45,17 +44,35 @@ commands.set('latest', (message) => {
 });
 
 commands.set('schedule add', (message) => {
-	if(message.guild != undefined && message.guild.available) {
+	if(message.guild !== undefined && message.guild.available) {
 		Utils.initSaveGuild(message.guild.id);
 		const projectID = message.content.replace(config.prefix + 'schedule add ', '');
+
 		Utils.addProjectToConfig(message.guild.id, projectID);
+		message.channel.send('Project was added successfully');
+	}
+});
+
+commands.set('schedule setchannel', (message) => {
+	if (message.guild !== undefined && message.guild.available) {
+		Utils.saveReleasesChannel(message.guild.id, message.channel.id);
+		message.channel.send('Scheduled projects announcements will start to appear here once a new project update is published!');
+	}
+});
+
+commands.set('schedule clearchannel', (message) => {
+	if (message.guild !== undefined && message.guild.available) {
+		Utils.resetReleasesChannel(message.guild.id);
+		message.channel.send('Scheduled update channel has been set to "None", Updates annoucements have been disabled on this server');
 	}
 });
 
 commands.set('schedule show', (message) => {
 	if(message.guild != undefined && message.guild.available) {
 		Utils.initSaveGuild(message.guild.id);
-		Utils.buildScheduleEmbed(message.guild.id).then(scheduledProjects => message.channel.send(scheduledProjects));
+		Utils.buildScheduleEmbed(message.guild.id, message.client).then(embed => {
+			message.channel.send(embed);
+		});
 	}
 });
 
@@ -68,6 +85,7 @@ commands.set('test', (message) => {
 commands.set('help', (message) => {
 	const embed = Utils.createEmbed();
 
+	embed.type = 'rich';
 	embed.addFields([
 		{
 			name: config.prefix + 'ping',
@@ -80,6 +98,18 @@ commands.set('help', (message) => {
 		{
 			name: config.prefix + 'latest `<projectID>`',
 			value: 'Queries Curseforge to get the latest version of a mod or modpack',
+		},
+		{
+			name: config.prefix + 'schedule show',
+			value: 'Shows the scheduled project updates announcements of the current server and the announcements channel',
+		},
+		{
+			name: config.prefix + 'schedule setchannel `<channel>`',
+			value: 'Sets the channel this command is sent to as the projects update annoucements channel of the current server',
+		},
+		{
+			name: config.prefix + 'schedule clearchannel',
+			value: 'Resets the projects update annoucements channel of the current server to "None" (no further updates will be posted) [can be used anywhere in the server]',
 		},
 		{
 			name: config.prefix + 'schedule add `<projectID>`',

@@ -1,4 +1,4 @@
-const { CFQuery } = require('./query');
+const cf = require('mc-curseforge-api');
 const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
 const config = require('../cfg.json');
@@ -15,13 +15,34 @@ const releaseColors = {
 
 
 class Utils {
+	// cf getMod Wrapper function
+	static async getModById(id) {
+		return cf.getMod(id);
+	}
+
 	static savePrefix(prefix) {
 		config.prefix = prefix;
 		this.updateJSONConfig();
 	}
 
 	static addProjectToConfig(guildId, projectId) {
-		config.serverConfig[guildId].projects.push(projectId);
+		this.queryLatest(projectId).then(embed => {
+			console.log(embed);
+			if (embed !== null) {
+				const latestFileName = embed.fields[2].value;
+				config.serverConfig[guildId].projects.push({ id: projectId, version: latestFileName });
+				this.updateJSONConfig();
+			}
+		});
+	}
+
+	static saveReleasesChannel(guildId, channelId) {
+		config.serverConfig[guildId].releasesChannel = channelId;
+		this.updateJSONConfig();
+	}
+
+	static resetReleasesChannel(guildId) {
+		config.serverConfig[guildId].releasesChannel = -1;
 		this.updateJSONConfig();
 	}
 
@@ -29,7 +50,7 @@ class Utils {
 		if(!(id in config.serverConfig)) {
 			console.log('GUILD INIT');
 			config.serverConfig[id] = {
-				releasesChannel: 'none',
+				releasesChannel: -1,
 				projects: [],
 			};
 			this.updateJSONConfig();
@@ -61,21 +82,31 @@ class Utils {
 		return embed;
 	}
 
-	static buildScheduleEmbed(guildId) {
+	static async buildScheduleEmbed(guildId, client) {
 		const idNamePairs = [];
 
-		config.serverConfig[guildId].projects.forEach(projectId => {
-			CFQuery.getModById(projectId).then(mod => {
-				idNamePairs.push({
-					name: projectId,
-					value: mod !== null ? mod.name : 'error',
-				});
-			});
+		config.serverConfig[guildId].projects.forEach(project => {
+			idNamePairs.push({ name: project.id, value: project.version });
 		});
 
 		const embed = new MessageEmbed();
 		embed.color = embedColors[Math.ceil((Math.random() * 3))];
-		embed.addField('Annoucements Channel:', config.serverConfig[guildId].releasesChannel);
+		embed.setTitle('Registered Projects and Release Channel for this server');
+
+		const releasesChannelId = config.serverConfig[guildId].releasesChannel;
+
+		let channel = null;
+		if (releasesChannelId !== -1) {
+			channel = await client.channels.fetch(releasesChannelId);
+		}
+
+		if (channel !== null) {
+			embed.addField('Announcements Channel', channel.toString());
+		}
+		else {
+			embed.addField('Announcements Channel', 'None');
+		}
+
 		if (idNamePairs.length > 0) {
 			embed.addFields(idNamePairs);
 		}
@@ -113,6 +144,14 @@ class Utils {
 		console.log(modFile);
 
 		return modEmbed;
+	}
+
+	static async queryLatest(id) {
+		const mod = await cf.getMod(id);
+		const latestFile = mod.latestFiles[mod.latestFiles.length - 1];
+		console.log(mod);
+		const embed = this.buildModEmbed(mod, latestFile);
+		return embed;
 	}
 
 	static getTypeStringFromId(typeId) {

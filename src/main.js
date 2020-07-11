@@ -2,6 +2,8 @@ const config = require('../cfg.json');
 const discord = require('discord.js');
 const client = new discord.Client();
 const { commands } = require('./commands');
+const { setInterval } = require('timers');
+const { Utils } = require('./utils');
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -21,5 +23,10 @@ client.on('message', msg => {
 		}
 	}
 });
+
+function queryServerProjects(guildId, projectIds, announcementChannel) {
+}
+
+// setInterval(900000, checkForNewUpdates);
 
 client.login(config.token);
