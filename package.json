@@ -26,10 +26,10 @@
   "homepage": "https://github.com/Davoleo/curse-updates#readme",
   "devDependencies": {},
   "dependencies": {
-    "@types/node": "^14.0.1",
+    "@types/node": "^14.0.22",
     "cloudscraper": "^4.6.0",
     "discord.js": "^12.2.0",
-    "eslint": "^7.0.0",
+    "eslint": "^7.4.0",
     "mc-curseforge-api": "^2.1.0",
     "request": "^2.88.2"
   }

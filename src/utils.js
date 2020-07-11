@@ -1,6 +1,6 @@
+const { CFQuery } = require('./query');
 const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
-const { cfquery } = require('./query');
 const config = require('../cfg.json');
 const embedColors = [
 	'404040',
@@ -65,15 +65,16 @@ class Utils {
 		const idNamePairs = [];
 
 		config.serverConfig[guildId].projects.forEach(projectId => {
-			const mod = cfquery.getModById(projectId);
-			idNamePairs.push({
-				name: projectId,
-				value: mod !== null ? mod.name : 'error',
+			CFQuery.getModById(projectId).then(mod => {
+				idNamePairs.push({
+					name: projectId,
+					value: mod !== null ? mod.name : 'error',
+				});
 			});
 		});
 
 		const embed = new MessageEmbed();
-		embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+		embed.color = embedColors[Math.ceil((Math.random() * 3))];
 		embed.addField('Annoucements Channel:', config.serverConfig[guildId].releasesChannel);
 		if (idNamePairs.length > 0) {
 			embed.addFields(idNamePairs);
@@ -97,6 +98,7 @@ class Utils {
 			authorString += '[' + author.name + '](' + author.url + '), ';
 		}
 
+		modEmbed.type = 'rich';
 		modEmbed.setTitle('New ' + mod.name + ' ' + releaseTypeString + '!').setURL(mod.url);
 		modEmbed.setDescription(mod.summary);
 		modEmbed.addField('Authors', authorString);
@@ -106,7 +108,6 @@ class Utils {
 		modEmbed.addField('New Mod Version', fileName);
 		modEmbed.addField('Type', releaseTypeString);
 		modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\n[CurseForge](' + mod.url + ')');
-		console.log(mod.authors[0]);
 		modEmbed.setTimestamp(modFile.timestamp);
 
 		console.log(modFile);
