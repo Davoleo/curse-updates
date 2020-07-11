@@ -1,5 +1,6 @@
 const config = require('../cfg.json');
 const { Utils } = require('./utils');
+const { GuildAuditLogs } = require('discord.js');
 
 const commands = new Map();
 
@@ -23,7 +24,7 @@ commands.set('changeprefix', (msg) => {
 		}
 	}
 	else {
-		msg.channel.send('This command is only usable by @Davoleo#3333 right now');
+		msg.channel.send('This command is only usable by <@143127230866915328> right now');
 	}
 });
 
@@ -55,8 +56,17 @@ commands.set('schedule add', (message) => {
 
 commands.set('schedule setchannel', (message) => {
 	if (message.guild !== undefined && message.guild.available) {
-		Utils.saveReleasesChannel(message.guild.id, message.channel.id);
-		message.channel.send('Scheduled projects announcements will start to appear here once a new project update is published!');
+
+		let channelId = message.content.replace(config.prefix + 'schedule setchannel <#', '');
+		channelId = channelId.replace('>', '');
+
+		if (!channelId.startsWith('||') && channelId.length > 0) {
+			Utils.saveReleasesChannel(message.guild.id, channelId);
+			message.channel.send('Scheduled projects announcements will start to appear in <#' + channelId + '> once a new project update is published!');
+		}
+		else {
+			message.channel.send('The provided channel reference is invalid!');
+		}
 	}
 });
 
