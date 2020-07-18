@@ -1,6 +1,5 @@
 const config = require('../cfg.json');
 const { Utils } = require('./utils');
-const { GuildAuditLogs } = require('discord.js');
 
 const commands = new Map();
 

@@ -36,6 +36,17 @@ class Utils {
 		});
 	}
 
+	static updateCachedProject(guildId, projectId, newVersion) {
+		if (config.serverConfig[guildId].projects.length > 0) {
+			config.serverConfig[guildId].projects.forEach((project) => {
+				if (project.id === projectId) {
+					project.version = newVersion;
+					this.updateJSONConfig();
+				}
+			});
+		}
+	}
+
 	static saveReleasesChannel(guildId, channelId) {
 		config.serverConfig[guildId].releasesChannel = channelId;
 		this.updateJSONConfig();
@@ -141,7 +152,7 @@ class Utils {
 		modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\n[CurseForge](' + mod.url + ')');
 		modEmbed.setTimestamp(modFile.timestamp);
 
-		console.log(modFile);
+		console.log('Latest file: ' + fileName);
 
 		return modEmbed;
 	}
@@ -149,7 +160,6 @@ class Utils {
 	static async queryLatest(id) {
 		const mod = await cf.getMod(id);
 		const latestFile = mod.latestFiles[mod.latestFiles.length - 1];
-		console.log(mod);
 		const embed = this.buildModEmbed(mod, latestFile);
 		return embed;
 	}

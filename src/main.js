@@ -24,9 +24,37 @@ client.on('message', msg => {
 	}
 });
 
-function queryServerProjects(guildId, projectIds, announcementChannel) {
+async function queryServerProjects(guildId, projectIds, announcementChannel) {
+	const embeds = [];
+
+	const channel = await client.channels.fetch(announcementChannel);
+
+	await projectIds.forEach(async project => {
+		console.log('Checking project: ' + project.id);
+		const latestEmbed = await Utils.queryLatest(project.id);
+		const newVersion = latestEmbed.fields[2].value;
+		console.log('Chiamato');
+		if (project.version !== newVersion) {
+			embeds.push(latestEmbed);
+			Utils.updateCachedProject(guildId, project.id, newVersion);
+			channel.send(latestEmbed);
+		}
+	});
+
+	return embeds;
 }
 
-// setInterval(900000, checkForNewUpdates);
+setInterval(() => {
+	for (const guildId in config.serverConfig) {
+		const serverObject = config.serverConfig[guildId];
+
+		if (serverObject.releasesChannel !== -1) {
+			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel).catch(error => {
+				console.warn('There was a problem while doing the usual scheduled task!', error);
+			});
+		}
+	}
+}, 900000);
+// 15 Minutes
 
 client.login(config.token);
