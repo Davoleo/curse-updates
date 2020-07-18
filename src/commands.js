@@ -55,6 +55,7 @@ commands.set('schedule add', (message) => {
 
 commands.set('schedule setchannel', (message) => {
 	if (message.guild !== undefined && message.guild.available) {
+		Utils.initSaveGuild(message.guild.id);
 
 		let channelId = message.content.replace(config.prefix + 'schedule setchannel <#', '');
 		channelId = channelId.replace('>', '');
@@ -71,6 +72,7 @@ commands.set('schedule setchannel', (message) => {
 
 commands.set('schedule clearchannel', (message) => {
 	if (message.guild !== undefined && message.guild.available) {
+		Utils.initSaveGuild(message.guild.id);
 		Utils.resetReleasesChannel(message.guild.id);
 		message.channel.send('Scheduled update channel has been set to "None", Updates annoucements have been disabled on this server');
 	}
