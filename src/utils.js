@@ -1,5 +1,4 @@
 const cf = require('mc-curseforge-api');
-const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
 const config = require('../cfg.json');
 const embedColors = [
@@ -20,68 +19,10 @@ class Utils {
 		return cf.getMod(id);
 	}
 
-	static savePrefix(prefix) {
-		config.prefix = prefix;
-		this.updateJSONConfig();
-	}
-
-	static addProjectToConfig(guildId, projectId) {
-		this.queryLatest(projectId).then(embed => {
-			console.log(embed);
-			if (embed !== null) {
-				const latestFileName = embed.fields[2].value;
-				config.serverConfig[guildId].projects.push({ id: projectId, version: latestFileName });
-				this.updateJSONConfig();
-			}
-		});
-	}
-
-	static updateCachedProject(guildId, projectId, newVersion) {
-		if (config.serverConfig[guildId].projects.length > 0) {
-			config.serverConfig[guildId].projects.forEach((project) => {
-				if (project.id === projectId) {
-					project.version = newVersion;
-					this.updateJSONConfig();
-				}
-			});
-		}
-	}
-
-	static saveReleasesChannel(guildId, channelId) {
-		config.serverConfig[guildId].releasesChannel = channelId;
-		this.updateJSONConfig();
-	}
-
-	static resetReleasesChannel(guildId) {
-		config.serverConfig[guildId].releasesChannel = -1;
-		this.updateJSONConfig();
-	}
-
-	static initSaveGuild(id) {
-		if(!(id in config.serverConfig)) {
-			console.log('GUILD INIT');
-			config.serverConfig[id] = {
-				releasesChannel: -1,
-				projects: [],
-			};
-			this.updateJSONConfig();
-		}
-	}
-
-	static updateJSONConfig() {
-		fs.writeFile('./cfg.json', JSON.stringify(config, null, 2), function writeJSON(e) {
-			if (e) {
-				return console.log(e);
-			}
-		});
-	}
-
-	static createEmbed(description = '', title = '') {
+	static createEmbed(title, description = '') {
 		const embed = new MessageEmbed();
 
-		if (title !== '') {
-			embed.setTitle(title);
-		}
+		embed.setTitle(title);
 
 		if (description !== '') {
 			embed.setDescription(description);

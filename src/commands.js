@@ -1,5 +1,6 @@
 const config = require('../cfg.json');
 const { Utils } = require('./utils');
+const fileUtils = require('./fileutils');
 
 const commands = new Map();
 
@@ -17,7 +18,7 @@ commands.set('changeprefix', (msg) => {
 				msg.channel.send('You can assign a string of up to 3 characters as prefix!');
 			}
 			else {
-				Utils.savePrefix(message);
+				fileUtils.savePrefix(message);
 				msg.channel.send('`' + message + '` is now the current prefix for commands');
 			}
 		}
@@ -45,23 +46,49 @@ commands.set('latest', (message) => {
 
 commands.set('schedule add', (message) => {
 	if(message.guild !== undefined && message.guild.available) {
-		Utils.initSaveGuild(message.guild.id);
+		fileUtils.initSaveGuild(message.guild.id);
 		const projectID = message.content.replace(config.prefix + 'schedule add ', '');
+		if (projectID.match(/\d+/)[0] !== ['']) {
+			const stringResult = fileUtils.addProjectToConfig(message.guild.id, projectID);
+			message.channel.send(stringResult);
+		}
+		else {
+			message.channel.send('Project ID is invalid!');
+		}
+	}
+});
 
-		Utils.addProjectToConfig(message.guild.id, projectID);
-		message.channel.send('Project was added successfully');
+commands.set('schedule remove', (message) => {
+	if (message.guild !== undefined && message.guild.available) {
+		fileUtils.initSaveGuild(message.guild.id);
+		const projectID = message.content.replace(config.prefix + 'schedule remove ', '');
+		if (projectID.match(/\d+/)[0] !== ['']) {
+			const stringResult = fileUtils.removeProjectFromConfig(message.guild.id, projectID);
+			message.channel.send(stringResult);
+		}
+		else {
+			message.channel.send('Project ID is invalid!');
+		}
+	}
+});
+
+commands.set('schedule clear', (message) => {
+	if (message.guild !== undefined && message.guild.available) {
+		fileUtils.initSaveGuild(message.guild.id);
+		fileUtils.clearSchedule(message.guild.id);
+		message.channel.send(':warning: Scheduled was cleared successfully! :warning:');
 	}
 });
 
 commands.set('schedule setchannel', (message) => {
 	if (message.guild !== undefined && message.guild.available) {
-		Utils.initSaveGuild(message.guild.id);
+		fileUtils.initSaveGuild(message.guild.id);
 
 		let channelId = message.content.replace(config.prefix + 'schedule setchannel <#', '');
 		channelId = channelId.replace('>', '');
 
 		if (!channelId.startsWith('||') && channelId.length > 0) {
-			Utils.saveReleasesChannel(message.guild.id, channelId);
+			fileUtils.saveReleasesChannel(message.guild.id, channelId);
 			message.channel.send('Scheduled projects announcements will start to appear in <#' + channelId + '> once a new project update is published!');
 		}
 		else {
@@ -72,15 +99,15 @@ commands.set('schedule setchannel', (message) => {
 
 commands.set('schedule clearchannel', (message) => {
 	if (message.guild !== undefined && message.guild.available) {
-		Utils.initSaveGuild(message.guild.id);
-		Utils.resetReleasesChannel(message.guild.id);
+		fileUtils.initSaveGuild(message.guild.id);
+		fileUtils.resetReleasesChannel(message.guild.id);
 		message.channel.send('Scheduled update channel has been set to "None", Updates annoucements have been disabled on this server');
 	}
 });
 
 commands.set('schedule show', (message) => {
 	if(message.guild != undefined && message.guild.available) {
-		Utils.initSaveGuild(message.guild.id);
+		fileUtils.initSaveGuild(message.guild.id);
 		Utils.buildScheduleEmbed(message.guild.id, message.client).then(embed => {
 			message.channel.send(embed);
 		});
@@ -89,14 +116,13 @@ commands.set('schedule show', (message) => {
 
 commands.set('test', (message) => {
 	if(message.guild != undefined && message.guild.available) {
-		Utils.initSaveGuild(message.guild.id);
+		fileUtils.initSaveGuild(message.guild.id);
 	}
 });
 
 commands.set('help', (message) => {
-	const embed = Utils.createEmbed();
+	const embed = Utils.createEmbed('Commands: ');
 
-	embed.setTitle('Commands:');
 	embed.addFields([
 		{
 			name: config.prefix + 'ping',
@@ -124,7 +150,15 @@ commands.set('help', (message) => {
 		},
 		{
 			name: config.prefix + 'schedule add `<projectID>`',
-			value: 'Adds a Curseforge project to the scheduled check that runs once every 15 minutes per entry',
+			value: 'Adds a Curseforge project to the scheduled check that runs once every 15 minutes',
+		},
+		{
+			name: config.prefix + 'schedule remove `<projectID>`',
+			value: 'Removes a Curseforge project from the scheduled check that runs once every 15 minutes',
+		},
+		{
+			name: config.prefix + 'schedule clear',
+			value: 'Removes all Curseforge projects from the scheduled check that runs once every 15 minutes',
 		},
 		{
 			name: config.prefix + 'help',

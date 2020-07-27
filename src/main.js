@@ -33,7 +33,6 @@ async function queryServerProjects(guildId, projectIds, announcementChannel) {
 		console.log('Checking project: ' + project.id);
 		const latestEmbed = await Utils.queryLatest(project.id);
 		const newVersion = latestEmbed.fields[2].value;
-		console.log('Chiamato');
 		if (project.version !== newVersion) {
 			embeds.push(latestEmbed);
 			Utils.updateCachedProject(guildId, project.id, newVersion);
