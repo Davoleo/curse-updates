@@ -1,6 +1,6 @@
 # Curse Updates
 
-A discord bot that has the purpose to announce new updates for mods, modpacks and other projects on [CurseForge](www.curseforge.com/minecraft)
+A discord bot that has the purpose to announce new updates for mods, modpacks and other projects on [CurseForge](http://www.curseforge.com/minecraft)
 
 It can announce new versions of:<br>
 - Mods
