@@ -96,7 +96,7 @@ commands.set('test', (message) => {
 commands.set('help', (message) => {
 	const embed = Utils.createEmbed();
 
-	embed.type = 'rich';
+	embed.setTitle('Commands:');
 	embed.addFields([
 		{
 			name: config.prefix + 'ping',
