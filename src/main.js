@@ -4,9 +4,32 @@ const client = new discord.Client();
 const { commands } = require('./commands');
 const { setInterval } = require('timers');
 const { Utils } = require('./utils');
+const fileutils = require('./fileutils');
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
+
+	// Set the bot status
+	if(config.prefix === '|cu') {
+		client.user.setPresence({
+			status: 'dnd',
+			afk: false,
+			activity: {
+				name: ' with Davoleo in VSCode',
+				type: 'PLAYING',
+			},
+		});
+	}
+	else {
+		client.user.setPresence({
+			status: 'online',
+			afk: false,
+			activity: {
+				name: ' new CurseForge Releases',
+				type: 'WATCHING',
+			},
+		});
+	}
 });
 
 client.on('message', msg => {
@@ -35,7 +58,7 @@ async function queryServerProjects(guildId, projectIds, announcementChannel) {
 		const newVersion = latestEmbed.fields[2].value;
 		if (project.version !== newVersion) {
 			embeds.push(latestEmbed);
-			Utils.updateCachedProject(guildId, project.id, newVersion);
+			fileutils.updateCachedProject(guildId, project.id, newVersion);
 			channel.send(latestEmbed);
 		}
 	});
