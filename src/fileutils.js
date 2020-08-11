@@ -21,6 +21,7 @@ module.exports = {
 				return 'There was an issue adding that project to the schedule';
 			}
 		});
+		// .catch(() => 'There was an issue adding that project to the schedule');
 	},
 
 	removeProjectFromConfig(guildId, projectId) {
@@ -65,11 +66,17 @@ module.exports = {
 		this.updateJSONConfig();
 	},
 
+	setTemplateMessage(guildId, message) {
+		config.serverConfig[guildId].messageTemplate = message;
+		this.updateJSONConfig();
+	},
+
 	initSaveGuild(id) {
 		if(!(id in config.serverConfig)) {
 			console.log('GUILD INIT');
 			config.serverConfig[id] = {
 				releasesChannel: -1,
+				messageTemplate: '',
 				projects: [],
 			};
 			this.updateJSONConfig();

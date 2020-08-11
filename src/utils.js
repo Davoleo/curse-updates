@@ -59,6 +59,14 @@ class Utils {
 			embed.addField('Announcements Channel', 'None');
 		}
 
+		const messageTemplate = config.serverConfig[guildId].messageTemplate;
+		if (messageTemplate !== '') {
+			embed.addField('Template Message', messageTemplate);
+		}
+		else {
+			embed.addField('Template Messsage', 'None');
+		}
+
 		if (idNamePairs.length > 0) {
 			embed.addFields(idNamePairs);
 		}
@@ -114,6 +122,11 @@ class Utils {
 		case 3:
 			return 'Alpha';
 		}
+	}
+
+	static sendDMtoDavoleo(client, message) {
+		client.users.fetch('143127230866915328')
+			.then((davoleo) => davoleo.send(message));
 	}
 }
 

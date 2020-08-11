@@ -10,7 +10,7 @@ client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 
 	// Set the bot status
-	if(config.prefix === '|cu') {
+	if(config.prefix === ':||') {
 		client.user.setPresence({
 			status: 'dnd',
 			afk: false,
@@ -59,6 +59,10 @@ async function queryServerProjects(guildId, projectIds, announcementChannel) {
 		if (project.version !== newVersion) {
 			embeds.push(latestEmbed);
 			fileutils.updateCachedProject(guildId, project.id, newVersion);
+			const messageTemplate = config.serverConfig[guildId].messageTemplate;
+			if (messageTemplate !== '') {
+				channel.send(messageTemplate);
+			}
 			channel.send(latestEmbed);
 		}
 	});
@@ -72,11 +76,17 @@ setInterval(() => {
 
 		if (serverObject.releasesChannel !== -1) {
 			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel).catch(error => {
+				Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
 				console.warn('There was a problem while doing the usual scheduled task!', error);
 			});
 		}
 	}
-}, 900000);
+}, 60000);
 // 15 Minutes
 
 client.login(config.token);
+
+// process.on('unhandledRejection', (reason, promise) => {
+// 	console.warn('Unhandled Rejection at: Promise', promise, 'reason', reason);
+// 	console.log(reason.stack);
+// });

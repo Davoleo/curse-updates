@@ -5,11 +5,11 @@ const fileUtils = require('./fileutils');
 const commands = new Map();
 
 commands.set('ping', (message) => {
-	message.channel.send('PONG! - Response Time: ' + message.client.ws.ping + 'ms');
+	message.channel.send('PONG! :ping_pong: - Response Time: ' + message.client.ws.ping + 'ms');
 });
 
 commands.set('changeprefix', (msg) => {
-	if (msg.author.id === 143127230866915328) {
+	if (msg.author.id == '143127230866915328') {
 		let message = msg.content;
 		if (message !== '') {
 			// Trim out everything that is not the new prefix
@@ -105,6 +105,20 @@ commands.set('schedule clearchannel', (message) => {
 	}
 });
 
+commands.set('schedule template', (message) => {
+	if (message.guild !== undefined && message.guild.available) {
+		fileUtils.initSaveGuild(message.guild.id);
+		const template = message.content.replace(config.prefix + 'schedule template', '').trimLeft();
+		fileUtils.setTemplateMessage(message.guild.id, template);
+		if (template !== '') {
+			message.channel.send('The template message has been set to: ```' + template + '```');
+		}
+		else {
+			message.channel.send('The template message has been reset to: ""');
+		}
+	}
+});
+
 commands.set('schedule show', (message) => {
 	if(message.guild != undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
@@ -115,9 +129,19 @@ commands.set('schedule show', (message) => {
 });
 
 commands.set('test', (message) => {
-	if(message.guild != undefined && message.guild.available) {
+	if(message.author.id == '143127230866915328' && message.guild != undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 	}
+});
+
+commands.set('updatestuff', (message) => {
+	if (message.author.id == '143127230866915328') {
+		for (const serverId in config.serverConfig) {
+			config.serverConfig[serverId].templateMessage = '';
+			fileUtils.updateJSONConfig();
+		}
+	}
+	message.channel.send('OwO update complete!');
 });
 
 commands.set('help', (message) => {
@@ -159,6 +183,10 @@ commands.set('help', (message) => {
 		{
 			name: config.prefix + 'schedule clear',
 			value: 'Removes all Curseforge projects from the scheduled check that runs once every 15 minutes',
+		},
+		{
+			name: config.prefix + 'schedule template `<announcementMessage>`',
+			value: 'Sets a template message that is sent together with the update embed once a project update is released (empty template will reset this setting)',
 		},
 		{
 			name: config.prefix + 'help',
