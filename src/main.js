@@ -25,7 +25,7 @@ client.on('ready', () => {
 			status: 'online',
 			afk: false,
 			activity: {
-				name: ' new CurseForge Releases',
+				name: ' for new updates',
 				type: 'WATCHING',
 			},
 		});
@@ -55,15 +55,17 @@ async function queryServerProjects(guildId, projectIds, announcementChannel) {
 	await projectIds.forEach(async project => {
 		console.log('Checking project: ' + project.id);
 		const latestEmbed = await Utils.queryLatest(project.id);
-		const newVersion = latestEmbed.fields[2].value;
-		if (project.version !== newVersion) {
-			embeds.push(latestEmbed);
-			fileutils.updateCachedProject(guildId, project.id, newVersion);
-			const messageTemplate = config.serverConfig[guildId].messageTemplate;
-			if (messageTemplate !== '') {
-				channel.send(messageTemplate);
+		if (latestEmbed != null) {
+			const newVersion = latestEmbed.fields[2].value;
+			if (project.version !== newVersion) {
+				embeds.push(latestEmbed);
+				fileutils.updateCachedProject(guildId, project.id, newVersion);
+				const messageTemplate = config.serverConfig[guildId].messageTemplate;
+				if (messageTemplate !== '') {
+					channel.send(messageTemplate);
+				}
+				channel.send(latestEmbed);
 			}
-			channel.send(latestEmbed);
 		}
 	});
 
@@ -75,18 +77,14 @@ setInterval(() => {
 		const serverObject = config.serverConfig[guildId];
 
 		if (serverObject.releasesChannel !== -1) {
-			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel).catch(error => {
-				Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
-				console.warn('There was a problem while doing the usual scheduled task!', error);
-			});
+			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel)
+				.catch((error) => {
+					Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
+					console.warn('There was a problem while doing the usual scheduled task!', error);
+				});
 		}
 	}
-}, 60000);
+}, 1000 * 60 * 15);
 // 15 Minutes
 
 client.login(config.token);
-
-// process.on('unhandledRejection', (reason, promise) => {
-// 	console.warn('Unhandled Rejection at: Promise', promise, 'reason', reason);
-// 	console.log(reason.stack);
-// });
