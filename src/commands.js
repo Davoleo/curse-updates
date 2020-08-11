@@ -49,8 +49,12 @@ commands.set('schedule add', (message) => {
 		fileUtils.initSaveGuild(message.guild.id);
 		const projectID = message.content.replace(config.prefix + 'schedule add ', '');
 		if (projectID.match(/\d+/)[0] !== ['']) {
-			const stringResult = fileUtils.addProjectToConfig(message.guild.id, projectID);
-			message.channel.send(stringResult);
+			fileUtils.addProjectToConfig(message.guild.id, projectID)
+				.then((resMessage) => message.channel.send(resMessage))
+				.catch((error) => {
+					console.log(error);
+					message.channel.send('There was an issue adding this project to the schedule');
+				});
 		}
 		else {
 			message.channel.send('Project ID is invalid!');
@@ -87,7 +91,7 @@ commands.set('schedule setchannel', (message) => {
 		let channelId = message.content.replace(config.prefix + 'schedule setchannel <#', '');
 		channelId = channelId.replace('>', '');
 
-		if (!channelId.startsWith('||') && channelId.length > 0) {
+		if (!channelId.startsWith(config.prefix) && channelId.length > 0) {
 			fileUtils.saveReleasesChannel(message.guild.id, channelId);
 			message.channel.send('Scheduled projects announcements will start to appear in <#' + channelId + '> once a new project update is published!');
 		}

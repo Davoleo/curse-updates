@@ -8,20 +8,34 @@ module.exports = {
 		this.updateJSONConfig();
 	},
 
-	addProjectToConfig(guildId, projectId) {
-		Utils.queryLatest(projectId).then(embed => {
-			// console.log(embed);
-			if (embed !== null) {
-				const latestFileName = embed.fields[2].value;
-				config.serverConfig[guildId].projects.push({ id: projectId, version: latestFileName });
-				this.updateJSONConfig();
-				return 'Project was added successfully';
+	async addProjectToConfig(guildId, projectId) {
+		const embed = await Utils.queryLatest(projectId);
+		const serverProjects = config.serverConfig[guildId].projects;
+
+		// console.log(embed);
+		if (embed !== null) {
+			const latestFileName = embed.fields[2].value;
+
+			let found = false;
+			for (const project of serverProjects) {
+				if (project.id === projectId) {
+					found = true;
+				}
+			}
+
+			if (!found) {
+				serverProjects.push({ id: projectId, version: latestFileName });
 			}
 			else {
-				return 'There was an issue adding that project to the schedule';
+				return 'This project was already in the bot schedule!';
 			}
-		});
-		// .catch(() => 'There was an issue adding that project to the schedule');
+
+			this.updateJSONConfig();
+			return 'Project was added successfully';
+		}
+		else {
+			return 'There was an issue adding this project to the schedule';
+		}
 	},
 
 	removeProjectFromConfig(guildId, projectId) {
