@@ -1,10 +1,11 @@
-const config = require('../cfg.json');
-const discord = require('discord.js');
+import * as config from '../cfg.json';
+import * as discord from 'discord.js';
 const client = new discord.Client();
-const { commands } = require('./commands');
-const { setInterval } = require('timers');
-const { Utils } = require('./utils');
-const fileutils = require('./fileutils');
+import { commands } from './commands';
+import { setInterval } from 'timers';
+import { Utils } from './utils';
+import fileutils from './fileutils';
+import { CachedProject } from './model/BotConfig';
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -37,20 +38,20 @@ client.on('message', msg => {
 		// The Command message trimmed of the prefix
 		const trimmedCommand = msg.content.replace(config.prefix, '');
 		// If the command message is equals to one of the commands in the Map
-		for (const command of commands.keys()) {
-			if(trimmedCommand.indexOf(command) !== -1) {
+		commands.forEach((command, name) => {
+			if(trimmedCommand.indexOf(name) !== -1) {
 				// Invoke the Command Function
 				// console.log('"' + trimmedCommand + '"');
-				commands.get(command)(msg);
+				command(msg);
 			}
-		}
+		});
 	}
 });
 
-async function queryServerProjects(guildId, projectIds, announcementChannel) {
+async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array<CachedProject>, announcementChannel: discord.Snowflake): Promise<Array<discord.MessageEmbed>> {
 	const embeds = [];
 
-	const channel = await client.channels.fetch(announcementChannel);
+	const channel: discord.TextChannel = await client.channels.fetch(announcementChannel) as discord.TextChannel;
 
 	await projectIds.forEach(async project => {
 		console.log('Checking project: ' + project.id);
