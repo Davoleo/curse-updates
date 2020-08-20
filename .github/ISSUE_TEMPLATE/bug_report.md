@@ -8,6 +8,7 @@ assignees: ''
 ---
 
 ### General Information
+<!-- not everything has to be filled although the more information you give to reproduce a bug the faster and the easier it will be to debug and fix it -->
 
 **Describe the bug:**
 <!-- A clear and concise description of what the bug is. -->
@@ -21,20 +22,13 @@ assignees: ''
 **Expected behavior:**
 <!-- A clear and concise description of what you expected to happen. -->
 
-**Environment Versions**
-<!-- Please write specific version of software that may be related to this issue (avoid saying "the latest" of something) -->
-
 **Logs (if available)**<br>
 **Please Use [gist](https://gist.github.com), [paste.ee](https://paste.ee), [pastebin](https://pastebin.com) or some other log sharing service**
-
 
 ***
 
 ### Additional Information
 **Screenshots (if available):**
 <!-- If applicable, add screenshots to help explain your problem. -->
-
-**Additional context (optional):**
-<!-- Add any other context about the problem here. -->
 
 <!-- Feel Free to delete these comments once you've filled in the template -->
