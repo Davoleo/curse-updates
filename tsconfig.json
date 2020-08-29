@@ -1,14 +1,16 @@
 {
     "compilerOptions": {
+        "rootDir": "./src",
         "outDir": "./build",
         "allowJs": true,
-        "target": "ES6",
+        "target": "ES5",
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "allowUnreachableCode": false,
         "noImplicitAny": true,
         "moduleResolution": "node",
         "resolveJsonModule": true,
+
+        "typeRoots": ["./typings", "./node_modules/@types"]
     },
-    "include": ["./src/**/*"]
 }

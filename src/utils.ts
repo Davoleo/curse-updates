@@ -1,6 +1,9 @@
 import cf from 'mc-curseforge-api';
-import { MessageEmbed, Snowflake, Client } from 'discord.js';
-import * as config from '../cfg.json';
+import { MessageEmbed, Snowflake, Client, EmbedFieldData } from 'discord.js';
+import * as configJson from './cfg.json';
+import { BotConfig } from './model/BotConfig';
+
+const config: BotConfig = Object.assign(configJson);
 const embedColors = [
 	0x404040,
 	0xFEBC11,
@@ -37,10 +40,10 @@ export class Utils {
 	}
 
 	static async buildScheduleEmbed(guildId: Snowflake, client: Client): Promise<MessageEmbed> {
-		const idNamePairs = [];
+		const idNamePairs: EmbedFieldData[] = [];
 
 		config.serverConfig[guildId].projects.forEach(project => {
-			idNamePairs.push({ name: project.id, value: project.version });
+			idNamePairs.push({name: project.id, value: project.version});
 		});
 
 		const embed = new MessageEmbed();
@@ -50,7 +53,7 @@ export class Utils {
 		const releasesChannelId = config.serverConfig[guildId].releasesChannel;
 
 		let channel = null;
-		if (releasesChannelId !== -1) {
+		if (releasesChannelId !== '-1') {
 			channel = await client.channels.fetch(releasesChannelId);
 		}
 
@@ -81,7 +84,7 @@ export class Utils {
 
 	static buildModEmbed(mod: any, modFile: any): MessageEmbed {
 		const modEmbed = new MessageEmbed();
-		const releaseTypeString = this.getTypeStringFromId(modFile.release_type);
+		const releaseTypeString: Release = this.getTypeStringFromId(modFile.release_type);
 		const splitUrl = modFile.download_url.split('/');
 		const fileName = splitUrl[splitUrl.length - 1];
 		let authorString = '';
@@ -95,7 +98,7 @@ export class Utils {
 		modEmbed.setTitle('New ' + mod.name + ' ' + releaseTypeString + '!').setURL(mod.url);
 		modEmbed.setDescription(mod.summary);
 		modEmbed.addField('Authors', authorString);
-		modEmbed.setColor(releaseColors[releaseTypeString]);
+		modEmbed.setColor(releaseColors.get(releaseTypeString));
 		modEmbed.setThumbnail(mod.logo.url);
 		modEmbed.addField('Minecraft Versions', modFile.minecraft_versions.join(', '));
 		modEmbed.addField('New Mod Version', fileName);
@@ -115,7 +118,7 @@ export class Utils {
 		return embed;
 	}
 
-	static getTypeStringFromId(typeId: number): string {
+	static getTypeStringFromId(typeId: number): Release {
 		switch (typeId) {
 		case 1:
 			return 'Release';
@@ -124,7 +127,7 @@ export class Utils {
 		case 3:
 			return 'Alpha';
 		}
-		return '';
+		return null;
 	}
 
 	static sendDMtoDavoleo(client: Client, message: string): void {

@@ -1,8 +1,10 @@
-import * as config from '../cfg.json';
+import * as configJson from './cfg.json';
 import { Utils } from './utils';
 import fileUtils from './fileutils';
 import { Message } from 'discord.js';
+import { BotConfig } from './model/BotConfig';
 
+const config: BotConfig = Object.assign(configJson);
 export const commands = new Map<string, CallableFunction>();
 
 commands.set('ping', (message: Message) => {
@@ -41,7 +43,10 @@ commands.set('latest', (message: Message) => {
 				else {
 					message.channel.send('Response is invalid :(');
 				}
-			}).catch(error => message.channel.send('A promise has been rejected, Error: ' + error));
+			}).catch(error => {
+				console.warn("Error: ", error)
+				message.channel.send('A promise has been rejected, Error: ' + error);
+			});
 	}
 });
 
@@ -142,7 +147,7 @@ commands.set('test', (message: Message) => {
 commands.set('updatestuff', (message: Message) => {
 	if (message.author.id == '143127230866915328') {
 		for (const serverId in config.serverConfig) {
-			config.serverConfig[serverId].templateMessage = '';
+			config.serverConfig[serverId].messageTemplate = '';
 			fileUtils.updateJSONConfig(config);
 		}
 	}

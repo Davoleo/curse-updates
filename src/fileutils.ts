@@ -1,11 +1,13 @@
 import { Utils } from './utils';
-import * as config from '../cfg.json';
+import * as configJson from './cfg.json';
 import * as fs from 'fs';
 import { Snowflake } from 'discord.js';
+import { BotConfig } from './model/BotConfig';
 
-//TODO Fix the "any"s
+const config: BotConfig = Object.assign(configJson);
+
 export default {
-	updateJSONConfig(newConfig: any): void {
+	updateJSONConfig(newConfig: BotConfig): void {
 		fs.writeFile('./cfg.json', JSON.stringify(newConfig, null, 2), function writeJSON(e) {
 			if (e) {
 				console.log(e);
@@ -88,7 +90,7 @@ export default {
 	},
 
 	resetReleasesChannel(guildId: Snowflake): void {
-		config.serverConfig[guildId].releasesChannel = -1;
+		config.serverConfig[guildId].releasesChannel = '-1';
 		this.updateJSONConfig(config);
 	},
 
@@ -101,7 +103,7 @@ export default {
 		if(!(id in config.serverConfig)) {
 			console.log('GUILD INIT');
 			config.serverConfig[id] = {
-				releasesChannel: -1,
+				releasesChannel: '-1',
 				messageTemplate: '',
 				projects: [],
 			};

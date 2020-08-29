@@ -1,11 +1,13 @@
-import * as config from '../cfg.json';
+import * as configJson from './cfg.json';
 import * as discord from 'discord.js';
 const client = new discord.Client();
 import { commands } from './commands';
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import fileutils from './fileutils';
-import { CachedProject } from './model/BotConfig';
+import { CachedProject, BotConfig, ServerConfig } from './model/BotConfig';
+
+const config: BotConfig = Object.assign(configJson);
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -49,7 +51,7 @@ client.on('message', msg => {
 });
 
 async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array<CachedProject>, announcementChannel: discord.Snowflake): Promise<Array<discord.MessageEmbed>> {
-	const embeds = [];
+	const embeds: Array<discord.MessageEmbed> = [];
 
 	const channel: discord.TextChannel = await client.channels.fetch(announcementChannel) as discord.TextChannel;
 
@@ -75,9 +77,9 @@ async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array
 
 setInterval(() => {
 	for (const guildId in config.serverConfig) {
-		const serverObject = config.serverConfig[guildId];
+		const serverObject: ServerConfig = config.serverConfig[guildId];
 
-		if (serverObject.releasesChannel !== -1) {
+		if (serverObject.releasesChannel !== '-1') {
 			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel)
 				.catch((error) => {
 					Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
