@@ -1,5 +1,5 @@
 import * as cf from 'mc-curseforge-api';
-import { MessageEmbed, Snowflake, Client, EmbedFieldData } from 'discord.js';
+import { MessageEmbed, Snowflake, Client, EmbedFieldData, Message } from 'discord.js';
 import * as configJson from './cfg.json';
 import { BotConfig } from './model/BotConfig';
 import { Mod } from '../typings/mc-curseforge-api/objects/Mod';
@@ -135,6 +135,18 @@ export class Utils {
 	static sendDMtoDavoleo(client: Client, message: string): void {
 		client.users.fetch('143127230866915328')
 			.then((davoleo) => davoleo.send(message));
+	}
+
+	static async hasPermission(message: Message): Promise<boolean> {
+		if (message.guild !== null && message.guild.available !== false) {
+			const authorId = message.author.id;
+			const guildMember = await message.guild.members.fetch(authorId);
+			const hasPermission = guildMember.permissions.has("MANAGE_CHANNELS");
+			console.log(hasPermission);
+			return hasPermission;
+		}
+
+		return false;
 	}
 }
 
