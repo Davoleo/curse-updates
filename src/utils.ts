@@ -55,7 +55,7 @@ export class Utils {
 		const releasesChannelId = config.serverConfig[guildId].releasesChannel;
 
 		let channel = null;
-		if (releasesChannelId !== '-1') {
+		if (releasesChannelId != '-1') {
 			channel = await client.channels.fetch(releasesChannelId);
 		}
 

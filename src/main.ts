@@ -77,7 +77,7 @@ setInterval(() => {
 	for (const guildId in config.serverConfig) {
 		const serverObject: ServerConfig = config.serverConfig[guildId];
 
-		if (serverObject.releasesChannel !== '-1') {
+		if (serverObject.releasesChannel != '-1') {
 			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel)
 				.catch((error) => {
 					Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
