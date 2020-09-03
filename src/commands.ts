@@ -1,14 +1,17 @@
-const config = require('../cfg.json');
-const { Utils } = require('./utils');
-const fileUtils = require('./fileutils');
+import * as configJson from './cfg.json';
+import { Utils } from './utils';
+import fileUtils from './fileutils';
+import { Message } from 'discord.js';
+import { BotConfig } from './model/BotConfig';
 
-const commands = new Map();
+const config: BotConfig = Object.assign(configJson);
+export const commands = new Map<string, CallableFunction>();
 
-commands.set('ping', (message) => {
+commands.set('ping', (message: Message) => {
 	message.channel.send('PONG! :ping_pong: - Response Time: ' + message.client.ws.ping + 'ms');
 });
 
-commands.set('changeprefix', (msg) => {
+commands.set('changeprefix', (msg: Message) => {
 	if (msg.author.id == '143127230866915328') {
 		let message = msg.content;
 		if (message !== '') {
@@ -28,28 +31,31 @@ commands.set('changeprefix', (msg) => {
 	}
 });
 
-commands.set('latest', (message) => {
+commands.set('latest', (message: Message) => {
 	const id = message.content.replace(config.prefix + 'latest ', '');
 
 	if (id !== '') {
-		Utils.queryLatest(id)
+		Utils.queryLatest(id as unknown as number)
 			.then((response) => {
-				if (response !== undefined && response !== null && response !== '') {
+				if (response !== undefined && response !== null) {
 					message.channel.send(response);
 				}
 				else {
 					message.channel.send('Response is invalid :(');
 				}
-			}).catch(error => message.channel.send('A promise has been rejected, Error: ' + error));
+			}).catch(error => {
+				console.warn("Error: ", error)
+				message.channel.send('A promise has been rejected, Error: ' + error);
+			});
 	}
 });
 
-commands.set('schedule add', (message) => {
+commands.set('schedule add', (message: Message) => {
 	if(message.guild !== undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 		const projectID = message.content.replace(config.prefix + 'schedule add ', '');
-		if (projectID.match(/\d+/)[0] !== ['']) {
-			fileUtils.addProjectToConfig(message.guild.id, projectID)
+		if (projectID.match(/\d+/)[0] !== '') {
+			fileUtils.addProjectToConfig(message.guild.id, projectID as unknown as number)
 				.then((resMessage) => message.channel.send(resMessage))
 				.catch((error) => {
 					console.log(error);
@@ -62,12 +68,12 @@ commands.set('schedule add', (message) => {
 	}
 });
 
-commands.set('schedule remove', (message) => {
+commands.set('schedule remove', (message: Message) => {
 	if (message.guild !== undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 		const projectID = message.content.replace(config.prefix + 'schedule remove ', '');
-		if (projectID.match(/\d+/)[0] !== ['']) {
-			const stringResult = fileUtils.removeProjectFromConfig(message.guild.id, projectID);
+		if (projectID.match(/\d+/)[0] !== '') {
+			const stringResult = fileUtils.removeProjectFromConfig(message.guild.id, projectID as unknown as number);
 			message.channel.send(stringResult);
 		}
 		else {
@@ -76,7 +82,7 @@ commands.set('schedule remove', (message) => {
 	}
 });
 
-commands.set('schedule clear', (message) => {
+commands.set('schedule clear', (message: Message) => {
 	if (message.guild !== undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 		fileUtils.clearSchedule(message.guild.id);
@@ -84,7 +90,7 @@ commands.set('schedule clear', (message) => {
 	}
 });
 
-commands.set('schedule setchannel', (message) => {
+commands.set('schedule setchannel', (message: Message) => {
 	if (message.guild !== undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 
@@ -101,7 +107,7 @@ commands.set('schedule setchannel', (message) => {
 	}
 });
 
-commands.set('schedule clearchannel', (message) => {
+commands.set('schedule clearchannel', (message: Message) => {
 	if (message.guild !== undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 		fileUtils.resetReleasesChannel(message.guild.id);
@@ -109,7 +115,7 @@ commands.set('schedule clearchannel', (message) => {
 	}
 });
 
-commands.set('schedule template', (message) => {
+commands.set('schedule template', (message: Message) => {
 	if (message.guild !== undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 		const template = message.content.replace(config.prefix + 'schedule template', '').trimLeft();
@@ -123,7 +129,7 @@ commands.set('schedule template', (message) => {
 	}
 });
 
-commands.set('schedule show', (message) => {
+commands.set('schedule show', (message: Message) => {
 	if(message.guild != undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 		Utils.buildScheduleEmbed(message.guild.id, message.client).then(embed => {
@@ -132,23 +138,23 @@ commands.set('schedule show', (message) => {
 	}
 });
 
-commands.set('test', (message) => {
+commands.set('test', (message: Message) => {
 	if(message.author.id == '143127230866915328' && message.guild != undefined && message.guild.available) {
 		fileUtils.initSaveGuild(message.guild.id);
 	}
 });
 
-commands.set('updatestuff', (message) => {
+commands.set('updatestuff', (message: Message) => {
 	if (message.author.id == '143127230866915328') {
 		for (const serverId in config.serverConfig) {
-			config.serverConfig[serverId].templateMessage = '';
-			fileUtils.updateJSONConfig();
+			config.serverConfig[serverId].messageTemplate = '';
+			fileUtils.updateJSONConfig(config);
 		}
 	}
 	message.channel.send('OwO update complete!');
 });
 
-commands.set('help', (message) => {
+commands.set('help', (message: Message) => {
 	const embed = Utils.createEmbed('Commands: ');
 
 	embed.addFields([

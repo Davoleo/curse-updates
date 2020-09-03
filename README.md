@@ -18,8 +18,8 @@ If you're having issues with the bot or you would like to suggest a new feature,
 ### Running your own version of this bot (Self-Hosting)
 If you want to self-host this discord bot you can do so by following these steps:<br>
 - Download/Clone the project sources from Github _(the green button)_
-- Create a new `cfg.json` file inside the bot directory _(**not** inside the src directory)_
-- Fill `cfg.json` with this template replacing the dummy data with your configuration:
+- Create a new `cfg.json` file in the `src` directory
+- Fill `cfg.json` with this template replacing the dummy data with your configuration options:
 ```json
 {
   "prefix": "||",
@@ -30,6 +30,7 @@ If you want to self-host this discord bot you can do so by following these steps
 }
 ```
 _(note that the prefix should be maximum 3 chars long)_
-_(you should replace the discord client token to start the bot with your own)_
-- To run the bot just open a terminal in the main directory and run this command: `npm run bot`
+_(you should replace the discord client token to start the bot with your own (you can get one in the Discord Applications dev portal))_
+- To build the bot open a terminal in the main directory and run this command: `npm run build`
+- To start it run `npm run bot` in the same directory as before
 - Invite the bot to your server and enjoy :)

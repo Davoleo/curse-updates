@@ -1,25 +1,30 @@
-const cf = require('mc-curseforge-api');
-const { MessageEmbed } = require('discord.js');
-const config = require('../cfg.json');
+import cf from 'mc-curseforge-api';
+import { MessageEmbed, Snowflake, Client, EmbedFieldData } from 'discord.js';
+import * as configJson from './cfg.json';
+import { BotConfig } from './model/BotConfig';
+
+const config: BotConfig = Object.assign(configJson);
 const embedColors = [
-	'404040',
-	'FEBC11',
-	'F26122',
+	0x404040,
+	0xFEBC11,
+	0xF26122,
 ];
-const releaseColors = {
-	Alpha: 'ED493E',
-	Beta: '0E9BD8',
-	Release: '14B866',
-};
+
+type Release = 'Alpha' | 'Beta' | "Release";
+
+const releaseColors = new Map<Release, number>();
+releaseColors.set('Alpha', 0xED493E)
+releaseColors.set('Beta', 0x0E9BD8);
+releaseColors.set('Release', 0x14B866);
 
 
-class Utils {
+export class Utils {
 	// cf getMod Wrapper function
-	static async getModById(id) {
+	static async getModById(id: number): Promise<any> {
 		return cf.getMod(id);
 	}
 
-	static createEmbed(title, description = '') {
+	static createEmbed(title: string, description = ''): MessageEmbed {
 		const embed = new MessageEmbed();
 
 		embed.setTitle(title);
@@ -34,11 +39,11 @@ class Utils {
 		return embed;
 	}
 
-	static async buildScheduleEmbed(guildId, client) {
-		const idNamePairs = [];
+	static async buildScheduleEmbed(guildId: Snowflake, client: Client): Promise<MessageEmbed> {
+		const idNamePairs: EmbedFieldData[] = [];
 
 		config.serverConfig[guildId].projects.forEach(project => {
-			idNamePairs.push({ name: project.id, value: project.version });
+			idNamePairs.push({name: project.id, value: project.version});
 		});
 
 		const embed = new MessageEmbed();
@@ -48,7 +53,7 @@ class Utils {
 		const releasesChannelId = config.serverConfig[guildId].releasesChannel;
 
 		let channel = null;
-		if (releasesChannelId !== -1) {
+		if (releasesChannelId !== '-1') {
 			channel = await client.channels.fetch(releasesChannelId);
 		}
 
@@ -77,9 +82,9 @@ class Utils {
 		return embed;
 	}
 
-	static buildModEmbed(mod, modFile) {
+	static buildModEmbed(mod: any, modFile: any): MessageEmbed {
 		const modEmbed = new MessageEmbed();
-		const releaseTypeString = this.getTypeStringFromId(modFile.release_type);
+		const releaseTypeString: Release = this.getTypeStringFromId(modFile.release_type);
 		const splitUrl = modFile.download_url.split('/');
 		const fileName = splitUrl[splitUrl.length - 1];
 		let authorString = '';
@@ -93,7 +98,7 @@ class Utils {
 		modEmbed.setTitle('New ' + mod.name + ' ' + releaseTypeString + '!').setURL(mod.url);
 		modEmbed.setDescription(mod.summary);
 		modEmbed.addField('Authors', authorString);
-		modEmbed.setColor(releaseColors[releaseTypeString]);
+		modEmbed.setColor(releaseColors.get(releaseTypeString));
 		modEmbed.setThumbnail(mod.logo.url);
 		modEmbed.addField('Minecraft Versions', modFile.minecraft_versions.join(', '));
 		modEmbed.addField('New Mod Version', fileName);
@@ -106,14 +111,14 @@ class Utils {
 		return modEmbed;
 	}
 
-	static async queryLatest(id) {
+	static async queryLatest(id: number): Promise<MessageEmbed> {
 		const mod = await cf.getMod(id);
 		const latestFile = mod.latestFiles[mod.latestFiles.length - 1];
 		const embed = this.buildModEmbed(mod, latestFile);
 		return embed;
 	}
 
-	static getTypeStringFromId(typeId) {
+	static getTypeStringFromId(typeId: number): Release {
 		switch (typeId) {
 		case 1:
 			return 'Release';
@@ -122,9 +127,10 @@ class Utils {
 		case 3:
 			return 'Alpha';
 		}
+		return null;
 	}
 
-	static sendDMtoDavoleo(client, message) {
+	static sendDMtoDavoleo(client: Client, message: string): void {
 		client.users.fetch('143127230866915328')
 			.then((davoleo) => davoleo.send(message));
 	}

@@ -1,14 +1,27 @@
-const { Utils } = require('./utils');
-const config = require('../cfg.json');
-const fs = require('fs');
+import { Utils } from './utils';
+import * as configJson from './cfg.json';
+import * as fs from 'fs';
+import { Snowflake } from 'discord.js';
+import { BotConfig } from './model/BotConfig';
 
-module.exports = {
-	savePrefix(prefix) {
-		config.prefix = prefix;
-		this.updateJSONConfig();
+const config: BotConfig = Object.assign(configJson);
+
+export default {
+	updateJSONConfig(newConfig: BotConfig): void {
+		fs.writeFile('./cfg.json', JSON.stringify(newConfig, null, 2), function writeJSON(e) {
+			if (e) {
+				console.log(e);
+			}
+		});
 	},
 
-	async addProjectToConfig(guildId, projectId) {
+	savePrefix(prefix: string): void {
+		const newConfig = config;
+		newConfig.prefix = prefix;
+		this.updateJSONConfig(newConfig);
+	},
+
+	async addProjectToConfig(guildId: Snowflake, projectId: number): Promise<string> {
 		const embed = await Utils.queryLatest(projectId);
 		const serverProjects = config.serverConfig[guildId].projects;
 
@@ -25,12 +38,13 @@ module.exports = {
 
 			if (!found) {
 				serverProjects.push({ id: projectId, version: latestFileName });
+				//TODO: send the first update right when you add the project if a channel was already set
 			}
 			else {
 				return 'This project was already in the bot schedule!';
 			}
 
-			this.updateJSONConfig();
+			this.updateJSONConfig(config);
 			return 'Project was added successfully';
 		}
 		else {
@@ -38,7 +52,7 @@ module.exports = {
 		}
 	},
 
-	removeProjectFromConfig(guildId, projectId) {
+	removeProjectFromConfig(guildId: Snowflake, projectId: number): string {
 		let found = false;
 		const projectsArray = config.serverConfig[guildId].projects;
 
@@ -47,61 +61,53 @@ module.exports = {
 				found = true;
 				const indexOfProject = projectsArray.indexOf(projectObj);
 				projectsArray.splice(indexOfProject, 1);
-				this.updateJSONConfig();
+				this.updateJSONConfig(config);
 			}
 		});
 
 		return found ? 'Project was removed successfully' : 'The project you want to remove is not part of the scheduled check';
 	},
 
-	clearSchedule(guildId) {
+	clearSchedule(guildId: Snowflake): void {
 		config.serverConfig[guildId].projects = [];
-		this.updateJSONConfig();
+		this.updateJSONConfig(config);
 	},
 
-	updateCachedProject(guildId, projectId, newVersion) {
+	updateCachedProject(guildId: Snowflake, projectId: number, newVersion: string): void {
 		if (config.serverConfig[guildId].projects.length > 0) {
 			config.serverConfig[guildId].projects.forEach((project) => {
 				if (project.id === projectId) {
 					project.version = newVersion;
-					this.updateJSONConfig();
+					this.updateJSONConfig(config);
 				}
 			});
 		}
 	},
 
-	saveReleasesChannel(guildId, channelId) {
+	saveReleasesChannel(guildId: Snowflake, channelId: Snowflake): void {
 		config.serverConfig[guildId].releasesChannel = channelId;
-		this.updateJSONConfig();
+		this.updateJSONConfig(config);
 	},
 
-	resetReleasesChannel(guildId) {
-		config.serverConfig[guildId].releasesChannel = -1;
-		this.updateJSONConfig();
+	resetReleasesChannel(guildId: Snowflake): void {
+		config.serverConfig[guildId].releasesChannel = '-1';
+		this.updateJSONConfig(config);
 	},
 
-	setTemplateMessage(guildId, message) {
+	setTemplateMessage(guildId: Snowflake, message: string): void {
 		config.serverConfig[guildId].messageTemplate = message;
-		this.updateJSONConfig();
+		this.updateJSONConfig(config);
 	},
 
-	initSaveGuild(id) {
+	initSaveGuild(id: Snowflake): void {
 		if(!(id in config.serverConfig)) {
 			console.log('GUILD INIT');
 			config.serverConfig[id] = {
-				releasesChannel: -1,
+				releasesChannel: '-1',
 				messageTemplate: '',
 				projects: [],
 			};
-			this.updateJSONConfig();
+			this.updateJSONConfig(config);
 		}
-	},
-
-	updateJSONConfig() {
-		fs.writeFile('./cfg.json', JSON.stringify(config, null, 2), function writeJSON(e) {
-			if (e) {
-				return console.log(e);
-			}
-		});
-	},
+	}
 };
