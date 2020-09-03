@@ -1,7 +1,9 @@
-import cf from 'mc-curseforge-api';
+import * as cf from 'mc-curseforge-api';
 import { MessageEmbed, Snowflake, Client, EmbedFieldData } from 'discord.js';
 import * as configJson from './cfg.json';
 import { BotConfig } from './model/BotConfig';
+import { Mod } from '../typings/mc-curseforge-api/objects/Mod';
+import { ModFile } from '../typings/mc-curseforge-api/objects/Files';
 
 const config: BotConfig = Object.assign(configJson);
 const embedColors = [
@@ -20,7 +22,7 @@ releaseColors.set('Release', 0x14B866);
 
 export class Utils {
 	// cf getMod Wrapper function
-	static async getModById(id: number): Promise<any> {
+	static async getModById(id: number): Promise<Mod> {
 		return cf.getMod(id);
 	}
 
@@ -82,9 +84,9 @@ export class Utils {
 		return embed;
 	}
 
-	static buildModEmbed(mod: any, modFile: any): MessageEmbed {
+	static buildModEmbed(mod: Mod, modFile: ModFile): MessageEmbed {
 		const modEmbed = new MessageEmbed();
-		const releaseTypeString: Release = this.getTypeStringFromId(modFile.release_type);
+		const releaseTypeString: Release = this.getTypeStringFromId(modFile.release_type as unknown as number);
 		const splitUrl = modFile.download_url.split('/');
 		const fileName = splitUrl[splitUrl.length - 1];
 		let authorString = '';

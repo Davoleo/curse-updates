@@ -42,7 +42,7 @@ export declare class Mod {
     getDescription(): Promise<string>;
     id: number;
     name: string;
-    authors: Array<string>;
+    authors: Array<Author>;
     attachments: Array<unknown>;
     url: string;
     summary: string;
@@ -54,10 +54,19 @@ export declare class Mod {
     popularityScore: number;
     gamePopularityRank: number;
     primaryLanguage: string;
-    logo: unknown;
+    logo: Logo;
     updated: string;
     created: string;
     released: string;
     available: boolean;
     experimental: boolean;
+}
+
+export declare interface Author {
+    name: string;
+    url: string;
+}
+
+export declare interface Logo {
+    url: string;
 }

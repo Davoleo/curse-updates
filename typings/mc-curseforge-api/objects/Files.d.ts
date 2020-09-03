@@ -52,7 +52,7 @@ export declare class ModFile {
     minecraft_versions: Array<string>;
     file_name: string;
     file_size: string;
-    timestamp: string;
+    timestamp: Date;
     release_type: string;
     download_url: string;
     downloads: number;
