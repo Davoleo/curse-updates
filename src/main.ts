@@ -37,11 +37,9 @@ client.on('ready', () => {
 
 client.on('message', msg => {
 	if(msg.content.startsWith(config.prefix)) {
-		// The Command message trimmed of the prefix
-		const trimmedCommand = msg.content.replace(config.prefix, '');
 		// If the command message is equals to one of the commands in the Map
 		commands.forEach((command, name) => {
-			if(trimmedCommand.indexOf(name) !== -1) {
+			if(msg.content.indexOf(config.prefix + name) !== -1) {
 				// Invoke the Command Function
 				// console.log('"' + trimmedCommand + '"');
 				command(msg);
