@@ -80,6 +80,11 @@ setInterval(() => {
 		if (serverObject.releasesChannel != '-1') {
 			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel)
 				.catch((error) => {
+					if (error == "DiscordAPIError: Missing Access") {
+						// TODO Temporary Solution to fix error spam when the bot is kicked from a server
+						fileutils.resetReleasesChannel(guildId);
+						Utils.sendDMtoDavoleo(client, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guildId + "/widget.json");
+					}
 					Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
 					console.warn('There was a problem while doing the usual scheduled task!', error);
 				});

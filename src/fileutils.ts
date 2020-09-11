@@ -109,5 +109,14 @@ export default {
 			};
 			this.updateJSONConfig(config);
 		}
+	},
+
+	clearGuild(id: Snowflake): boolean {
+		if (id in config.serverConfig) {
+			delete config.serverConfig.id;
+			this.updateJSONConfig(config)
+			return true;
+		}
+		else return false;
 	}
 };
