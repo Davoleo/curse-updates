@@ -12,7 +12,7 @@ It can announce new versions of:<br>
 If you're having issues with the bot or you would like to suggest a new feature, please consider opening a new bug report thread on the [issue tracker](https://github.com/Davoleo/curse-updates/issues).
 
 ### Inviting the original version of this bot.
-**At the moment this bot is in experimental state**, so I should stress that the invite link *is not* public for this reason, if you're a modpack or a mod developer that is at least moderately famous for a specific Curseforge Project project we can discuss it on my Discord Server at http://discord.davoleo.net and I might give you the invite link for the main bot version that is running on my VPS. Although don't take for granted that you'll get access to this version since I don't want it to spread too much yet.<br>
+**At the moment this bot is in experimental state** and the invite link *is not* public for this reason, if you're a modpack or a mod developer that is at at least a bit famous for a Curseforge Project project we can discuss it on my Discord Server at http://discord.davoleo.net and I might give you the invite link for the main bot version that is running on my VPS. Although don't take for granted that you'll get access to this version since I don't want it to spread too much yet.<br>
 *I may publish the invite link in the future when the project is a bit more stable*.
 
 ### Running your own version of this bot (Self-Hosting)
