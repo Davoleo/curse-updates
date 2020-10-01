@@ -15,7 +15,7 @@ const embedColors = [
 type Release = 'Alpha' | 'Beta' | "Release";
 
 const releaseColors = new Map<Release, number>();
-releaseColors.set('Alpha', 0xED493E)
+releaseColors.set('Alpha', 0xD3CAE8)
 releaseColors.set('Beta', 0x0E9BD8);
 releaseColors.set('Release', 0x14B866);
 
