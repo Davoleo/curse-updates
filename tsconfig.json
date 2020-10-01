@@ -2,7 +2,7 @@
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./build",
-        "allowJs": true,
+        "allowJs": false,
         "target": "ES5",
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,

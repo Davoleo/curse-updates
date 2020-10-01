@@ -8,7 +8,7 @@ const config: BotConfig = Object.assign(configJson);
 
 export default {
 	updateJSONConfig(newConfig: BotConfig): void {
-		fs.writeFile('./cfg.json', JSON.stringify(newConfig, null, 2), function writeJSON(e) {
+		fs.writeFile('./build/cfg.json', JSON.stringify(newConfig, null, 2), function writeJSON(e) {
 			if (e) {
 				console.log(e);
 			}
