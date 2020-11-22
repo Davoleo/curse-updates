@@ -6,7 +6,6 @@ function run(args: string[]) {
         return 'You can assign a string of up to 3 characters as prefix!';
     }
     else {
-        fileUtils.savePrefix(args[0]);
         return '`' + args[0] + '` is now the current prefix for commands';
     }
 }

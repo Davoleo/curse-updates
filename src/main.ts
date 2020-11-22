@@ -1,10 +1,10 @@
 import * as configJson from './cfg.json';
 import * as discord from 'discord.js';
-import { commands } from './commands';
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import fileutils from './fileutils';
 import { CachedProject, BotConfig, ServerConfig } from './model/BotConfig';
+import loadCommands from './commandLoader';
 
 const client = new discord.Client();
 
@@ -35,6 +35,8 @@ client.on('ready', () => {
 		});
 	}
 });
+
+const commands = loadCommands();
 
 client.on('message', msg => {
 	if(msg.content.startsWith(config.prefix)) {
