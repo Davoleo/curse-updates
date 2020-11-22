@@ -19,6 +19,13 @@ releaseColors.set('Alpha', 0xD3CAE8)
 releaseColors.set('Beta', 0x0E9BD8);
 releaseColors.set('Release', 0x14B866);
 
+///The different levels of permission that may be needed to execute a certain command
+export enum Permission {
+    USER,
+    MODERATOR,
+    ADMINISTRATOR,
+    DAVOLEO
+}
 
 export class Utils {
 	// cf getMod Wrapper function
@@ -137,17 +144,25 @@ export class Utils {
 			.then((davoleo) => davoleo.send(message));
 	}
 
-	static async hasPermission(message: Message): Promise<boolean> {
+	static async hasPermission(message: Message, permissionLevel: Permission): Promise<boolean> {
 		if (message.guild !== null && message.guild.available !== false) {
 			const authorId = message.author.id;
 			const guildMember = await message.guild.members.fetch(authorId);
-			const hasPermission = guildMember.permissions.has("MANAGE_CHANNELS");
-			console.log(hasPermission);
-			return hasPermission;
+
+			switch (permissionLevel) {
+				case Permission.DAVOLEO:
+					return authorId === '143127230866915328';
+				case Permission.ADMINISTRATOR:
+					return guildMember.permissions.has("ADMINISTRATOR");
+				case Permission.MODERATOR:
+					return guildMember.permissions.has("MANAGE_CHANNELS");
+				case Permission.USER:
+					return true;
+				default:
+					return false;
+			}
 		}
 
 		return false;
 	}
 }
-
-exports.Utils = Utils;

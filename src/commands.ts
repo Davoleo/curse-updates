@@ -3,32 +3,35 @@ import { Utils } from './utils';
 import fileUtils from './fileutils';
 import { Message } from 'discord.js';
 import { BotConfig } from './model/BotConfig';
+import Command from './model/Command';
+import * as fs from 'fs';
 
 const config: BotConfig = Object.assign(configJson);
-export const commands = new Map<string, CallableFunction>();
 
-commands.set('ping', (message: Message) => {
-	message.channel.send('PONG! :ping_pong: - Response Time: ' + message.client.ws.ping + 'ms');
+export const commands = new Array<Command>();
+
+fs.readdir('./build/commands/util', (error, files) => {
+	if (error)
+		console.error(error);
+	console.log("Loading " + files.length + " util commands");
+	files.forEach(file => {
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const command = require('./commands/util/' + file);
+		commands.push(command);
+		delete require.cache[require.resolve("./commands/util/" + file)];
+	});
 });
 
-commands.set('changeprefix', (msg: Message) => {
-	if (msg.author.id == '143127230866915328') {
-		let message = msg.content;
-		if (message !== '') {
-			// Trim out everything that is not the new prefix
-			message = message.replace(config.prefix + 'changeprefix ', '');
-			if (message.length > 3) {
-				msg.channel.send('You can assign a string of up to 3 characters as prefix!');
-			}
-			else {
-				fileUtils.savePrefix(message);
-				msg.channel.send('`' + message + '` is now the current prefix for commands');
-			}
-		}
-	}
-	else {
-		msg.channel.send('This command is only usable by <@143127230866915328> right now');
-	}
+fs.readdir('./build/commands/schedule', (error, files) => {
+	if (error)
+		console.error(error);
+	console.log("Loading " + files.length + " scheduling commands");
+	files.forEach(file => {
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		const command = require('./commands/schedule/' + file);
+		commands.push(command);
+		delete require.cache[require.resolve("./commands/schedule/" + file)];
+	});
 });
 
 commands.set('latest', (message: Message) => {

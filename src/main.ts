@@ -1,11 +1,12 @@
 import * as configJson from './cfg.json';
 import * as discord from 'discord.js';
-const client = new discord.Client();
 import { commands } from './commands';
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import fileutils from './fileutils';
 import { CachedProject, BotConfig, ServerConfig } from './model/BotConfig';
+
+const client = new discord.Client();
 
 const config: BotConfig = Object.assign(configJson);
 
