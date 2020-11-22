@@ -8,8 +8,12 @@ function run(_: string[], messageRef: Message) {
 
 export const ping: Command = new Command(
     'ping', 
-    'Sends a message with information about the latency of the bot response',
-    false,
-    run,
-    Permission.USER
+    {
+        description: 'Sends a message with information about the latency of the bot response',
+        isGuild: false,
+        action: run,
+        permLevel: Permission.USER,
+        argNames: [],
+        async: false
+    }
 );
