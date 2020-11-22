@@ -7,13 +7,17 @@ export default class Command {
     private isGuildCommand:  boolean;
     private action: CallableFunction;
     private permissionLevel: Permission;
+    private argNames: string[];
+    private async: boolean;
 
-    constructor(name: string, description: string, isGuild: boolean, action: CallableFunction, permLevel: Permission) {
+    constructor(name: string, options: CommandOptions) {
         this.name = name;
-        this.description = description;
-        this.isGuildCommand = isGuild;
-        this.action = action;
-        this.permissionLevel = permLevel;
+        this.description = options.description;
+        this.isGuildCommand = options.isGuild;
+        this.action = options.action;
+        this.permissionLevel = options.permLevel;
+        this.argNames = options.argNames;
+        this.async = options.async;
     }
 
     execute(message: Message): void {
@@ -29,8 +33,18 @@ export default class Command {
                         const splitCommand = command.split(' ');
 
                         if (splitCommand.shift() === this.name) {
-                            const response = this.action(splitCommand, message);
-                            message.channel.send(response);
+                            if (!this.async) {
+                                const response = this.action(splitCommand, message);
+                                message.channel.send(response);
+                            } else {
+                                this.action(splitCommand, message).then((response: unknown) => {
+                                    message.channel.send(response);
+                                })
+                                .catch((error: string) => {
+                                    console.warn("Error: ", error)
+                                    message.channel.send('There was an error during the async execution of the command `' + name +  '`, Error: ' + error);
+                                })
+                            }
                         }
                     }
                 }
@@ -40,4 +54,13 @@ export default class Command {
             message.channel.send(response);
         }
     }
+}
+
+class CommandOptions {
+    description: string;
+    isGuild: boolean; 
+    action: CallableFunction; 
+    permLevel: Permission; 
+    argNames: string[]; 
+    async: boolean;
 }
