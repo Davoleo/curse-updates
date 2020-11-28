@@ -1,30 +1,10 @@
-import { commands } from "../../commands";
+import { buildHelpEmbed } from "../../embedBuilder";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
-function run() {
+function run(args: string[]) {
 
-    const embed = Utils.createEmbed('Commands: ');
-
-    commands.forEach(command => {
-        if (command.argNames.length > 0) {
-            let commandName = config.prefix + command.name;
-            command.argNames.forEach(argument => {
-                commandName += " `" + argument + "`";
-            });
-
-            embed.addField({
-                name: commandName,
-                value: command.description,
-            });
-        } 
-        else {
-            embed.addField({
-                name: config.prefix + command.name,
-                value: command.description,
-            });
-        }
-    });
+    const embed = buildHelpEmbed('Commands: ', args[0]);
     
     return embed;
 }

@@ -5,7 +5,7 @@ import { Utils, Permission } from "../utils";
 export default class Command {
     public name: string;
     public description: string;
-    private category?: string = "";
+    public category?: string = "";
     private isGuildCommand:  boolean;
     private action: CallableFunction;
     private permissionLevel: Permission;

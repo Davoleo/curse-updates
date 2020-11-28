@@ -2,12 +2,12 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run() {
-    for (const serverId in config.serverConfig) {
-        config.serverConfig[serverId].messageTemplate = '';
-        fileUtils.updateJSONConfig(config);
-    }
+    // for (const serverId in config.serverConfig) {
+    //     config.serverConfig[serverId].messageTemplate = '';
+    //     fileUtils.updateJSONConfig(config);
+    // }
 
-    return 'OwO update complete!';
+    return 'There\'s no code to update anything here -_-\'';
 }
 
 export const ping: Command = new Command(

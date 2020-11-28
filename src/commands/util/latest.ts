@@ -10,7 +10,7 @@ async function run(args: string[]) {
             return response;
         }
         else {
-            return "Invalid Reposnse!"
+            return "Invalid Response!"
         }
     } else 
         return "Project ID argument can't be empty!"

@@ -64,25 +64,24 @@ function updateCachedProject(id: number, newVersion: string): void {
 
 //#region ServerConfig
 
-function getPrefix(serverId: Snowflake): string {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
-    return server.prefix;
+function getServerConfig(serverId: Snowflake): ServerConfig {
+    return serverCollection.findOne({serverId: serverId});
 }
 
 function updatePrefix(serverId: Snowflake, prefix: string): void {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
+    const server: ServerConfig = getServerConfig(serverId);
     server.prefix = prefix;
     serverCollection.update(server);
 }
 
 function addProjectToSchedule(serverId: Snowflake, projectId: number): void {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId})
+    const server: ServerConfig = getServerConfig(serverId);
     server.projectIds.push(projectId);
     serverCollection.update(server);
 }
 
 function removeProjectFromSchedule(serverId: Snowflake, projectId: number): boolean {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
+    const server: ServerConfig = getServerConfig(serverId);
     let found = false;
     
     server.projectIds.forEach(id => {
@@ -98,25 +97,25 @@ function removeProjectFromSchedule(serverId: Snowflake, projectId: number): bool
 }
 
 function clearProjectsSchedule(serverId: Snowflake): void {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
+    const server: ServerConfig = getServerConfig(serverId);
     server.projectIds = [];
     serverCollection.update(server)
 }
 
 function setReleseChannel(serverId: Snowflake, channelId: Snowflake): void {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
+    const server: ServerConfig = getServerConfig(serverId);
     server.releasesChannel = channelId;
     serverCollection.update(server);
 }
 
 function resetReleaseChannel(serverId: Snowflake): void {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
+    const server: ServerConfig = getServerConfig(serverId);
     server.releasesChannel = '-1';
     serverCollection.update(server);
 }
 
 function setTemplateMessage(serverId: Snowflake, message: string): void {
-    const server: ServerConfig = serverCollection.findOne({serverId: serverId});
+    const server: ServerConfig = getServerConfig(serverId);
     server.messageTemplate = message;
     serverCollection.update(server);
 }
@@ -135,12 +134,12 @@ export const cacheHandler = {
 }
 
 export const guildHandler = {
-    getPrefix,
     updatePrefix,
     addProjectToSchedule,
     removeProjectFromSchedule,
     clearProjectsSchedule,
     setReleseChannel,
     resetReleaseChannel,
-    setTemplateMessage
+    setTemplateMessage,
+    getServerConfig
 }

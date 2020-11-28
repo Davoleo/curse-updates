@@ -1,10 +1,10 @@
-import * as jsonConfig from './data/config.json';
 import * as discord from 'discord.js';
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import fileutils from './fileutils';
 import { CachedProject, ServerConfig } from './model/BotConfig';
 import loadCommands from './commandLoader';
+import { guildHandler } from './data/dataHandler';
 
 const client = new discord.Client();
 
@@ -36,16 +36,17 @@ client.on('ready', () => {
 	}
 });
 
-const commands = loadCommands();
+export const commands = loadCommands();
 
 client.on('message', msg => {
-	if(msg.content.startsWith(config.prefix)) {
-		commands.forEach(command => {
-			// Invoke the Command
-			// console.log('"' + trimmedCommand + '"');
-			command.execute(msg);
-		});
-	}
+
+	// Handle pinging the bot
+	if (msg.content === '<@658271214116274196>' && msg.guild.id !== null && msg.guild.available)
+		msg.channel.send("Hey, my prefix in this server is: `" + guildHandler.getServerConfig(msg.guild.id) + '`');
+
+	commands.forEach(command => {
+		command.execute(msg);
+	});
 });
 
 async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array<CachedProject>, announcementChannel: discord.Snowflake): Promise<Array<discord.MessageEmbed>> {
@@ -61,7 +62,7 @@ async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array
 			if (project.version !== newVersion) {
 				embeds.push(latestEmbed);
 				fileutils.updateCachedProject(guildId, project.id, newVersion);
-				const messageTemplate = config.serverConfig[guildId].messageTemplate;
+				const messageTemplate = guildHandler.getTemplateMessage(guildId);
 				if (messageTemplate !== '') {
 					channel.send(messageTemplate);
 				}
@@ -78,7 +79,7 @@ setInterval(() => {
 		const serverObject: ServerConfig = config.serverConfig[guildId];
 
 		if (serverObject.releasesChannel != '-1') {
-			queryServerProjects(guildId, serverObject.projects, serverObject.releasesChannel)
+			queryServerProjects(guildId, guildHandler, serverObject.releasesChannel)
 				.catch((error) => {
 					if (error == "DiscordAPIError: Missing Access") {
 						// TODO Temporary Solution to fix error spam when the bot is kicked from a server

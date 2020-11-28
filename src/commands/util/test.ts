@@ -1,9 +1,11 @@
 import { Message } from "discord.js";
+import { guildInitializer } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
-    fileUtils.initSaveGuild(messageRef.guild.id);
+    guildInitializer.initServerConfig(messageRef.guild.id);
+    return "Initializing this server's Data Package";
 }
 
 export const ping: Command = new Command(
