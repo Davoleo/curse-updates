@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { guildHandler, guildInitializer } from "../data/dataHandler";
 import { Utils, Permission } from "../utils";
 
 export default class Command {
@@ -24,14 +25,15 @@ export default class Command {
 
     execute(message: Message): void {
         if (this.isGuildCommand) {
-            fileUtils.initSaveGuild(message.guild.id);
+            guildInitializer.initServerConfig(message.guild.id);
             //Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
             Utils.hasPermission(message, this.permissionLevel).then((pass) => {
                 if(pass) {
+                    const prefix = guildHandler.getPrefix(message.guild.id);
                     let command = message.content;
-                    if (command.startsWith('||')) {
+                    if (command.startsWith(prefix)) {
                         //Trim the prefix
-                        command = command.substr(0, '||'.length);
+                        command = command.substr(0, prefix.length);
                         command = command.trim();
                         const splitCommand = command.split(' ');
 
@@ -46,7 +48,7 @@ export default class Command {
                                     })
                                     .catch((error: string) => {
                                         console.warn("Error: ", error)
-                                        message.channel.send('There was an error during the async execution of the command `' + name +  '`, Error: ' + error);
+                                        message.channel.send('There was an error during the async execution of the command `' + prefix + name +  '`, Error: ' + error);
                                     })
                                 }
                             }

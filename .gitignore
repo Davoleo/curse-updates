@@ -11,7 +11,7 @@ libs/
 node_modules/
 
 # Configuration File
-cfg.json
+config.json
 
 # Logo
 curseforge-updates.psd

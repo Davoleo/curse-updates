@@ -1,20 +1,20 @@
-import * as configJson from './cfg.json';
+import * as jsonConfig from './data/config.json';
 import * as discord from 'discord.js';
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import fileutils from './fileutils';
-import { CachedProject, BotConfig, ServerConfig } from './model/BotConfig';
+import { CachedProject, ServerConfig } from './model/BotConfig';
 import loadCommands from './commandLoader';
 
 const client = new discord.Client();
 
-const config: BotConfig = Object.assign(configJson);
+const devMode = true;
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 
 	// Set the bot status
-	if(config.prefix === ':||') {
+	if(devMode) {
 		client.user.setPresence({
 			status: 'dnd',
 			afk: false,
@@ -40,13 +40,10 @@ const commands = loadCommands();
 
 client.on('message', msg => {
 	if(msg.content.startsWith(config.prefix)) {
-		// If the command message is equals to one of the commands in the Map
-		commands.forEach((command, name) => {
-			if(msg.content.indexOf(config.prefix + name) !== -1) {
-				// Invoke the Command Function
-				// console.log('"' + trimmedCommand + '"');
-				command(msg);
-			}
+		commands.forEach(command => {
+			// Invoke the Command
+			// console.log('"' + trimmedCommand + '"');
+			command.execute(msg);
 		});
 	}
 });

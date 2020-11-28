@@ -1,18 +1,19 @@
 import { Snowflake } from "discord.js";
 
-export interface BotConfig {
-    prefix: string;
+export interface JSONConfig {
     token: string;
-    serverConfig: {[serverId: string]: ServerConfig};
 }
 
 export interface ServerConfig {
+    serverId: Snowflake
+    prefix: string;
     releasesChannel: Snowflake;
     messageTemplate: string;
-    projects: Array<CachedProject>;
+    projectIds: Array<number>;
 }
 
 export interface CachedProject {
     id: number;
+    slug: string;
     version: string;
 }
