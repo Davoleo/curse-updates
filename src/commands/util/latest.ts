@@ -1,10 +1,11 @@
 import { MessageEmbed } from "discord.js";
+import { buildModEmbed } from "../../embedBuilder";
 import Command from "../../model/Command";
-import { Permission, Utils } from "../../utils";
+import { Permission } from "../../utils";
 
 async function run(args: string[]) {
     if (args[0] !== '') {
-		const response: MessageEmbed = await Utils.queryLatest(args[0] as unknown as number);
+		const response: MessageEmbed = await buildModEmbed(args[0] as unknown as number);
         
         if (response !== undefined && response !== null) {
             return response;

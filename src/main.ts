@@ -4,7 +4,7 @@ import { Utils } from './utils';
 import fileutils from './fileutils';
 import { CachedProject, ServerConfig } from './model/BotConfig';
 import loadCommands from './commandLoader';
-import { guildHandler } from './data/dataHandler';
+import { GuildHandler } from './data/dataHandler';
 
 const client = new discord.Client();
 
@@ -42,7 +42,7 @@ client.on('message', msg => {
 
 	// Handle pinging the bot
 	if (msg.content === '<@658271214116274196>' && msg.guild.id !== null && msg.guild.available)
-		msg.channel.send("Hey, my prefix in this server is: `" + guildHandler.getServerConfig(msg.guild.id) + '`');
+		msg.channel.send("Hey, my prefix in this server is: `" + GuildHandler.getServerConfig(msg.guild.id) + '`');
 
 	commands.forEach(command => {
 		command.execute(msg);
@@ -62,7 +62,7 @@ async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array
 			if (project.version !== newVersion) {
 				embeds.push(latestEmbed);
 				fileutils.updateCachedProject(guildId, project.id, newVersion);
-				const messageTemplate = guildHandler.getTemplateMessage(guildId);
+				const messageTemplate = GuildHandler.getTemplateMessage(guildId);
 				if (messageTemplate !== '') {
 					channel.send(messageTemplate);
 				}
@@ -79,7 +79,7 @@ setInterval(() => {
 		const serverObject: ServerConfig = config.serverConfig[guildId];
 
 		if (serverObject.releasesChannel != '-1') {
-			queryServerProjects(guildId, guildHandler, serverObject.releasesChannel)
+			queryServerProjects(guildId, GuildHandler, serverObject.releasesChannel)
 				.catch((error) => {
 					if (error == "DiscordAPIError: Missing Access") {
 						// TODO Temporary Solution to fix error spam when the bot is kicked from a server

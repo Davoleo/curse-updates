@@ -1,10 +1,10 @@
 import { Message } from "discord.js";
-import { guildInitializer } from "../../data/dataHandler";
+import { GuildInitializer } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
-    guildInitializer.initServerConfig(messageRef.guild.id);
+    GuildInitializer.initServerConfig(messageRef.guild.id);
     return "Initializing this server's Data Package";
 }
 

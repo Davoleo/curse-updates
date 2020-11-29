@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { guildHandler, guildInitializer } from "../data/dataHandler";
+import { GuildHandler, GuildInitializer } from "../data/dataHandler";
 import { Utils, Permission } from "../utils";
 
 export default class Command {
@@ -25,11 +25,11 @@ export default class Command {
 
     execute(message: Message): void {
         if (this.isGuildCommand) {
-            guildInitializer.initServerConfig(message.guild.id);
+            GuildInitializer.initServerConfig(message.guild.id);
             //Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
             Utils.hasPermission(message, this.permissionLevel).then((pass) => {
                 if(pass) {
-                    const prefix = guildHandler.getPrefix(message.guild.id);
+                    const prefix = GuildHandler.getPrefix(message.guild.id);
                     let command = message.content;
                     if (command.startsWith(prefix)) {
                         //Trim the prefix

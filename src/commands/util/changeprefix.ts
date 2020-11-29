@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { guildHandler } from "../../data/dataHandler";
+import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
@@ -8,7 +8,7 @@ function run(args: string[], message: Message) {
         return 'You can only assign a string of up to 3 characters as prefix';
     }
     else {
-        guildHandler.updatePrefix(message.guild.id, args[0]);
+        GuildHandler.updatePrefix(message.guild.id, args[0]);
         return '`' + args[0] + '` is now the current prefix for commands';
     }
 }

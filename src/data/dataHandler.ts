@@ -122,18 +122,18 @@ function setTemplateMessage(serverId: Snowflake, message: string): void {
 
 //#endregion Server Config
 
-export const guildInitializer = {
+export const GuildInitializer = {
     initServerConfig,
     removeServerConfig
 }
 
-export const cacheHandler = {
+export const CacheHandler = {
     addProjectToCache,
     getProjectById,
     updateCachedProject
 }
 
-export const guildHandler = {
+export const GuildHandler = {
     updatePrefix,
     addProjectToSchedule,
     removeProjectFromSchedule,

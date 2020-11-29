@@ -7,13 +7,6 @@ import { ModFile } from '../typings/mc-curseforge-api/objects/Files';
 
 const config: BotConfig = Object.assign(configJson);
 
-type Release = 'Alpha' | 'Beta' | "Release";
-
-const releaseColors = new Map<Release, number>();
-releaseColors.set('Alpha', 0xD3CAE8)
-releaseColors.set('Beta', 0x0E9BD8);
-releaseColors.set('Release', 0x14B866);
-
 ///The different levels of permission that may be needed to execute a certain command
 export enum Permission {
     USER,
@@ -23,10 +16,6 @@ export enum Permission {
 }
 
 export class Utils {
-	// cf getMod Wrapper function
-	static async getModById(id: number): Promise<Mod> {
-		return cf.getMod(id);
-	}
 
 	static async buildScheduleEmbed(guildId: Snowflake, client: Client): Promise<MessageEmbed> {
 		const idNamePairs: EmbedFieldData[] = [];
@@ -69,25 +58,6 @@ export class Utils {
 		}
 
 		return embed;
-	}
-
-	static async queryLatest(id: number): Promise<MessageEmbed> {
-		const mod = await cf.getMod(id);
-		const latestFile = mod.latestFiles[mod.latestFiles.length - 1];
-		const embed = this.buildModEmbed(mod, latestFile);
-		return embed;
-	}
-
-	static getTypeStringFromId(typeId: number): Release {
-		switch (typeId) {
-		case 1:
-			return 'Release';
-		case 2:
-			return 'Beta';
-		case 3:
-			return 'Alpha';
-		}
-		return null;
 	}
 
 	static sendDMtoDavoleo(client: Client, message: string): void {

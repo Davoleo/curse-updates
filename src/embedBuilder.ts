@@ -1,6 +1,8 @@
 import { MessageEmbed } from "discord.js";
+import { CurseHelper } from "./curseHelper";
 import { commands } from "./main";
-import { Utils } from "./utils";
+import { ReleaseType, releaseTypes } from "./model/ModData";
+
 
 const embedColors = [
 	0x404040,
@@ -27,12 +29,14 @@ export function buildHelpEmbed(title: string, category: string): MessageEmbed {
     return embed;
 }
 
-export function buildModEmbed(modId: number) {
+export async function buildModEmbed(modId: number): Promise<MessageEmbed> {
 
-    Utils.queryLatest(modId);
+    const projectData = await CurseHelper.queryModById(modId);
+    const mod = projectData.mod;
+    const modFile = projectData.latestFile;
 
     const modEmbed = new MessageEmbed();
-    const releaseTypeString: Release = this.getTypeStringFromId(modFile.release_type as unknown as number);
+    const releaseType: ReleaseType = releaseTypes[modFile.release_type as unknown as number];
     const splitUrl = modFile.download_url.split('/');
     const fileName = splitUrl[splitUrl.length - 1];
     let authorString = '';
@@ -43,14 +47,14 @@ export function buildModEmbed(modId: number) {
     }
 
     modEmbed.type = 'rich';
-    modEmbed.setTitle('New ' + mod.name + ' ' + releaseTypeString + '!').setURL(mod.url);
+    modEmbed.setTitle('New ' + mod.name + ' ' + releaseType.name + '!').setURL(mod.url);
     modEmbed.setDescription(mod.summary);
     modEmbed.addField('Authors', authorString);
-    modEmbed.setColor(releaseColors.get(releaseTypeString));
+    modEmbed.setColor(releaseType.color);
     modEmbed.setThumbnail(mod.logo.url);
     modEmbed.addField('Minecraft Versions', modFile.minecraft_versions.join(', '));
     modEmbed.addField('New Mod Version', fileName);
-    modEmbed.addField('Type', releaseTypeString);
+    modEmbed.addField('Type', releaseType.name);
     modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\n[CurseForge](' + mod.url + ')');
     modEmbed.setTimestamp(modFile.timestamp);
 
