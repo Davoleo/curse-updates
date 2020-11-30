@@ -1,7 +1,9 @@
-import { MessageEmbed } from "discord.js";
+import { Client, EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
 import { CurseHelper } from "./curseHelper";
+import { CacheHandler, GuildHandler } from "./data/dataHandler";
 import { commands } from "./main";
 import { ReleaseType, releaseTypes } from "./model/ModData";
+import { Utils } from "./utils";
 
 
 const embedColors = [
@@ -37,8 +39,7 @@ export async function buildModEmbed(modId: number): Promise<MessageEmbed> {
 
     const modEmbed = new MessageEmbed();
     const releaseType: ReleaseType = releaseTypes[modFile.release_type as unknown as number];
-    const splitUrl = modFile.download_url.split('/');
-    const fileName = splitUrl[splitUrl.length - 1];
+    Utils.getFilenameFromURL(modFile.download_url);
     let authorString = '';
 
     for (let i = 0; i < mod.authors.length; i++) {
@@ -61,4 +62,50 @@ export async function buildModEmbed(modId: number): Promise<MessageEmbed> {
     console.log('Latest file: ' + fileName);
 
     return modEmbed;
+}
+
+export async function buildScheduleEmbed(guildId: Snowflake, client: Client): Promise<MessageEmbed> {
+    const idNamePairs: EmbedFieldData[] = [];
+
+    const config = GuildHandler.getServerConfig(guildId);
+
+    config.projectIds.forEach(id => {
+        const project = CacheHandler.getProjectById(id);
+        idNamePairs.push({name: project.id, value: project.id});
+    });
+
+    const embed = new MessageEmbed();
+    embed.color = embedColors[Math.ceil((Math.random() * 3))];
+    embed.setTitle('Registered Projects and Release Channel for this server');
+
+    const releasesChannelId = config.serverConfig[guildId].releasesChannel;
+
+    let channel = null;
+    if (releasesChannelId != '-1') {
+        channel = await client.channels.fetch(releasesChannelId);
+    }
+
+    if (channel !== null) {
+        embed.addField('Announcements Channel', channel.toString());
+    }
+    else {
+        embed.addField('Announcements Channel', 'None');
+    }
+
+    const messageTemplate = config.serverConfig[guildId].messageTemplate;
+    if (messageTemplate !== '') {
+        embed.addField('Template Message', messageTemplate);
+    }
+    else {
+        embed.addField('Template Messsage', 'None');
+    }
+
+    if (idNamePairs.length > 0) {
+        embed.addFields(idNamePairs);
+    }
+    else {
+        embed.setTitle('No Projects have been Scheduled on this server');
+    }
+
+    return embed;
 }

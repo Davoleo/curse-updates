@@ -16,4 +16,5 @@ export interface CachedProject {
     id: number;
     slug: string;
     version: string;
+    subbedGuilds: Snowflake[];
 }

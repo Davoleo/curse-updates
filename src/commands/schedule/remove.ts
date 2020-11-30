@@ -1,14 +1,20 @@
 import { Message } from "discord.js";
+import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
+    //Check if the project ID is an actual number before casting it
     if (args[0].match(/\d+/)[0] === '')
         return 'Project ID is invalid!';
     
     const projectID = args[0] as unknown as number;
-    const stringResult = fileUtils.removeProjectFromConfig(messageRef.guild.id, projectID);
-    return stringResult;
+    const wasRemoved = GuildHandler.removeProjectFromSchedule(messageRef.guild.id, projectID);
+    
+    if (wasRemoved)
+        return ":recycle: Project removed successfully!"
+    else
+        return ":x: Couldn't find a project with that ID in the bot schedule"
 }
 
 export const ping: Command = new Command(

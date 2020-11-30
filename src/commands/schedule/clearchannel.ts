@@ -1,9 +1,10 @@
 import { Message } from "discord.js";
+import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
-	fileUtils.resetReleasesChannel(messageRef.guild.id);
+	GuildHandler.resetReleaseChannel(messageRef.guild.id);
 	return 'Scheduled update channel has been set to "None", Updates annoucements have been disabled on this server';
 }
 

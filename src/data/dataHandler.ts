@@ -1,4 +1,6 @@
 import { Snowflake } from "discord.js";
+import { getPriority } from "os";
+import { fileURLToPath } from "url";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
 
 const storage = new Loki("data.db");
@@ -6,7 +8,7 @@ const serverCollection = storage.addCollection('server_config');
 const cachedProjects = storage.addCollection('cached_projects');
 
 function initServerConfig(serverId: Snowflake): void {
-    const oldServer = serverCollection.findOne({serverId: serverId});
+    const oldServer = serverCollection.findObject({serverId: serverId});
 
     if (oldServer === null) {
         serverCollection.insert({
@@ -20,7 +22,7 @@ function initServerConfig(serverId: Snowflake): void {
 }
 
 function removeServerConfig(serverId: Snowflake): boolean {
-    const server = serverCollection.findOne({serverId: serverId});
+    const server = serverCollection.findObject({serverId: serverId});
 
     if (server !== null) {
         serverCollection.remove(server);
@@ -31,31 +33,50 @@ function removeServerConfig(serverId: Snowflake): boolean {
 
 //#region Projects Cache
 
-function addProjectToCache(newProject: CachedProject, update: boolean): void {
+function addProjectToCache(id: number, slug: string, version: string, guildId: Snowflake, update: boolean): void {
     
-    const project: CachedProject = getProjectById(newProject.id)
+    const project: CachedProject = getProjectById(id)
 
     if (project === null) {
         cachedProjects.insert({
-            id: newProject.id,
-            slug: newProject.slug,
-            version: newProject.version
+            id: id,
+            slug: slug,
+            version: version,
+            subbedGuilds: [guildId]
         });
     }
     else if (update) {
-        if (project.version !== newProject.version) {
-            updateCachedProject(project.id, newProject.version);
+        if (project.version !== version) {
+            updateCachedProject(project.id, version);
+        }
+
+        if (project.subbedGuilds.indexOf(guildId) === -1) {
+            project.subbedGuilds.push(guildId);
         }
     }
 }
 
+function removeAllByGuild(guildId: Snowflake) {
+    const projects = cachedProjects.where(project => project.subbedGuilds.indexOf(guildId) !== -1);
+    projects.forEach((project: CachedProject) => {
+        if (project.subbedGuilds.length <= 1) {
+            cachedProjects.findAndRemove({ id: { '$eq': project.id }});
+        }
+        else {
+            cachedProjects.findAndUpdate({id: {'$eq': project.id }}, (project: CachedProject) => {
+                project.subbedGuilds
+            })
+        }
+    })
+}
+
 function getProjectById(id: number): CachedProject {
-    const project: CachedProject = cachedProjects.findOne({id: id});
+    const project: CachedProject = cachedProjects.findObject({id: id});
     return project;
 }
 
 function updateCachedProject(id: number, newVersion: string): void {
-    const project: CachedProject = cachedProjects.findOne({id: id});
+    const project: CachedProject = cachedProjects.findObject({id: id});
     project.version = newVersion;
     cachedProjects.update(project);
 }
@@ -65,7 +86,7 @@ function updateCachedProject(id: number, newVersion: string): void {
 //#region ServerConfig
 
 function getServerConfig(serverId: Snowflake): ServerConfig {
-    return serverCollection.findOne({serverId: serverId});
+    return serverCollection.findObject({serverId: serverId});
 }
 
 function updatePrefix(serverId: Snowflake, prefix: string): void {

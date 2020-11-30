@@ -1,10 +1,12 @@
 import { Message } from "discord.js";
+import { CacheHandler, GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
-    fileUtils.clearSchedule(messageRef.guild.id);
-    return ':warning: Scheduled was cleared successfully! :warning:';
+    GuildHandler.clearProjectsSchedule(messageRef.guild.id);
+
+    return ':warning: Scheduled was cleared successfully!';
 }
 
 export const ping: Command = new Command(
