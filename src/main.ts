@@ -2,7 +2,7 @@ import { setInterval } from 'timers';
 import { Utils } from './utils';
 import { CachedProject, ServerConfig } from './model/BotConfig';
 import loadCommands from './commandLoader';
-import { CacheHandler, GuildHandler } from './data/dataHandler';
+import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler';
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed, } from './embedBuilder';
@@ -43,18 +43,19 @@ export const commands = loadCommands();
 client.on('message', (msg: Message) => {
 
 	// Handle pinging the bot
-	if (msg.content === '<@658271214116274196>' && msg.guild.id !== null && msg.guild.available)
+	if (msg.mentions.users.get('658271214116274196') !== undefined && msg.guild.id !== null && msg.guild.available) {
+		GuildInitializer.initServerConfig(msg.guild.id);
 		msg.channel.send("Hey, my prefix in this server is: `" + GuildHandler.getServerConfig(msg.guild.id) + '`');
+	}
 
-	commands.forEach(command => {
-		command.execute(msg);
-	});
+	console.warn(commands[0]);
+	commands.forEach(command => command.execute(msg));
 });
 
 
 // -------------------------- Scheduled Check --------------------------------------
 
-async function queryServerProjects(guildId: Snowflake, messageTemplate: string, announcementChannel: Snowflake): Promise<void> {
+async function queryServerProjects(messageTemplate: string, announcementChannel: Snowflake): Promise<void> {
 
 	const channel: TextChannel = await client.channels.fetch(announcementChannel) as TextChannel;
 	const projects: CachedProject[] = CacheHandler.getAllCachedProjects();
@@ -80,7 +81,7 @@ setInterval(() => {
 		const serverObject: ServerConfig = GuildHandler.getServerConfig(guildId);
 
 		if (serverObject.releasesChannel != '-1') {
-			queryServerProjects(guildId, serverObject.messageTemplate, serverObject.releasesChannel)
+			queryServerProjects(serverObject.messageTemplate, serverObject.releasesChannel)
 				.catch((error) => {
 					if (error == "DiscordAPIError: Missing Access") {
 						// TODO Temporary Solution to fix error spam when the bot is kicked from a server

@@ -1,8 +1,6 @@
 import Command from './model/Command';
 import * as fs from 'fs';
 
-// const config: BotConfig = Object.assign(configJson);
-
 export default function loadCommands(): Array<Command> {
 	const commands = new Array<Command>();
 
@@ -12,7 +10,7 @@ export default function loadCommands(): Array<Command> {
 		console.log("Loading " + files.length + " util commands");
 		files.forEach(file => {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const command = require('./commands/util/' + file);
+			const command: Command = require('./commands/util/' + file).ping;
 			commands.push(command);
 			delete require.cache[require.resolve("./commands/util/" + file)];
 		});
@@ -24,7 +22,7 @@ export default function loadCommands(): Array<Command> {
 		console.log("Loading " + files.length + " scheduling commands");
 		files.forEach(file => {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const command = require('./commands/schedule/' + file);
+			const command: Command = require('./commands/schedule/' + file).ping;
 			commands.push(command);
 			delete require.cache[require.resolve("./commands/schedule/" + file)];
 		});

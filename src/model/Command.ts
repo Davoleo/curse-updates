@@ -29,7 +29,7 @@ export default class Command {
             //Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
             Utils.hasPermission(message, this.permissionLevel).then((pass) => {
                 if(pass) {
-                    const prefix = GuildHandler.getPrefix(message.guild.id);
+                    const prefix = GuildHandler.getServerConfig(message.guild.id).prefix;
                     let command = message.content;
                     if (command.startsWith(prefix)) {
                         //Trim the prefix

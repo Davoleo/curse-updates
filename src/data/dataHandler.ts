@@ -1,5 +1,6 @@
 import { Snowflake } from "discord.js";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
+import * as Loki from 'lokijs'
 
 const storage = new Loki("data.db");
 const serverCollection = storage.addCollection('server_config');
