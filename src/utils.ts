@@ -1,7 +1,4 @@
 import { Client, Message } from 'discord.js';
-import * as configJson from './cfg.json';
-
-const config: BotConfig = Object.assign(configJson);
 
 ///The different levels of permission that may be needed to execute a certain command
 export enum Permission {
