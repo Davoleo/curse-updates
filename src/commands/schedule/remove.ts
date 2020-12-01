@@ -11,8 +11,9 @@ function run(args: string[], messageRef: Message) {
     const projectID = args[0] as unknown as number;
     const wasRemoved = GuildHandler.removeProjectFromSchedule(messageRef.guild.id, projectID);
     
-    if (wasRemoved)
+    if (wasRemoved) {
         return ":recycle: Project removed successfully!"
+    }
     else
         return ":x: Couldn't find a project with that ID in the bot schedule"
 }

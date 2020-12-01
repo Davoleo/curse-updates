@@ -1,6 +1,4 @@
 import { Snowflake } from "discord.js";
-import { getPriority } from "os";
-import { fileURLToPath } from "url";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
 
 const storage = new Loki("data.db");
@@ -56,18 +54,22 @@ function addProjectToCache(id: number, slug: string, version: string, guildId: S
     }
 }
 
-function removeAllByGuild(guildId: Snowflake) {
-    const projects = cachedProjects.where(project => project.subbedGuilds.indexOf(guildId) !== -1);
-    projects.forEach((project: CachedProject) => {
-        if (project.subbedGuilds.length <= 1) {
-            cachedProjects.findAndRemove({ id: { '$eq': project.id }});
-        }
-        else {
-            cachedProjects.findAndUpdate({id: {'$eq': project.id }}, (project: CachedProject) => {
-                project.subbedGuilds
-            })
-        }
-    })
+function removeAllByGuild(guildId: Snowflake, projectIds: number[]): void {
+    projectIds.forEach(id => removeProjectById(guildId, id))
+}
+
+function removeProjectById(guildId: Snowflake, projectID: number): void {
+    const project: CachedProject = cachedProjects.findObject({id: projectID});
+
+    if (project.subbedGuilds.length <= 1) {
+        cachedProjects.findAndRemove({ id: { '$eq': project.id }});
+    }
+    else {
+        cachedProjects.findAndUpdate({id: { '$eq': project.id }}, (project: CachedProject) => {
+            const indexOfProject = project.subbedGuilds.indexOf(guildId);
+            project.subbedGuilds.splice(indexOfProject, 1);
+        })
+    }
 }
 
 function getProjectById(id: number): CachedProject {
@@ -151,7 +153,8 @@ export const GuildInitializer = {
 export const CacheHandler = {
     addProjectToCache,
     getProjectById,
-    updateCachedProject
+    updateCachedProject,
+    removeAllByGuild
 }
 
 export const GuildHandler = {
