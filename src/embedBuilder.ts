@@ -1,8 +1,7 @@
-import { Client, EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
-import { CurseHelper } from "./curseHelper";
+import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
 import { CacheHandler, GuildHandler } from "./data/dataHandler";
 import { commands } from "./main";
-import { ReleaseType, releaseTypes } from "./model/ModData";
+import ModData, { ReleaseType, releaseTypes } from "./model/ModData";
 import { Utils } from "./utils";
 
 
@@ -36,9 +35,8 @@ export function buildHelpEmbed(title: string, category: string): MessageEmbed {
     return embed;
 }
 
-export async function buildModEmbed(modId: number): Promise<MessageEmbed> {
+export function buildModEmbed(projectData: ModData): MessageEmbed {
 
-    const projectData = await CurseHelper.queryModById(modId);
     const mod = projectData.mod;
     const modFile = projectData.latestFile;
 

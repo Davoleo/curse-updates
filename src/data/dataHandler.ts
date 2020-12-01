@@ -77,6 +77,10 @@ function getProjectById(id: number): CachedProject {
     return project;
 }
 
+function getAllCachedProjects(): CachedProject[] {
+    return cachedProjects.find({});
+}
+
 function updateCachedProject(id: number, newVersion: string): void {
     const project: CachedProject = cachedProjects.findObject({id: id});
     project.version = newVersion;
@@ -154,7 +158,8 @@ export const CacheHandler = {
     addProjectToCache,
     getProjectById,
     updateCachedProject,
-    removeAllByGuild
+    removeAllByGuild,
+    getAllCachedProjects
 }
 
 export const GuildHandler = {

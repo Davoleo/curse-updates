@@ -1,11 +1,14 @@
 import { MessageEmbed } from "discord.js";
+import { CurseHelper } from "../../curseHelper";
 import { buildModEmbed } from "../../embedBuilder";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 async function run(args: string[]) {
     if (args[0] !== '') {
-		const response: MessageEmbed = await buildModEmbed(args[0] as unknown as number);
+
+        const modData = await CurseHelper.queryModById(args[0] as unknown as number);
+		const response: MessageEmbed = buildModEmbed(modData);
         
         if (response !== undefined && response !== null) {
             return response;

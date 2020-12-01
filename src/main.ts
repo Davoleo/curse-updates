@@ -1,12 +1,15 @@
-import * as discord from 'discord.js';
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import fileutils from './fileutils';
 import { CachedProject, ServerConfig } from './model/BotConfig';
 import loadCommands from './commandLoader';
-import { GuildHandler } from './data/dataHandler';
+import { CacheHandler, GuildHandler } from './data/dataHandler';
+import * as config from './data/config.json';
+import { CurseHelper } from './curseHelper';
+import { buildModEmbed, } from './embedBuilder';
+import { Client, Message, Snowflake, TextChannel } from 'discord.js';
 
-const client = new discord.Client();
+const client = new Client();
 
 const devMode = true;
 
@@ -38,7 +41,7 @@ client.on('ready', () => {
 
 export const commands = loadCommands();
 
-client.on('message', msg => {
+client.on('message', (msg: Message) => {
 
 	// Handle pinging the bot
 	if (msg.content === '<@658271214116274196>' && msg.guild.id !== null && msg.guild.available)
@@ -49,37 +52,36 @@ client.on('message', msg => {
 	});
 });
 
-async function queryServerProjects(guildId: discord.Snowflake, projectIds: Array<CachedProject>, announcementChannel: discord.Snowflake): Promise<Array<discord.MessageEmbed>> {
-	const embeds: Array<discord.MessageEmbed> = [];
 
-	const channel: discord.TextChannel = await client.channels.fetch(announcementChannel) as discord.TextChannel;
+// -------------------------- Scheduled Check --------------------------------------
 
-	await projectIds.forEach(async project => {
+async function queryServerProjects(guildId: Snowflake, messageTemplate: string, announcementChannel: Snowflake): Promise<void> {
+
+	const channel: TextChannel = await client.channels.fetch(announcementChannel) as TextChannel;
+	const projects: CachedProject[] = CacheHandler.getAllCachedProjects();
+
+	projects.forEach(async project => {
 		console.log('Checking project: ' + project.id);
-		const latestEmbed = await Utils.queryLatest(project.id);
-		if (latestEmbed != null) {
-			const newVersion = latestEmbed.fields[2].value;
-			if (project.version !== newVersion) {
-				embeds.push(latestEmbed);
-				fileutils.updateCachedProject(guildId, project.id, newVersion);
-				const messageTemplate = GuildHandler.getTemplateMessage(guildId);
-				if (messageTemplate !== '') {
-					channel.send(messageTemplate);
-				}
-				channel.send(latestEmbed);
+		const data = await CurseHelper.queryModById(project.id);
+		const newVersion = Utils.getFilenameFromURL(data.latestFile.download_url);
+		if (project.version !== newVersion) {
+			const embed = buildModEmbed(data);
+			CacheHandler.updateCachedProject(project.id, newVersion);
+
+			if (messageTemplate !== '') {
+				channel.send(messageTemplate);
 			}
+			channel.send(embed);
 		}
 	});
-
-	return embeds;
 }
 
 setInterval(() => {
 	for (const guildId in config.serverConfig) {
-		const serverObject: ServerConfig = config.serverConfig[guildId];
+		const serverObject: ServerConfig = GuildHandler.getServerConfig(guildId);
 
 		if (serverObject.releasesChannel != '-1') {
-			queryServerProjects(guildId, GuildHandler, serverObject.releasesChannel)
+			queryServerProjects(guildId, serverObject.messageTemplate, serverObject.releasesChannel)
 				.catch((error) => {
 					if (error == "DiscordAPIError: Missing Access") {
 						// TODO Temporary Solution to fix error spam when the bot is kicked from a server
