@@ -1,11 +1,12 @@
 import { Message } from "discord.js";
+import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
-    fileUtils.setTemplateMessage(messageRef.guild.id, args[0]);
+    GuildHandler.setTemplateMessage(messageRef.guild.id, args[0]);
 
-    if (args[0] !== '')
+    if (args !== [] && args[0] !== '')
         return 'The template message has been set to: ```' + args[0] + '```';
     else
         return 'The template message has been reset to: ""';

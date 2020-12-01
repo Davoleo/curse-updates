@@ -18,7 +18,12 @@ export function buildHelpEmbed(title: string, category: string): MessageEmbed {
 
     commands.forEach(command => {
         if (command.category === category) {
-            embed.addField(command.name, command.description);
+
+            let argString = '';
+            if (command.argNames !== [])
+                command.argNames.forEach(arg => argString += (" `" + arg + "`"))
+
+            embed.addField(command.name + argString, command.description);
         }
     });
 
@@ -39,7 +44,7 @@ export async function buildModEmbed(modId: number): Promise<MessageEmbed> {
 
     const modEmbed = new MessageEmbed();
     const releaseType: ReleaseType = releaseTypes[modFile.release_type as unknown as number];
-    Utils.getFilenameFromURL(modFile.download_url);
+    const fileName = Utils.getFilenameFromURL(modFile.download_url);
     let authorString = '';
 
     for (let i = 0; i < mod.authors.length; i++) {
@@ -64,7 +69,7 @@ export async function buildModEmbed(modId: number): Promise<MessageEmbed> {
     return modEmbed;
 }
 
-export async function buildScheduleEmbed(guildId: Snowflake, client: Client): Promise<MessageEmbed> {
+export function buildScheduleEmbed(guildId: Snowflake): MessageEmbed {
     const idNamePairs: EmbedFieldData[] = [];
 
     const config = GuildHandler.getServerConfig(guildId);
@@ -78,34 +83,20 @@ export async function buildScheduleEmbed(guildId: Snowflake, client: Client): Pr
     embed.color = embedColors[Math.ceil((Math.random() * 3))];
     embed.setTitle('Registered Projects and Release Channel for this server');
 
-    const releasesChannelId = config.serverConfig[guildId].releasesChannel;
-
-    let channel = null;
-    if (releasesChannelId != '-1') {
-        channel = await client.channels.fetch(releasesChannelId);
-    }
-
-    if (channel !== null) {
-        embed.addField('Announcements Channel', channel.toString());
-    }
-    else {
+    if (config.releasesChannel !== '-1')
+        embed.addField('Announcements Channel', '<#' + config.releasesChannel + '>');
+    else
         embed.addField('Announcements Channel', 'None');
-    }
 
-    const messageTemplate = config.serverConfig[guildId].messageTemplate;
-    if (messageTemplate !== '') {
-        embed.addField('Template Message', messageTemplate);
-    }
-    else {
+    if (config.messageTemplate !== '')
+        embed.addField('Template Message', config.messageTemplate);
+    else
         embed.addField('Template Messsage', 'None');
-    }
 
-    if (idNamePairs.length > 0) {
+    if (idNamePairs.length > 0)
         embed.addFields(idNamePairs);
-    }
-    else {
+    else
         embed.setTitle('No Projects have been Scheduled on this server');
-    }
 
     return embed;
 }

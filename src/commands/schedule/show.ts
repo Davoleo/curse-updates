@@ -1,10 +1,11 @@
 
 import { Message } from "discord.js";
+import { buildScheduleEmbed } from "../../embedBuilder";
 import Command from "../../model/Command";
-import { Permission, Utils } from "../../utils";
+import { Permission } from "../../utils";
 
-async function run(args: string[], messageRef: Message) {
-    return await Utils.buildScheduleEmbed(messageRef.guild.id, messageRef.client)
+function run(args: string[], messageRef: Message) {
+    return buildScheduleEmbed(messageRef.guild.id)
 }
 
 export const ping: Command = new Command(
@@ -16,6 +17,6 @@ export const ping: Command = new Command(
         action: run,
         permLevel: Permission.USER,
         argNames: [],
-        async: true
+        async: false
     }
 );
