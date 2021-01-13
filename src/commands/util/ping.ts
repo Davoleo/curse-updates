@@ -3,7 +3,6 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
-    console.log(messageRef)
     messageRef.channel.send("Pinging...").then((pingMessage) => {
         pingMessage.edit('PONG! :ping_pong: - Response Time: ' + (pingMessage.createdTimestamp - messageRef.createdTimestamp) + 'ms')
     });

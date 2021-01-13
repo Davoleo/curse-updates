@@ -8,7 +8,6 @@ import { buildModEmbed, } from './embedBuilder';
 import { Client, Message, Snowflake, TextChannel } from 'discord.js';
 import Command from './model/Command';
 import { loadCommands } from './commandLoader';
-import { comm } from './commands/schedule/add';
 
 export const botClient = new Client();
 
@@ -81,18 +80,13 @@ botClient.on('message', (message: Message) => {
 			
 			const splitCommand = cmdString.split(' ');
 			let sliver = splitCommand.shift();
-			//console.log(sliver);
-			//Check the command category
-			if (command.name === 'ping')
-				console.log(command.category);
 
+			//Check the command category
 			if (command.category === '' || sliver === command.category) {
 
 				if (command.category !== '') {
 					sliver = splitCommand.shift();
-					console.log("Called");
 				}
-				console.log(sliver);
 
 				//Check the command name
 				if (sliver === command.name) {
@@ -181,7 +175,7 @@ setInterval(() => {
 				});
 		}
 	}
-}, 1000 * 60 * 15);
+}, 1000 * 60 /* * 15*/);
 // 15 Minutes
 
 botClient.login(config.token);

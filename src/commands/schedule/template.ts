@@ -4,12 +4,17 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
-    GuildHandler.setTemplateMessage(messageRef.guild.id, args[0]);
-
-    if (args !== [] && args[0] !== '')
-        return 'The template message has been set to: ```' + args[0] + '```';
-    else
+    
+    //an argument has been passed
+    if (args[0] !== undefined) {
+        const category =  args.join(' ');
+        GuildHandler.setTemplateMessage(messageRef.guild.id, category);
+        return 'The template message has been set to: ```' + category + '```';
+    }  
+    else {
+        GuildHandler.setTemplateMessage(messageRef.guild.id, "");
         return 'The template message has been reset to: ""';
+    }
 }
 
 export const comm: Command = new Command(

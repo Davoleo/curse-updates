@@ -5,7 +5,7 @@ import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
 	GuildHandler.resetReleaseChannel(messageRef.guild.id);
-	return 'Scheduled update channel has been set to "None", Updates annoucements have been disabled on this server';
+	return 'Scheduled update channel has been set to "None", Update annoucements have been disabled on this server';
 }
 
 export const comm: Command = new Command(

@@ -3,7 +3,8 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(args: string[]) {
-    const embed = buildHelpEmbed('Commands: ', args[0]);
+    const category = args[0] === undefined ? "" : args[0];
+    const embed = buildHelpEmbed('Commands: ', category);
     return embed;
 }
 
