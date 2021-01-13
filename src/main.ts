@@ -1,6 +1,6 @@
 import { setInterval } from 'timers';
 import { Utils } from './utils';
-import { CachedProject, ServerConfig } from './model/BotConfig';
+import { CachedProject } from './model/BotConfig';
 import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler';
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
@@ -11,7 +11,7 @@ import { loadCommands } from './commandLoader';
 
 export const botClient = new Client();
 
-const devMode = true;
+const devMode = config.devMode;
 let ready = false;
 
 botClient.on('ready', () => {
@@ -48,27 +48,28 @@ loadCommands().then(comms => {
 
 
 botClient.on('message', (message: Message) => {
+
 	if (message.guild !== null && message.guild.available) {
 		if (GuildHandler.getServerConfig(message.guild.id) == null) {
-			GuildInitializer.initServerConfig(message.guild.id);
-			console.log("Init.............")
+			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
+			console.log("Init......")
 		}
 	}
 	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
 
 	// Handle pinging the bot
-	if (message.content.indexOf(botClient.user.id) !== -1) {
-		GuildInitializer.initServerConfig(message.guild.id);
+	if (message.content === '<@!' + botClient.user.id + '>') {
+		GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
 		message.channel.send("Hey, my prefix in this server is: `" + prefix + '`');
 	}
 
 	// console.log(message)
-
-	if (message.guild.id !== '500396398324350989')
+	if (devMode && message.guild.id !== '500396398324350989') {
 		return;
-
-	if (!ready) 
+	}
+	if (!ready) {
 		return;
+	}
 
 	let cmdString = message.content;
 	if (cmdString.startsWith(prefix)) {
@@ -159,23 +160,24 @@ async function queryServerProjects(messageTemplate: string, announcementChannel:
 }
 
 setInterval(() => {
-	for (const guildId in config.serverConfig) {
-		const serverObject: ServerConfig = GuildHandler.getServerConfig(guildId);
 
-		if (serverObject.releasesChannel != '-1') {
-			queryServerProjects(serverObject.messageTemplate, serverObject.releasesChannel)
-				.catch((error) => {
-					if (error == "DiscordAPIError: Missing Access") {
-						// TODO Temporary Solution to fix error spam when the bot is kicked from a server
-						GuildHandler.resetReleaseChannel(guildId);
-						Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guildId + "/widget.json");
-					}
-					Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
-					console.warn('There was a problem while doing the usual scheduled task!', error);
-				});
+	const guilds = GuildHandler.getAllServerConfigs();
+
+	guilds.forEach(guild => {
+		if (guild.releasesChannel !== '-1') {
+			queryServerProjects(guild.messageTemplate, guild.releasesChannel)
+			.catch((error) => {
+				if (error == "DiscordAPIError: Missing Access") {
+					GuildHandler.resetReleaseChannel(guild.serverId);
+					Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
+				}
+				Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
+				console.warn('There was a problem while doing the usual scheduled task!', error);
+			});
 		}
-	}
-}, 1000 * 60 /* * 15*/);
+	});
+
+}, 1000 * 60 * 15);
 // 15 Minutes
 
 botClient.login(config.token);

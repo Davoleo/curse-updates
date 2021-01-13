@@ -4,7 +4,7 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
-    GuildInitializer.initServerConfig(messageRef.guild.id);
+    GuildInitializer.initServerConfig(messageRef.guild.id, messageRef.guild.name);
     return "Initializing this server's Data Package";
 }
 

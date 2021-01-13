@@ -16,27 +16,29 @@ function databaseInit() {
     serverCollection = storage.getCollection("server_config");
     if (serverCollection === null)
         storage.addCollection('server_config');
+    else {
+        //Remove data for servers the bot has been kicked/banned from
+        const servers = serverCollection.find({});
+        servers.forEach(servConfig => {
+            botClient.guilds.fetch(servConfig.serverId, true, true).catch(() => {
+                removeAllByGuild(servConfig.serverId, servConfig.projectIds);
+                removeServerConfig(servConfig.serverId);
+            });
+        });
+    }
 
     cachedProjects = storage.getCollection("cached_projects");
     if (cachedProjects === null)
         storage.addCollection('cached_projects');
-
-    //Remove data for servers the bot has been kicked/banned from
-    const servers = serverCollection.find({});
-    servers.forEach(servConfig => {
-        botClient.guilds.fetch(servConfig.serverId, true, true).catch(() => {
-            removeAllByGuild(servConfig.serverId, servConfig.projectIds);
-            removeServerConfig(servConfig.serverId);
-        })
-    })
 }
 
-function initServerConfig(serverId: Snowflake): void {
+function initServerConfig(serverId: Snowflake, serverName: string): void {
     const oldServer = serverCollection.findOne({'serverId': serverId});
 
     if (oldServer == null) {
         serverCollection.insert({
             serverId: serverId,
+            serverName: serverName,
             prefix: '||',
             releasesChannel: '-1',
             messageTemplate: '',
@@ -117,6 +119,10 @@ function updateCachedProject(id: number, newVersion: string): void {
 
 //#region ServerConfig
 
+function getAllServerConfigs(): ServerConfig[] {
+    return serverCollection.find({});
+}
+
 function getServerConfig(serverId: Snowflake): ServerConfig {
     return serverCollection.findOne({'serverId': serverId});
 }
@@ -196,5 +202,6 @@ export const GuildHandler = {
     setReleseChannel,
     resetReleaseChannel,
     setTemplateMessage,
-    getServerConfig
+    getServerConfig,
+    getAllServerConfigs
 }

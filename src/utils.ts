@@ -1,6 +1,4 @@
 import { Client, Message } from 'discord.js';
-import { GuildInitializer, GuildHandler } from './data/dataHandler';
-import Command from './model/Command';
 
 ///The different levels of permission that may be needed to execute a certain command
 export enum Permission {

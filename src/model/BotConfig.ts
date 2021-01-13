@@ -5,7 +5,8 @@ export interface JSONConfig {
 }
 
 export interface ServerConfig {
-    serverId: Snowflake
+    serverId: Snowflake;
+    serverName: string;
     prefix: string;
     releasesChannel: Snowflake;
     messageTemplate: string;
