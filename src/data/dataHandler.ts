@@ -2,14 +2,29 @@ import { Snowflake } from "discord.js";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
 import * as Loki from 'lokijs'
 
-const storage = new Loki("data.db");
-const serverCollection = storage.addCollection('server_config');
-const cachedProjects = storage.addCollection('cached_projects');
+const storage = new Loki("data.db", {
+    autoload: true,
+    autoloadCallback: databaseInit,
+    autosave: true,
+    autosaveInterval: 8000
+});
+let serverCollection: Collection<ServerConfig>;
+let cachedProjects: Collection<CachedProject>;
+
+function databaseInit() {
+    serverCollection = storage.getCollection("server_config");
+    if (serverCollection === null)
+        storage.addCollection('server_config');
+
+    cachedProjects = storage.getCollection("cached_projects");
+    if (cachedProjects === null)
+        storage.addCollection('cached_projects');
+}
 
 function initServerConfig(serverId: Snowflake): void {
-    const oldServer = serverCollection.findObject({serverId: serverId});
+    const oldServer = serverCollection.findOne({'serverId': serverId});
 
-    if (oldServer === null) {
+    if (oldServer == null) {
         serverCollection.insert({
             serverId: serverId,
             prefix: '||',
@@ -21,7 +36,7 @@ function initServerConfig(serverId: Snowflake): void {
 }
 
 function removeServerConfig(serverId: Snowflake): boolean {
-    const server = serverCollection.findObject({serverId: serverId});
+    const server = serverCollection.find({'serverId': serverId});
 
     if (server !== null) {
         serverCollection.remove(server);
@@ -60,7 +75,7 @@ function removeAllByGuild(guildId: Snowflake, projectIds: number[]): void {
 }
 
 function removeProjectById(guildId: Snowflake, projectID: number): void {
-    const project: CachedProject = cachedProjects.findObject({id: projectID});
+    const project: CachedProject = cachedProjects.findOne({'id': projectID});
 
     if (project.subbedGuilds.length <= 1) {
         cachedProjects.findAndRemove({ id: { '$eq': project.id }});
@@ -74,7 +89,7 @@ function removeProjectById(guildId: Snowflake, projectID: number): void {
 }
 
 function getProjectById(id: number): CachedProject {
-    const project: CachedProject = cachedProjects.findObject({id: id});
+    const project: CachedProject = cachedProjects.findOne({'id': id});
     return project;
 }
 
@@ -83,7 +98,7 @@ function getAllCachedProjects(): CachedProject[] {
 }
 
 function updateCachedProject(id: number, newVersion: string): void {
-    const project: CachedProject = cachedProjects.findObject({id: id});
+    const project: CachedProject = cachedProjects.findOne({'id': id});
     project.version = newVersion;
     cachedProjects.update(project);
 }
@@ -93,7 +108,7 @@ function updateCachedProject(id: number, newVersion: string): void {
 //#region ServerConfig
 
 function getServerConfig(serverId: Snowflake): ServerConfig {
-    return serverCollection.findObject({serverId: serverId});
+    return serverCollection.findOne({'serverId': serverId});
 }
 
 function updatePrefix(serverId: Snowflake, prefix: string): void {
