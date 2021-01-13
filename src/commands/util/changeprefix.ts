@@ -13,7 +13,7 @@ function run(args: string[], message: Message) {
     }
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'changeprefix', 
     {
         description: 'Changes the command prefix of the bot to the string passed as an argument',

@@ -10,7 +10,7 @@ function run() {
     return 'There\'s no code to update anything here -_-\'';
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'updatestuff', 
     {
         description: 'performs updates on the internal JSON database - Internal Command only runnable by the bot author',

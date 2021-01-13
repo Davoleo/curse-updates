@@ -8,7 +8,7 @@ function run(_: string[], messageRef: Message) {
     return "Initializing this server's Data Package";
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'test', 
     {
         description: 'does hacky tests [it actually does nothing except testing some functions] - Internal Command only runnable by the bot author',

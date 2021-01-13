@@ -20,7 +20,7 @@ async function run(args: string[]) {
         return "Project ID argument can't be empty!"
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'latest', 
     {
         description: 'Queries CurseForge to get information regarding the latest version of a project',

@@ -8,7 +8,7 @@ function run(_: string[], messageRef: Message) {
 	return 'Scheduled update channel has been set to "None", Updates annoucements have been disabled on this server';
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'clearchannel', 
     {
         category: "schedule",

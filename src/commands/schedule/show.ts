@@ -8,7 +8,7 @@ function run(args: string[], messageRef: Message) {
     return buildScheduleEmbed(messageRef.guild.id)
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'show', 
     {
         category: "schedule",

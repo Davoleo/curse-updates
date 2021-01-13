@@ -12,7 +12,7 @@ function run(args: string[], messageRef: Message) {
         return 'The template message has been reset to: ""';
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'template', 
     {
         category: "schedule",

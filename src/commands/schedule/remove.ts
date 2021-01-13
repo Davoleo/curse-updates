@@ -18,7 +18,7 @@ function run(args: string[], messageRef: Message) {
         return ":x: Couldn't find a project with that ID in the bot schedule"
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'remove', 
     {
         category: "schedule",

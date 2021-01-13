@@ -10,7 +10,7 @@ function run(_: string[], messageRef: Message) {
     return ':warning: Scheduled was cleared successfully!';
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'clear', 
     {
         category: "schedule",

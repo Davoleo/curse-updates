@@ -24,7 +24,7 @@ async function run(args: string[], messageRef: Message) {
     }
 }
 
-export const ping: Command = new Command(
+export const comm: Command = new Command(
     'add', 
     {
         category: "schedule",
