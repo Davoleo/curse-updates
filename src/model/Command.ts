@@ -1,16 +1,14 @@
-import { Message } from "discord.js";
-import { GuildHandler, GuildInitializer } from "../data/dataHandler";
-import { Utils, Permission } from "../utils";
+import { Permission } from "../utils";
 
 export default class Command {
     public name: string;
     public description: string;
     public category?: string = "";
-    private isGuildCommand:  boolean;
-    private action: CallableFunction;
-    private permissionLevel: Permission;
+    public isGuildCommand:  boolean;
+    public action: CallableFunction;
+    public permissionLevel: Permission;
     public argNames: string[];
-    private async: boolean;
+    public async: boolean;
 
     constructor(name: string, options: CommandOptions) {
         this.name = name;
@@ -21,45 +19,6 @@ export default class Command {
         this.permissionLevel = options.permLevel;
         this.argNames = options.argNames;
         this.async = options.async;
-    }
-
-    execute(message: Message): void {
-        if (this.isGuildCommand) {
-            GuildInitializer.initServerConfig(message.guild.id);
-            //Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
-            Utils.hasPermission(message, this.permissionLevel).then((pass) => {
-                if(pass) {
-                    const prefix = GuildHandler.getServerConfig(message.guild.id).prefix;
-                    let command = message.content;
-                    if (command.startsWith(prefix)) {
-                        //Trim the prefix
-                        command = command.substr(0, prefix.length);
-                        command = command.trim();
-                        const splitCommand = command.split(' ');
-
-                        if (this.category === "" || splitCommand.shift() === this.category) {
-                            if (splitCommand.shift() === this.name) {
-                                if (!this.async) {
-                                    const response = this.action(splitCommand, message);
-                                    message.channel.send(response);
-                                } else {
-                                    this.action(splitCommand, message).then((response: unknown) => {
-                                        message.channel.send(response);
-                                    })
-                                    .catch((error: string) => {
-                                        console.warn("Error: ", error)
-                                        message.channel.send('There was an error during the async execution of the command `' + prefix + name +  '`, Error: ' + error);
-                                    })
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        } else {
-            const response = this.action(message.content);
-            message.channel.send(response);
-        }
     }
 }
 
