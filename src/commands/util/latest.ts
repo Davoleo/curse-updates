@@ -1,0 +1,33 @@
+import { MessageEmbed } from "discord.js";
+import { CurseHelper } from "../../curseHelper";
+import { buildModEmbed } from "../../embedBuilder";
+import Command from "../../model/Command";
+import { Permission } from "../../utils";
+
+async function run(args: string[]) {
+    if (args[0] !== '') {
+
+        const modData = await CurseHelper.queryModById(args[0] as unknown as number);
+		const response: MessageEmbed = buildModEmbed(modData);
+        
+        if (response !== undefined && response !== null) {
+            return response;
+        }
+        else {
+            return "Invalid Response!"
+        }
+    } else 
+        return "Project ID argument can't be empty!"
+}
+
+export const comm: Command = new Command(
+    'latest', 
+    {
+        description: 'Queries CurseForge to get information regarding the latest version of a project',
+        isGuild: true,
+        action: run,
+        permLevel: Permission.USER,
+        argNames: ["ProjectID"],
+        async: true
+    }
+);
