@@ -19,14 +19,14 @@ export function buildHelpEmbed(title: string, category: string): MessageEmbed {
         if (command.category === category) {
 
             let argString = '';
-            if (command.argNames !== [])
+            if (command.argNames.length > 0)
                 command.argNames.forEach(arg => argString += (" `" + arg + "`"))
 
             embed.addField(command.name + argString, command.description);
         }
     });
 
-    if (embed.fields === []) {
+    if (embed.fields.length === 0) {
         embed.setDescription("No commands found for specificed category.\nTip: write `help` without any category to get a list of general commands")
     }
 
@@ -74,7 +74,7 @@ export function buildScheduleEmbed(guildId: Snowflake): MessageEmbed {
 
     config.projectIds.forEach(id => {
         const project = CacheHandler.getProjectById(id);
-        idNamePairs.push({name: project.id, value: project.id});
+        idNamePairs.push({name: project.id, value: project.slug});
     });
 
     const embed = new MessageEmbed();
