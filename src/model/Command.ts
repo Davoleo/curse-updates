@@ -13,7 +13,8 @@ export default class Command {
     constructor(name: string, options: CommandOptions) {
         this.name = name;
         this.description = options.description;
-        this.category = options.category;
+        if (options.category !== undefined)
+            this.category = options.category;
         this.isGuildCommand = options.isGuild;
         this.action = options.action;
         this.permissionLevel = options.permLevel;
