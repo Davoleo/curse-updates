@@ -15,3 +15,6 @@ config.json
 
 # Logo
 curseforge-updates.psd
+
+# DB File
+data.db

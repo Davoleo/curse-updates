@@ -1,23 +1,26 @@
 import { setInterval } from 'timers';
 import { Utils } from './utils';
 import { CachedProject, ServerConfig } from './model/BotConfig';
-import loadCommands from './commandLoader';
 import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler';
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed, } from './embedBuilder';
 import { Client, Message, Snowflake, TextChannel } from 'discord.js';
+import Command from './model/Command';
+import { loadCommands } from './commandLoader';
+import { comm } from './commands/schedule/add';
 
-const client = new Client();
+export const botClient = new Client();
 
 const devMode = true;
+let ready = false;
 
-client.on('ready', () => {
-	console.log(`Logged in as ${client.user.tag}!`);
+botClient.on('ready', () => {
+	console.log(`Logged in as ${botClient.user.tag}!`);
 
 	// Set the bot status
 	if(devMode) {
-		client.user.setPresence({
+		botClient.user.setPresence({
 			status: 'dnd',
 			afk: false,
 			activity: {
@@ -27,7 +30,7 @@ client.on('ready', () => {
 		});
 	}
 	else {
-		client.user.setPresence({
+		botClient.user.setPresence({
 			status: 'online',
 			afk: false,
 			activity: {
@@ -38,18 +41,103 @@ client.on('ready', () => {
 	}
 });
 
-export const commands = loadCommands();
+export let commands: Command[] = null;
+loadCommands().then(comms => { 
+	commands = comms;
+	ready = true;
+});
 
-client.on('message', (msg: Message) => {
+
+botClient.on('message', (message: Message) => {
+	if (message.guild !== null && message.guild.available) {
+		if (GuildHandler.getServerConfig(message.guild.id) == null) {
+			GuildInitializer.initServerConfig(message.guild.id);
+			console.log("Init.............")
+		}
+	}
+	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
 
 	// Handle pinging the bot
-	if (msg.mentions.users.get('658271214116274196') !== undefined && msg.guild.id !== null && msg.guild.available) {
-		GuildInitializer.initServerConfig(msg.guild.id);
-		msg.channel.send("Hey, my prefix in this server is: `" + GuildHandler.getServerConfig(msg.guild.id) + '`');
+	if (message.content.indexOf(botClient.user.id) !== -1) {
+		GuildInitializer.initServerConfig(message.guild.id);
+		message.channel.send("Hey, my prefix in this server is: `" + prefix + '`');
 	}
 
-	console.warn(commands[0]);
-	commands.forEach(command => command.execute(msg));
+	// console.log(message)
+
+	if (message.guild.id !== '500396398324350989')
+		return;
+
+	if (!ready) 
+		return;
+
+	let cmdString = message.content;
+	if (cmdString.startsWith(prefix)) {
+		//Trim the prefix
+		cmdString = cmdString.replace(prefix, "");
+		cmdString = cmdString.trim();
+
+		commands.forEach(command => {
+			
+			const splitCommand = cmdString.split(' ');
+			let sliver = splitCommand.shift();
+			//console.log(sliver);
+			//Check the command category
+			if (command.name === 'ping')
+				console.log(command.category);
+
+			if (command.category === '' || sliver === command.category) {
+
+				if (command.category !== '') {
+					sliver = splitCommand.shift();
+					console.log("Called");
+				}
+				console.log(sliver);
+
+				//Check the command name
+				if (sliver === command.name) {
+					// if it's a guild command check for guild permissions
+					if (command.isGuildCommand) {
+						//Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
+						Utils.hasPermission(message, command.permissionLevel).then((pass) => {
+							if(pass) {
+								//Handle command execution differently depending if it's a sync or async command
+								if (!command.async) {
+									const response = command.action(splitCommand, message);
+									if (response !== '')
+										message.channel.send(response);
+								} 
+								else {
+									command.action(splitCommand, message).then((response: unknown) => {
+										message.channel.send(response);
+									})
+									.catch((error: string) => {
+										console.warn("Error: ", error)
+										message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
+									})
+								}
+							}
+						});
+					} else {
+						//Handle command execution differently depending if it's a sync or async command
+						if (!command.async) {
+							const response = command.action(splitCommand, message);
+							if (response !== '')
+								message.channel.send(response);
+						} else {
+							command.action(splitCommand, message).then((response: unknown) => {
+								message.channel.send(response);
+							})
+							.catch((error: string) => {
+								console.warn("Error: ", error)
+								message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
+							})
+						}
+					}
+				}
+			}
+		});
+	}
 });
 
 
@@ -57,7 +145,7 @@ client.on('message', (msg: Message) => {
 
 async function queryServerProjects(messageTemplate: string, announcementChannel: Snowflake): Promise<void> {
 
-	const channel: TextChannel = await client.channels.fetch(announcementChannel) as TextChannel;
+	const channel: TextChannel = await botClient.channels.fetch(announcementChannel) as TextChannel;
 	const projects: CachedProject[] = CacheHandler.getAllCachedProjects();
 
 	projects.forEach(async project => {
@@ -86,9 +174,9 @@ setInterval(() => {
 					if (error == "DiscordAPIError: Missing Access") {
 						// TODO Temporary Solution to fix error spam when the bot is kicked from a server
 						GuildHandler.resetReleaseChannel(guildId);
-						Utils.sendDMtoDavoleo(client, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guildId + "/widget.json");
+						Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guildId + "/widget.json");
 					}
-					Utils.sendDMtoDavoleo(client, 'Error while quering scheduled projects: ' + error);
+					Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
 					console.warn('There was a problem while doing the usual scheduled task!', error);
 				});
 		}
@@ -96,4 +184,4 @@ setInterval(() => {
 }, 1000 * 60 * 15);
 // 15 Minutes
 
-client.login(config.token);
+botClient.login(config.token);
