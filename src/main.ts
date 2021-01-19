@@ -60,7 +60,7 @@ botClient.on('message', (message: Message) => {
 	// Handle pinging the bot
 	if (message.content === '<@!' + botClient.user.id + '>') {
 		GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
-		message.channel.send("Hey, my prefix in this server is: `" + prefix + '`');
+		message.channel.send("Hey, my prefix in this server is: `" + prefix + '`\nTry out `' + prefix + 'help` to get a list of commands');
 	}
 
 	// console.log(message)

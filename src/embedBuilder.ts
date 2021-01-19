@@ -15,19 +15,24 @@ export function buildHelpEmbed(title: string, category: string): MessageEmbed {
     const embed = new MessageEmbed();
     embed.setTitle(title);
 
+    if (category === 'general') {
+        category = '';
+    }
+
     commands.forEach(command => {
         if (command.category === category) {
 
             let argString = '';
             if (command.argNames.length > 0)
-                command.argNames.forEach(arg => argString += (" `" + arg + "`"))
+                command.argNames.forEach(arg => argString += (" `" + arg + "`"));
 
             embed.addField(command.name + argString, command.description);
         }
     });
 
     if (embed.fields.length === 0) {
-        embed.setDescription("No commands found for specificed category.\nTip: write `help` without any category to get a list of general commands")
+        embed.setDescription("No commands found for specified category.\nTip: write `help` with any of the categories listed below to get a list of commands!");
+        embed.addField("Categories: ", "`general`\n`schedule`")
     }
 
     // Set a Random Embed Color
