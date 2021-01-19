@@ -39,7 +39,7 @@
     "discord.js": "^12.5.1",
     "eslint": "^7.4.0",
     "lokijs": "^1.5.11",
-    "mc-curseforge-api": "^2.1.0",
+    "mc-curseforge-api": "^2.2.1",
     "request": "^2.88.2"
   }
 }
