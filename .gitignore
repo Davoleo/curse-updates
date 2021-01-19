@@ -7,3 +7,9 @@
 build/
 run/
 libs/
+
+# new js branch stuff
+node_modules/
+curseforge-updates.psd
+data.db
+src/data/config.json
