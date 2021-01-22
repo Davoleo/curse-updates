@@ -5,7 +5,7 @@ import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed, } from './embedBuilder';
-import { Client, Message, Snowflake, TextChannel } from 'discord.js';
+import { Client, Message, MessageEmbed, TextChannel } from 'discord.js';
 import Command from './model/Command';
 import { loadCommands } from './commandLoader';
 
@@ -64,7 +64,7 @@ botClient.on('message', (message: Message) => {
 	}
 
 	// console.log(message)
-	if (devMode && message.guild.id !== '500396398324350989') {
+	if (devMode && message.guild.id !== '500396398324350989' && message.guild.id !== '473145328439132160') {
 		return;
 	}
 	if (!ready) {
@@ -138,46 +138,65 @@ botClient.on('message', (message: Message) => {
 
 // -------------------------- Scheduled Check --------------------------------------
 
-async function queryServerProjects(messageTemplate: string, announcementChannel: Snowflake): Promise<void> {
+async function queryCacheUpdates(): Promise<Map<number, MessageEmbed>> {
 
-	const channel: TextChannel = await botClient.channels.fetch(announcementChannel) as TextChannel;
 	const projects: CachedProject[] = CacheHandler.getAllCachedProjects();
 
-	projects.forEach(async project => {
-		console.log('Checking project: ' + project.id);
+	const updatedProjects: Map<number, MessageEmbed> = new Map();
+
+
+	for(const project of projects) {		
+		//console.log('Checking project: ' + project.id);
 		const data = await CurseHelper.queryModById(project.id);
 		const newVersion = Utils.getFilenameFromURL(data.latestFile.download_url);
 		if (project.version !== newVersion) {
 			const embed = buildModEmbed(data);
 			CacheHandler.updateCachedProject(project.id, newVersion);
-
-			if (messageTemplate !== '') {
-				channel.send(messageTemplate);
-			}
-			channel.send(embed);
+			updatedProjects.set(project.id, embed);
 		}
-	});
+	}
+
+	return updatedProjects;
+}
+
+async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
+	
+	const guilds = GuildHandler.getAllServerConfigs();
+
+	for (const guild of guilds) {
+		try {
+			if (guild.releasesChannel !== '-1') {
+				const channel: TextChannel = await botClient.channels.fetch(guild.releasesChannel) as TextChannel;
+				//console.log('Will send the message in: ' + channel.name)
+
+				for (const id of guild.projectIds) {
+					const embed = updates.get(id);
+
+					if (guild.messageTemplate !== '') {
+						await channel.send(guild.messageTemplate);
+					}
+					await channel.send(embed);
+				}
+			}
+		}
+		catch(error) {
+			if (error == "DiscordAPIError: Missing Access") {
+				GuildHandler.resetReleaseChannel(guild.serverId);
+				Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
+			}
+			Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
+			console.warn('There was a problem while doing the usual scheduled task!', error);
+		}
+	}
 }
 
 setInterval(() => {
-
-	const guilds = GuildHandler.getAllServerConfigs();
-
-	guilds.forEach(guild => {
-		if (guild.releasesChannel !== '-1') {
-			queryServerProjects(guild.messageTemplate, guild.releasesChannel)
-			.catch((error) => {
-				if (error == "DiscordAPIError: Missing Access") {
-					GuildHandler.resetReleaseChannel(guild.serverId);
-					Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
-				}
-				Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
-				console.warn('There was a problem while doing the usual scheduled task!', error);
-			});
-		}
+	queryCacheUpdates()
+	.then(updates => {
+		sendUpdateAnnouncements(updates);
 	});
 
-}, 1000 * 60 * 15);
+}, 1000 * 60);
 // 15 Minutes
 
 botClient.login(config.token);
