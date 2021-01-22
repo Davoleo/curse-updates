@@ -7,7 +7,7 @@ function run(_: string[], messageRef: Message) {
     const projectIDs = GuildHandler.getServerConfig(messageRef.guild.id).projectIds;
     GuildHandler.clearProjectsSchedule(messageRef.guild.id);
     CacheHandler.removeAllByGuild(messageRef.guild.id, projectIDs);
-    return ':warning: Scheduled was cleared successfully!';
+    return ':warning: Schedule was cleared successfully!';
 }
 
 export const comm: Command = new Command(

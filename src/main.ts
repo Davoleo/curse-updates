@@ -175,7 +175,9 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 					if (guild.messageTemplate !== '') {
 						await channel.send(guild.messageTemplate);
 					}
-					await channel.send(embed);
+					if (embed != undefined) {
+						await channel.send(embed);
+					}
 				}
 			}
 		}
@@ -193,7 +195,9 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 setInterval(() => {
 	queryCacheUpdates()
 	.then(updates => {
-		sendUpdateAnnouncements(updates);
+		if (updates.size > 0) {
+			sendUpdateAnnouncements(updates);
+		}
 	});
 
 }, 1000 * 60);
