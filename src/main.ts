@@ -173,11 +173,21 @@ setInterval(() => {
 				}
 				Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
 				console.warn('There was a problem while doing the usual scheduled task!', error);
+			})
+			.catch((error) => {
+				Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
+				console.warn('There was a problem while doing the usual scheduled task!', error);
 			});
 		}
 	});
 
 }, 1000 * 60 * 15);
 // 15 Minutes
+
+process.on('unhandledRejection', (reason, promise) => {
+	Utils.sendDMtoDavoleo(botClient, "GENERIC: " + reason + "\n\n---------\n\n Promise: " + promise);
+	promise.catch(() => console.warn("Damn, how did this happen"));
+	//throw reason;
+})
 
 botClient.login(config.token);
