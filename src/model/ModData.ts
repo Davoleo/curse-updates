@@ -1,6 +1,3 @@
-import { ModFile } from "../../typings/mc-curseforge-api/objects/Files";
-import { Mod } from "../../typings/mc-curseforge-api/objects/Mod";
-
 export default interface ModData {
     mod: Mod;
     latestFile: ModFile;

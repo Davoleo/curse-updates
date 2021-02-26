@@ -203,4 +203,10 @@ setInterval(() => {
 }, 1000 * 60);
 // 15 Minutes
 
+process.on('unhandledRejection', (reason, promise) => {
+	Utils.sendDMtoDavoleo(botClient, "GENERIC: " + reason + "\n\n---------\n\n Promise: " + promise);
+	promise.catch(() => console.warn("Damn, how did this happen"));
+	//throw reason;
+})
+
 botClient.login(config.token);

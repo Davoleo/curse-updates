@@ -55,7 +55,6 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
         authorString += '[' + author.name + '](' + author.url + '), ';
     }
 
-    modEmbed.type = 'rich';
     modEmbed.setTitle('New ' + mod.name + ' ' + releaseType.name + '!').setURL(mod.url);
     modEmbed.setDescription(mod.summary);
     modEmbed.addField('Authors', authorString);
@@ -64,7 +63,7 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     modEmbed.addField('Minecraft Versions', modFile.minecraft_versions.join(', '));
     modEmbed.addField('New Mod Version', fileName);
     modEmbed.addField('Type', releaseType.name);
-    modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\n[CurseForge](' + mod.url + ')');
+    modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\n[Changelog](' + mod.url + '/files/' + modFile.id + ')\n[Project](' + mod.url + ')');
     modEmbed.setTimestamp(modFile.timestamp);
 
     console.log('Latest file: ' + fileName);
@@ -79,7 +78,7 @@ export function buildScheduleEmbed(guildId: Snowflake): MessageEmbed {
 
     config.projectIds.forEach(id => {
         const project = CacheHandler.getProjectById(id);
-        idNamePairs.push({name: project.id, value: project.slug});
+        idNamePairs.push({name: project.slug, value: 'id: ' + project.id + '\nlatest cached version: ' + project.version});
     });
 
     const embed = new MessageEmbed();
