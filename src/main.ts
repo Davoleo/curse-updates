@@ -33,7 +33,7 @@ botClient.on('ready', () => {
 			status: 'online',
 			afk: false,
 			activity: {
-				name: ' for new updates',
+				name: ' for updates on CF',
 				type: 'WATCHING',
 			},
 		});
@@ -96,6 +96,7 @@ botClient.on('message', (message: Message) => {
 						//Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
 						Utils.hasPermission(message, command.permissionLevel).then((pass) => {
 							if(pass) {
+								//TODO Deduplicate code here and below
 								//Handle command execution differently depending if it's a sync or async command
 								if (!command.async) {
 									const response = command.action(splitCommand, message);
@@ -107,13 +108,15 @@ botClient.on('message', (message: Message) => {
 										message.channel.send(response);
 									})
 									.catch((error: string) => {
-										console.warn("Error: ", error)
+										console.warn("WARNING : ", error)
 										message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
 									})
 								}
 							}
-						});
+						})
+						.catch(error => Utils.sendDMtoDavoleo(botClient, "WARNING: Error during permission evaluation: " + error));
 					} else {
+						//TODO Deduplicate code here and above 
 						//Handle command execution differently depending if it's a sync or async command
 						if (!command.async) {
 							const response = command.action(splitCommand, message);
@@ -186,8 +189,8 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 				GuildHandler.resetReleaseChannel(guild.serverId);
 				Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
 			}
-			Utils.sendDMtoDavoleo(botClient, 'Error while quering scheduled projects: ' + error);
-			console.warn('There was a problem while doing the usual scheduled task!', error);
+			Utils.sendDMtoDavoleo(botClient, 'Error sending mod update information in one of the guilds: ' + error);
+			console.warn('WARNING: A promise was rejected!', error);
 		}
 	}
 }
@@ -198,14 +201,15 @@ setInterval(() => {
 		if (updates.size > 0) {
 			sendUpdateAnnouncements(updates);
 		}
-	});
+	})
+	.catch(error => console.warn("WARNING: A promise was rejected!\n" + error));
 
-}, 1000 * 60);
+}, 1000 * 60 * 15);
 // 15 Minutes
 
 process.on('unhandledRejection', (reason, promise) => {
-	Utils.sendDMtoDavoleo(botClient, "GENERIC: " + reason + "\n\n---------\n\n Promise: " + promise);
-	promise.catch(() => console.warn("Damn, how did this happen"));
+	Utils.sendDMtoDavoleo(botClient, "GENERIC ERROR (Unhandled Promise): " + reason);
+	promise.catch(() => console.warn("Damn boi, how did this happen"));
 	//throw reason;
 })
 
