@@ -46,24 +46,48 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     const modFile = projectData.latestFile;
 
     const modEmbed = new MessageEmbed();
-    const releaseType: ReleaseType = releaseTypes[modFile.release_type as unknown as number];
+
+    if (modFile == undefined) {
+        throw "ERROR: Querying the latest file of **" + mod.name + "** resulted in an `undefined` file!\nNote: if this error persists and is caused by a scheduled check, please remove the project from the bot schedule."
+    }
+
+    let releaseType: ReleaseType;
+    if (modFile.release_type == undefined) {
+        releaseType = releaseTypes[0];
+    }
+    else {
+        releaseType = releaseTypes[modFile.release_type as unknown as number];
+    }
+
     const fileName = Utils.getFilenameFromURL(modFile.download_url);
     let authorString = '';
 
     for (let i = 0; i < mod.authors.length; i++) {
         const author = mod.authors[i];
-        authorString += '[' + author.name + '](' + author.url + '), ';
+
+        authorString += '[' + author.name + '](' + author.url + ')' + (i == mod.authors.length - 1 ? '; ' : ', ');
+    }
+
+    let fileSize = Number(modFile.file_size)
+    let fileSizeString = fileSize + "B"
+    fileSize /= 1000;
+    if (fileSize > 0) {
+        fileSizeString = fileSize.toFixed(2) + "KB";
+    }
+    fileSize /= 1000;
+    if (fileSize > 0) {
+        fileSizeString = fileSize.toFixed(2) + "MB";
     }
 
     modEmbed.setTitle('New ' + mod.name + ' ' + releaseType.name + '!').setURL(mod.url);
-    modEmbed.setDescription(mod.summary);
-    modEmbed.addField('Authors', authorString);
+    modEmbed.setDescription(mod.summary + '\n━━━━━━━\n**Total Downloads**: ' + mod.downloads + "\n**Authors**: " + authorString);
     modEmbed.setColor(releaseType.color);
     modEmbed.setThumbnail(mod.logo.url);
-    modEmbed.addField('Minecraft Versions', modFile.minecraft_versions.join(', '));
-    modEmbed.addField('New Mod Version', fileName);
+    modEmbed.addField('New Version File', fileName, true);
+    modEmbed.addField('Size', fileSizeString, true);
     modEmbed.addField('Type', releaseType.name);
-    modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\n[Changelog](' + mod.url + '/files/' + modFile.id + ')\n[Project](' + mod.url + ')');
+    modEmbed.addField('Minecraft Versions', modFile.minecraft_versions.join(', '));
+    modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\t|\t[Changelog](' + mod.url + '/files/' + modFile.id + ')\t|\t[Project](' + mod.url + ')');
     modEmbed.setTimestamp(modFile.timestamp);
 
     console.log('Latest file: ' + fileName);
