@@ -2,18 +2,23 @@ import { Message } from "discord.js";
 import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
+import { devMode } from "../../data/config.json"
 
 function run(args: string[], messageRef: Message) {
-    
-    //an argument has been passed
-    if (args[0] !== undefined) {
-        const category =  args.join(' ');
-        GuildHandler.setTemplateMessage(messageRef.guild.id, category);
-        return 'The template message has been set to: ```' + category + '```';
-    }  
+    if(devMode) {
+        //an argument has been passed
+        if (args[0] !== undefined) {
+            const category =  args.join(' ');
+            GuildHandler.setTemplateMessage(messageRef.guild.id, category);
+            return 'The template message has been set to: ```' + category + '```';
+        }  
+        else {
+            GuildHandler.setTemplateMessage(messageRef.guild.id, "");
+            return 'The template message has been reset to: ""';
+        }
+    }
     else {
-        GuildHandler.setTemplateMessage(messageRef.guild.id, "");
-        return 'The template message has been reset to: ""';
+        return "This feature is momentarily disabled due to it not working correctly, sorry for the inconvenience!"
     }
 }
 
