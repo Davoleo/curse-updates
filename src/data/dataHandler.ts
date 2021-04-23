@@ -1,7 +1,6 @@
 import { Snowflake } from "discord.js";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
 import * as Loki from 'lokijs'
-import { botClient } from "../main";
 
 const storage = new Loki("data.db", {
     autoload: true,
@@ -16,16 +15,6 @@ function databaseInit() {
     serverCollection = storage.getCollection("server_config");
     if (serverCollection === null)
         storage.addCollection('server_config');
-    else {
-        //Remove data for servers the bot has been kicked/banned from
-        const servers = serverCollection.find({});
-        servers.forEach(servConfig => {
-            botClient.guilds.fetch(servConfig.serverId, true, true).catch(() => {
-                removeAllByGuild(servConfig.serverId, servConfig.projectIds);
-                removeServerConfig(servConfig.serverId);
-            });
-        });
-    }
 
     cachedProjects = storage.getCollection("cached_projects");
     if (cachedProjects === null)
@@ -191,7 +180,8 @@ export const CacheHandler = {
     getProjectById,
     updateCachedProject,
     removeAllByGuild,
-    getAllCachedProjects
+    getAllCachedProjects,
+    removeProjectById
 }
 
 export const GuildHandler = {

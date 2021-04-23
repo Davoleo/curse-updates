@@ -5,7 +5,7 @@ import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed, } from './embedBuilder';
-import { Client, Message, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, Guild, Message, MessageEmbed, TextChannel } from 'discord.js';
 import Command from './model/Command';
 import { loadCommands } from './commandLoader';
 
@@ -138,6 +138,10 @@ botClient.on('message', (message: Message) => {
 	}
 });
 
+botClient.on('guildDelete', (guild: Guild) => {
+	//Remove data for servers the bot has been kicked/banned from
+	GuildInitializer.removeServerConfig(guild.id);
+})
 
 // -------------------------- Scheduled Check --------------------------------------
 
@@ -208,8 +212,7 @@ setInterval(() => {
 // 15 Minutes
 
 process.on('unhandledRejection', (reason, promise) => {
-	Utils.sendDMtoDavoleo(botClient, "GENERIC ERROR (Unhandled Promise): " + reason);
-	promise.catch(() => console.warn("Damn boi, how did this happen"));
+	promise.catch(() => console.warn("Damn boi, how did this happen " + reason));
 	//throw reason;
 })
 
