@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { GuildHandler } from "../../data/dataHandler";
+import { CacheHandler, GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
@@ -10,6 +10,7 @@ function run(args: string[], messageRef: Message) {
     
     const projectID = args[0] as unknown as number;
     const wasRemoved = GuildHandler.removeProjectFromSchedule(messageRef.guild.id, projectID);
+    CacheHandler.removeProjectById(messageRef.guild.id, projectID);
     
     if (wasRemoved) {
         return ":recycle: Project removed successfully!"
