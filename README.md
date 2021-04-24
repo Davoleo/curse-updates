@@ -9,7 +9,7 @@ It can announce new versions of:<br>
 - Worlds
 
 #### Example Update Message
-![example](https://i.imgur.com/Vf94nE3.png)
+![example](https://i.imgur.com/tdd0qrC.png)
 
 ### Reporting Bugs / Suggesting Features
 If you're having issues with the bot or you would like to suggest a new feature, please consider opening a new bug report thread on the [issue tracker](https://github.com/Davoleo/curse-updates/issues).
