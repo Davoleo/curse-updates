@@ -79,8 +79,10 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
         fileSizeString = fileSize.toFixed(2) + "MB";
     }
 
+    const downloadString = new Intl.NumberFormat('en-US').format(mod.downloads);
+
     modEmbed.setTitle('New ' + mod.name + ' ' + releaseType.name + '!').setURL(mod.url);
-    modEmbed.setDescription(mod.summary + '\n━━━━━━━\n**Total Downloads**: ' + mod.downloads + "\n**Authors**: " + authorString);
+    modEmbed.setDescription(mod.summary + '\n━━━━━━━\n**Total Downloads**: ' + downloadString + "\n**Authors**: " + authorString);
     modEmbed.setColor(releaseType.color);
     modEmbed.setThumbnail(mod.logo.url);
     modEmbed.addField('New Version File', fileName, true);
