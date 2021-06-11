@@ -1,5 +1,5 @@
 import { setInterval } from 'timers';
-import { Utils } from './utils';
+import { Logger, Utils } from './utils';
 import { CachedProject } from './model/BotConfig';
 import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler';
 import * as config from './data/config.json';
@@ -11,11 +11,13 @@ import { loadCommands } from './commandLoader';
 
 export const botClient = new Client();
 
+export const logger: Logger = new Logger("bot.log");
+
 const devMode = config.devMode;
 let ready = false;
 
 botClient.on('ready', () => {
-	console.log(`Logged in as ${botClient.user.tag}!`);
+	logger.info(`Logged in as ${botClient.user.tag}!`);
 
 	Utils.updateBotStatus(botClient, devMode);
 });
@@ -26,13 +28,12 @@ loadCommands().then(comms => {
 	ready = true;
 });
 
-
 botClient.on('message', (message: Message) => {
 
 	if (message.guild !== null && message.guild.available) {
 		if (GuildHandler.getServerConfig(message.guild.id) == null) {
 			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
-			console.log("Init......")
+			logger.info("Init......")
 		}
 	}
 	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
@@ -43,7 +44,7 @@ botClient.on('message', (message: Message) => {
 		message.channel.send("Hey, my prefix in this server is: `" + prefix + '`\nTry out `' + prefix + 'help` to get a list of commands');
 	}
 
-	// console.log(message)
+	// logger.info(message)
 	if (devMode && message.guild.id !== '500396398324350989' && message.guild.id !== '473145328439132160') {
 		return;
 	}
@@ -88,7 +89,7 @@ botClient.on('message', (message: Message) => {
 										message.channel.send(response);
 									})
 									.catch((error: string) => {
-										console.warn("ERROR: async command execution: ", error)
+										logger.warn("ERROR: async command execution: ", error)
 										message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
 									})
 								}
@@ -133,7 +134,7 @@ async function queryCacheUpdates(): Promise<Map<number, MessageEmbed>> {
 
 
 	for(const project of projects) {		
-		//console.log('Checking project: ' + project.id);
+		//logger.info('Checking project: ' + project.id);
 		const data = await CurseHelper.queryModById(project.id);
 		const newVersion = Utils.getFilenameFromURL(data.latestFile.download_url);
 		if (project.version !== newVersion) {
@@ -154,7 +155,7 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 		try {
 			if (guild.releasesChannel !== '-1') {
 				const channel: TextChannel = await botClient.channels.fetch(guild.releasesChannel) as TextChannel;
-				//console.log('Will send the message in: ' + channel.name)
+				//logger.info('Will send the message in: ' + channel.name)
 
 				for (const id of guild.projectIds) {
 					const embed = updates.get(id);
@@ -174,7 +175,7 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 				Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
 			}
 			Utils.sendDMtoDavoleo(botClient, 'Error sending mod update information in one of the guilds: ' + error);
-			console.warn('WARNING: A promise was rejected!', error);
+			logger.warn('WARNING: A promise was rejected!', error);
 		}
 	}
 }
@@ -186,7 +187,7 @@ setInterval(() => {
 			sendUpdateAnnouncements(updates);
 		}
 	})
-	.catch(error => console.warn("WARNING: A promise was rejected!\n" + error));
+	.catch(error => logger.warn("WARNING: A promise was rejected!\n" + error));
 
 }, 1000 * 60 * 15);
 // 15 Minutes
@@ -197,7 +198,7 @@ setInterval(() => {
 // 1 Hour
 
 process.on('unhandledRejection', (reason, promise) => {
-	promise.catch(() => console.warn("Damn boi, how did this happen " + reason));
+	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
 	//throw reason;
 })
 

@@ -1,6 +1,6 @@
 import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
 import { CacheHandler, GuildHandler } from "./data/dataHandler";
-import { commands } from "./main";
+import { commands, logger } from "./main";
 import ModData, { ReleaseType, releaseTypes } from "./model/ModData";
 import { Utils } from "./utils";
 
@@ -92,7 +92,7 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     modEmbed.addField('Links', '[Download](' + modFile.download_url.replace(/ /g, '%20') + ')\t|\t[Changelog](' + mod.url + '/files/' + modFile.id + ')\t|\t[Project](' + mod.url + ')');
     modEmbed.setTimestamp(modFile.timestamp);
 
-    console.log('Latest file: ' + fileName);
+    logger.info('Latest file: ' + fileName);
 
     return modEmbed;
 }
