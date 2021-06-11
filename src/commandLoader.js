@@ -7,10 +7,10 @@ async function loadCommands() {
 	fs.readdir('./build/commands/util', (error, files) => {
 		if (error)
 			logger.error(error);
-		logger.log("Loading " + files.length + " util commands");
+		logger.info("Loading " + files.length + " util commands");
 		files.forEach(async file => {
 			const command = await import("./commands/util/" + file);
-			// logger.log(command.comm);
+			// logger.info(command.comm);
 			commands.push(command.comm);
 		});
 	});
@@ -18,10 +18,10 @@ async function loadCommands() {
 	fs.readdir('./build/commands/schedule', (error, files) => {
 		if (error)
 			logger.error(error);
-		logger.log("Loading " + files.length + " scheduling commands");
+		logger.info("Loading " + files.length + " scheduling commands");
 		files.forEach(async file => {
 			const command = await import('./commands/schedule/' + file);
-			// logger.log(command.comm);
+			// logger.info(command.comm);
 			commands.push(command.comm);
 		});
 	});

@@ -18,3 +18,6 @@ curseforge-updates.psd
 
 # DB File
 data.db
+
+# Log file
+bot.log

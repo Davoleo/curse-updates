@@ -108,7 +108,7 @@ botClient.on('message', (message: Message) => {
 								message.channel.send(response);
 							})
 							.catch((error: string) => {
-								console.warn("ERROR: async command execution: ", error)
+								logger.warn("ERROR: async command execution: ", error)
 								message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
 							})
 						}
