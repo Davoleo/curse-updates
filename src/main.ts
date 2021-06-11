@@ -17,27 +17,7 @@ let ready = false;
 botClient.on('ready', () => {
 	console.log(`Logged in as ${botClient.user.tag}!`);
 
-	// Set the bot status
-	if(devMode) {
-		botClient.user.setPresence({
-			status: 'dnd',
-			afk: false,
-			activity: {
-				name: ' with Davoleo in VSCode',
-				type: 'PLAYING',
-			},
-		});
-	}
-	else {
-		botClient.user.setPresence({
-			status: 'online',
-			afk: false,
-			activity: {
-				name: ' for updates on CF',
-				type: 'WATCHING',
-			},
-		});
-	}
+	Utils.updateBotStatus(botClient, devMode);
 });
 
 export let commands: Command[] = null;
@@ -210,6 +190,11 @@ setInterval(() => {
 
 }, 1000 * 60 * 15);
 // 15 Minutes
+
+setInterval(() => {
+	Utils.updateBotStatus(botClient, devMode);
+}, 1000 * 60 * 60)
+// 1 Hour
 
 process.on('unhandledRejection', (reason, promise) => {
 	promise.catch(() => console.warn("Damn boi, how did this happen " + reason));

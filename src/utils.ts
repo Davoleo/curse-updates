@@ -41,4 +41,28 @@ export class Utils {
 		const splitUrl = url.split('/');
 		return splitUrl[splitUrl.length - 1];
 	}
+
+	static updateBotStatus(client: Client, devMode: boolean): void {
+		// Set the bot status
+		if(devMode) {
+			client.user.setPresence({
+				status: 'dnd',
+				afk: false,
+				activity: {
+					name: ' with Davoleo in VSCode',
+					type: 'PLAYING',
+				},
+			});
+		}
+		else {
+			client.user.setPresence({
+				status: 'online',
+				afk: false,
+				activity: {
+					name: ' for updates on CF',
+					type: 'WATCHING',
+				},
+			});
+		}
+	}
 }
