@@ -1,5 +1,5 @@
 import { Client, Message, StringResolvable } from 'discord.js';
-import { appendFile, writeFile } from 'fs';
+import { createWriteStream, WriteStream } from 'fs';
 
 ///The different levels of permission that may be needed to execute a certain command
 export enum Permission {
@@ -9,48 +9,44 @@ export enum Permission {
     DAVOLEO
 }
 
-//TODO Fix file param printing
 export class Logger {
 
 	private filename: string;
+	private logStream: WriteStream;
 
 	constructor(filename: string) {
 		this.filename = filename;
-		writeFile(filename, "", 
-			(error) => console.log(error ? "Error while creating the file" : "Log file was created successfully")
-		);
+		this.logStream = createWriteStream(filename, {});
 	}
 
-	private appendLogLine(line: string): void {
-		appendFile(this.filename, line, (error) => {
-			if (error) {
+	private appendLogLine(line: string, ...extras: unknown[]): void {
+		this.logStream.write(line + '\n', (error) => {
+			if (error)
 				console.error("Error while writing to " + this.filename +  ": ", error);
-			}
-		})
+		});
+		if (extras.length > 0)
+			this.logStream.write(JSON.stringify(extras) + '\n');
 	}
 
 	public info(message: string, ...params: StringResolvable[]): void {
 		const prefixedMessage = "[INFO] curse_updates: " + message;
 		console.log(prefixedMessage, ...params);
 
-		params.forEach(param => message += (", " + JSON.stringify(param)));
-		this.appendLogLine(prefixedMessage + '\n');
+		this.appendLogLine(prefixedMessage, ...params);
 	}
 
 	public warn(message: string, ...params: StringResolvable[]): void {
 		const prefixedMessage = "[WARN] curse_updates: " + message;
 		console.warn(prefixedMessage, ...params);
 
-		params.forEach(param => message += (", " + JSON.stringify(param)));
-		this.appendLogLine(prefixedMessage + '\n');
+		this.appendLogLine(prefixedMessage, ...params);
 	}
 
 	public error(message: string, ...params: StringResolvable[]): void {
 		const prefixedMessage = "[ERROR] curse_updates: " + message;
 		console.error(prefixedMessage, ...params);
 
-		params.forEach(param => message += (", " + JSON.stringify(param)));
-		this.appendLogLine(prefixedMessage + '\n');
+		this.appendLogLine(prefixedMessage, ...params);
 	}
 }
 
