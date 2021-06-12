@@ -48,7 +48,9 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     const modEmbed = new MessageEmbed();
 
     if (modFile == undefined) {
-        throw "ERROR: Querying the latest file of **" + mod.name + "** resulted in an `undefined` file!\nNote: if this error persists and is caused by a scheduled check, please remove the project from the bot schedule."
+        throw `ERROR: Querying the latest file of **${mod.name}** resulted in an \`undefined\` file!
+        Note: This error is most likely caused by trying to query an unsupported CF Project
+        Note: If this error persists and is thrown in a scheduled update check please remove the project from the bot schedule.`
     }
 
     let releaseType: ReleaseType;
