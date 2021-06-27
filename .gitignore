@@ -21,3 +21,6 @@ data.db
 
 # Log file
 bot.log
+
+# Remote VPS Data Analysis folder
+remote_data
