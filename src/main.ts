@@ -95,7 +95,10 @@ botClient.on('message', (message: Message) => {
 								}
 							}
 						})
-						.catch(error => Utils.sendDMtoDavoleo(botClient, "WARNING: Error during permission evaluation: " + error));
+						.catch(error => {
+							Utils.sendDMtoDavoleo(botClient, "WARNING: Error during permission evaluation: " + error);
+							logger.warn("WARNING: Error during permission evaluation: ", error);
+						});
 					} else {
 						//TODO Deduplicate code here and above 
 						//Handle command execution differently depending if it's a sync or async command
@@ -187,7 +190,7 @@ setInterval(() => {
 			sendUpdateAnnouncements(updates);
 		}
 	})
-	.catch(error => logger.warn("WARNING: A promise was rejected!\n" + error));
+	.catch(error => logger.warn("WARNING: A promise was rejected!\n", error));
 
 }, 1000 * 60 * 15);
 // 15 Minutes

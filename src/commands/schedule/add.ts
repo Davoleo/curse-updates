@@ -13,10 +13,13 @@ async function run(args: string[], messageRef: Message) {
     
     try {
         const data = await CurseHelper.queryModById(projectID);
-        GuildHandler.addProjectToSchedule(messageRef.guild.id, projectID);
-        
         const filename = Utils.getFilenameFromURL(data.latestFile.download_url);
+        if (data.mod.key == undefined)
+            throw Error("NULL slug!")
+
         CacheHandler.addProjectToCache(projectID, data.mod.key, filename, messageRef.guild.id, true);
+        GuildHandler.addProjectToSchedule(messageRef.guild.id, projectID);
+
         return ":white_check_mark: " + data.mod.name + " has been successfully added to the schedule";
     }
     catch(error) {
