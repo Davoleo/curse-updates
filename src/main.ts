@@ -30,6 +30,7 @@ loadCommands().then(comms => {
 
 botClient.on('message', (message: Message) => {
 
+	//Initialize the guild if its config is null
 	if (message.guild !== null && message.guild.available) {
 		if (GuildHandler.getServerConfig(message.guild.id) == null) {
 			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);

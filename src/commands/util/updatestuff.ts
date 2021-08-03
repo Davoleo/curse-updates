@@ -1,23 +1,31 @@
+import { commands } from "../../main";
 import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
-function run() {
-    // for (const serverId in config.serverConfig) {
-    //     config.serverConfig[serverId].messageTemplate = '';
-    //     fileUtils.updateJSONConfig(config);
-    // }
+async function run() {
 
-    return 'There\'s no code to update anything here -_-\'';
+    const commandData = [];
+    commands.forEach(command => {
+        const obj = {
+            name: command.name,
+            description: command.description,
+        };
+        commandData.push(obj);
+    });
+
+    //slashCommands = await botClient.guilds.cache.get('500396398324350989')
+
+    return 'Slash Commands have been deployed';
 }
 
 export const comm: Command = new Command(
     'updatestuff', 
     {
-        description: 'performs updates on the internal JSON database - Internal Command only runnable by the bot author',
+        description: "deploys current commands to be used with discord's standard Interactions API - Internal Command only runnable by the bot author",
         isGuild: true,
         action: run,
         permLevel: Permission.DAVOLEO,
         argNames: [],
-        async: false
+        async: true
     }
 );
