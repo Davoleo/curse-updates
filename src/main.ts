@@ -96,7 +96,7 @@ botClient.on('message', (message: Message) => {
 							}
 						})
 						.catch(error => {
-							Utils.sendDMtoDavoleo(botClient, "WARNING: Error during permission evaluation: " + error);
+							Utils.sendDMtoOwner(botClient, "WARNING: Error during permission evaluation: " + error);
 							logger.warn("WARNING: Error during permission evaluation: ", error);
 						});
 					} else {
@@ -175,9 +175,9 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 		catch(error) {
 			if (error == "DiscordAPIError: Missing Access") {
 				GuildHandler.resetReleaseChannel(guild.serverId);
-				Utils.sendDMtoDavoleo(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
+				Utils.sendDMtoOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
 			}
-			Utils.sendDMtoDavoleo(botClient, 'Error sending mod update information in one of the guilds: ' + error);
+			Utils.sendDMtoOwner(botClient, 'Error sending mod update information in one of the guilds: ' + error);
 			logger.warn('WARNING: A promise was rejected!', error);
 		}
 	}

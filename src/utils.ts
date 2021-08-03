@@ -1,4 +1,4 @@
-import { Client, Message, StringResolvable } from 'discord.js';
+import { Client, Message, StringResolvable, User } from 'discord.js';
 import { createWriteStream, WriteStream } from 'fs';
 
 ///The different levels of permission that may be needed to execute a certain command
@@ -52,9 +52,11 @@ export class Logger {
 
 export class Utils {
 
-	static sendDMtoDavoleo(client: Client, message: string): void {
-		client.users.fetch('143127230866915328')
-			.then((davoleo) => davoleo.send(message));
+	static sendDMtoOwner(client: Client, message: string): void {
+		client.fetchApplication().then(app => {
+			if (app.owner instanceof User)
+				app.owner.send(message);
+		});
 	}
 
 	static async hasPermission(message: Message, permissionLevel: Permission): Promise<boolean> {
