@@ -26,7 +26,7 @@ export function buildHelpEmbed(title: string, category: string): MessageEmbed {
             if (command.argNames.length > 0)
                 command.argNames.forEach(arg => argString += (" `" + arg + "`"));
 
-            embed.addField(command.name + argString, command.description);
+            embed.addField(category + ' ' +  command.name + argString, command.description);
         }
     });
 

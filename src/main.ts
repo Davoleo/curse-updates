@@ -34,7 +34,7 @@ botClient.on('message', (message: Message) => {
 	if (message.guild !== null && message.guild.available) {
 		if (GuildHandler.getServerConfig(message.guild.id) == null) {
 			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
-			logger.info("Init......")
+			logger.info(`Initializing guild config... :  ${message.guild.name}`)
 		}
 	}
 	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
