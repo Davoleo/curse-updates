@@ -4,7 +4,10 @@ import { Permission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
     messageRef.channel.send("Pinging...").then((pingMessage) => {
-        pingMessage.edit('PONG! :ping_pong: - Response Time: ' + (pingMessage.createdTimestamp - messageRef.createdTimestamp) + 'ms')
+        if (Math.random() < 0.5)
+            pingMessage.edit('PONG! :ping_pong: - Response Time: ' + (pingMessage.createdTimestamp - messageRef.createdTimestamp) + 'ms')
+        else
+            pingMessage.edit('PING! :ping_pong: - Response Time: ' + (pingMessage.createdTimestamp - messageRef.createdTimestamp) + 'ms')
     });
     return "";
 }
