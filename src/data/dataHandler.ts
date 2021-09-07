@@ -8,6 +8,7 @@ const storage = new Loki("data.db", {
     autosave: true,
     autosaveInterval: 8000
 });
+
 let serverCollection: Collection<ServerConfig>;
 let cachedProjects: Collection<CachedProject>;
 
@@ -124,6 +125,8 @@ function updatePrefix(serverId: Snowflake, prefix: string): void {
 
 function addProjectToSchedule(serverId: Snowflake, projectId: number): void {
     const server: ServerConfig = getServerConfig(serverId);
+    //if (server.projectIds.length > 15)
+    //    throw Error("Too_Many_Projects")
     server.projectIds.push(projectId);
     serverCollection.update(server);
 }
