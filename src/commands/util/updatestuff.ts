@@ -24,7 +24,7 @@ export const comm: Command = new Command(
         description: "deploys current commands to be used with discord's standard Interactions API - Internal Command only runnable by the bot author",
         isGuild: true,
         action: run,
-        permLevel: Permission.DAVOLEO,
+        permLevel: Permission.OWNER,
         argNames: [],
         async: true
     }

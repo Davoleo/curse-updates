@@ -6,7 +6,7 @@ export enum Permission {
     USER,
     MODERATOR,
     ADMINISTRATOR,
-    DAVOLEO
+    OWNER
 }
 
 export class Logger {
@@ -65,7 +65,7 @@ export class Utils {
 			const guildMember = await message.guild.members.fetch(authorId);
 
 			switch (permissionLevel) {
-				case Permission.DAVOLEO:
+				case Permission.OWNER:
 					return authorId === '143127230866915328';
 				case Permission.ADMINISTRATOR:
 					return guildMember.permissions.has("ADMINISTRATOR");
