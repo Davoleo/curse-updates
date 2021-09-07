@@ -1,13 +1,13 @@
 import { Message } from "discord.js";
 import { GuildInitializer } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission, Utils } from "../../utils";
+import { Permission } from "../../utils";
 
 async function run(args: string[], messageRef: Message) {
     const guild = await messageRef.client.guilds.fetch(args[0]);
     GuildInitializer.initServerConfig(guild.id, guild.name);
-    const invite = (await guild.fetchInvites()).first();
-    Utils.sendDMtoOwner(messageRef.client, invite.url)
+    //const invite = (await guild.fetchInvites()).first();
+    //Utils.sendDMtoOwner(messageRef.client, invite.url)
     return "Initializing this server's Data Package";
 }
 
