@@ -1,6 +1,7 @@
 import { Snowflake } from "discord.js";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
 import * as Loki from 'lokijs'
+import { logger } from "../main";
 
 const storage = new Loki("data.db", {
     autoload: true,
@@ -15,17 +16,19 @@ let cachedProjects: Collection<CachedProject>;
 function databaseInit() {
     serverCollection = storage.getCollection("server_config");
     if (serverCollection === null)
-        storage.addCollection('server_config');
+        serverCollection = storage.addCollection('server_config');
 
     cachedProjects = storage.getCollection("cached_projects");
     if (cachedProjects === null)
-        storage.addCollection('cached_projects');
+        cachedProjects = storage.addCollection('cached_projects');
+
+    logger.info("Database has been initialized!")
 }
 
 function initServerConfig(serverId: Snowflake, serverName: string): void {
     const oldServer = serverCollection.findOne({'serverId': serverId});
 
-    if (oldServer == null) {
+    if (oldServer == undefined) {
         serverCollection.insert({
             serverId: serverId,
             serverName: serverName,
@@ -114,7 +117,7 @@ function getAllServerConfigs(): ServerConfig[] {
 }
 
 function getServerConfig(serverId: Snowflake): ServerConfig {
-    return serverCollection.findOne({'serverId': serverId});
+    return serverCollection?.findOne({'serverId': serverId});
 }
 
 function updatePrefix(serverId: Snowflake, prefix: string): void {
