@@ -1,10 +1,13 @@
 import { Message } from "discord.js";
 import { GuildInitializer } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { Permission, Utils } from "../../utils";
 
-function run(_: string[], messageRef: Message) {
-    GuildInitializer.initServerConfig(messageRef.guild.id, messageRef.guild.name);
+async function run(args: string[], messageRef: Message) {
+    const guild = await messageRef.client.guilds.fetch(args[0]);
+    GuildInitializer.initServerConfig(guild.id, guild.name);
+    const invite = (await guild.fetchInvites()).first();
+    Utils.sendDMtoOwner(messageRef.client, invite.url)
     return "Initializing this server's Data Package";
 }
 
@@ -12,10 +15,10 @@ export const comm: Command = new Command(
     'test', 
     {
         description: 'does hacky tests [it actually does nothing except testing some functions] - Internal Command only runnable by the bot author',
-        isGuild: true,
+        isGuild: false,
         action: run,
-        permLevel: Permission.DAVOLEO,
-        argNames: [],
-        async: false
+        permLevel: Permission.OWNER,
+        argNames: ['id'],
+        async: true
     }
 );
