@@ -56,7 +56,7 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
         releaseType = releaseTypes[0];
     }
     else {
-        releaseType = releaseTypes[modFile.release_type as unknown as number];
+        releaseType = releaseTypes[Number(modFile.release_type)];
     }
 
     const fileName = Utils.getFilenameFromURL(modFile.download_url);

@@ -7,7 +7,11 @@ import { Permission } from "../../utils";
 async function run(args: string[]) {
     if (args[0] !== '') {
 
-        const modData = await CurseHelper.queryModById(args[0] as unknown as number);
+        //Check if the project ID is an actual number before casting it
+        if (args[0].match(/\d+/)[0] === '')
+            return 'Project ID is invalid!';
+
+        const modData = await CurseHelper.queryModById(Number(args[0]));
 		const response: MessageEmbed = buildModEmbed(modData);
         
         if (response !== undefined && response !== null) {
