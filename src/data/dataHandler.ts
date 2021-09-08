@@ -128,8 +128,12 @@ function updatePrefix(serverId: Snowflake, prefix: string): void {
 
 function addProjectToSchedule(serverId: Snowflake, projectId: number): void {
     const server: ServerConfig = getServerConfig(serverId);
+
+    if (server.projectIds.indexOf(projectId) !== -1)
+        throw Error("Project_Already_Scheduled");
+
     if (server.projectIds.length > 30)
-        throw Error("Too_Many_Projects")
+        throw Error("Too_Many_Projects");
     server.projectIds.push(projectId);
     serverCollection.update(server);
 }

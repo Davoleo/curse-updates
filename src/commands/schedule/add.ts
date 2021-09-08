@@ -26,9 +26,11 @@ async function run(args: string[], messageRef: Message) {
         if (error === "NULL_slug!")
             return ":x: The project corresponding to that ID doesn't exist or can't be fetched";
         else if (error === "Too_Many_Projects")
-            return ":x: You have reached the project number limit for this guild, please remove some"
+            return ":x: You have reached the project number limit for this guild, please remove some";
+        else if (error === "Project_Already_Scheduled")
+            return ":x: This project was already added to this server's schedule";
         else
-            return ":x: Unexpected Error!"
+            return ":x: Unexpected Error!";
     }
 }
 
