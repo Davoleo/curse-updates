@@ -1,5 +1,6 @@
-import { Client, Message, StringResolvable, User } from 'discord.js';
+import { Client, Message, StringResolvable } from 'discord.js';
 import { createWriteStream, WriteStream } from 'fs';
+import * as config from './data/config.json';
 
 ///The different levels of permission that may be needed to execute a certain command
 export enum Permission {
@@ -53,20 +54,20 @@ export class Logger {
 export class Utils {
 
 	static sendDMtoOwner(client: Client, message: string): void {
-		client.fetchApplication().then(app => {
-			if (app.owner instanceof User)
-				app.owner.send(message);
-		});
+		client.users.fetch(config.ownerId).then(owner => {
+			owner.send(message);
+		})
 	}
 
 	static async hasPermission(message: Message, permissionLevel: Permission): Promise<boolean> {
+		const authorId = message.author.id;
+
 		if (message.guild !== null && message.guild.available !== false) {
-			const authorId = message.author.id;
 			const guildMember = await message.guild.members.fetch(authorId);
 
 			switch (permissionLevel) {
 				case Permission.OWNER:
-					return authorId === '143127230866915328';
+					return authorId === config.ownerId;
 				case Permission.ADMINISTRATOR:
 					return guildMember.permissions.has("ADMINISTRATOR");
 				case Permission.MODERATOR:
@@ -77,8 +78,13 @@ export class Utils {
 					return false;
 			}
 		}
-
-		return false;
+		else {
+			//Guild is not available we only check for owner level permission
+			if (permissionLevel == Permission.OWNER)
+				return authorId === config.ownerId;
+			else 
+				return true;
+		}
 	}
 
 	static getFilenameFromURL(url: string): string {

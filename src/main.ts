@@ -73,50 +73,31 @@ botClient.on('message', (message: Message) => {
 
 				//Check the command name
 				if (sliver === command.name) {
-					// if it's a guild command check for guild permissions
-					if (command.isGuildCommand) {
-						//Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
-						Utils.hasPermission(message, command.permissionLevel).then((pass) => {
-							if(pass) {
-								//TODO Deduplicate code here and below
-								//Handle command execution differently depending if it's a sync or async command
-								if (!command.async) {
-									const response = command.action(splitCommand, message);
-									if (response !== '')
-										message.channel.send(response);
-								} 
-								else {
-									command.action(splitCommand, message).then((response: unknown) => {
-										message.channel.send(response);
-									})
-									.catch((error: string) => {
-										logger.warn("ERROR: async command execution: ", error)
-										message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
-									})
-								}
+					//Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
+					Utils.hasPermission(message, command.permissionLevel).then((pass) => {
+						if(pass) {
+							//TODO Deduplicate code here and below
+							//Handle command execution differently depending if it's a sync or async command
+							if (!command.async) {
+								const response = command.action(splitCommand, message);
+								if (response !== '')
+									message.channel.send(response);
+							} 
+							else {
+								command.action(splitCommand, message).then((response: unknown) => {
+									message.channel.send(response);
+								})
+								.catch((error: string) => {
+									logger.warn("ERROR: async command execution: ", error)
+									message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
+								})
 							}
-						})
-						.catch(error => {
-							Utils.sendDMtoOwner(botClient, "WARNING: Error during permission evaluation: " + error);
-							logger.warn("WARNING: Error during permission evaluation: ", error);
-						});
-					} else {
-						//TODO Deduplicate code here and above 
-						//Handle command execution differently depending if it's a sync or async command
-						if (!command.async) {
-							const response = command.action(splitCommand, message);
-							if (response !== '')
-								message.channel.send(response);
-						} else {
-							command.action(splitCommand, message).then((response: unknown) => {
-								message.channel.send(response);
-							})
-							.catch((error: string) => {
-								logger.warn("ERROR: async command execution: ", error)
-								message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
-							})
 						}
-					}
+					})
+					.catch(error => {
+						Utils.sendDMtoOwner(botClient, "WARNING: Error during permission evaluation: " + error);
+						logger.warn("WARNING: Error during permission evaluation: ", error);
+					});
 				}
 			}
 		});
