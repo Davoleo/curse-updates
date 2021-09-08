@@ -5,11 +5,15 @@ import Command from "../../model/Command";
 import { Permission, Utils } from "../../utils";
 
 async function run(args: string[], messageRef: Message) {
+
+    if (args.length !== 1)
+        return ":x: Wrong number of arguments!"
+
     //Check if the project ID is an actual number before casting it
     if (args[0].match(/\d+/)[0] === '')
         return 'Project ID is invalid!';
 
-    const projectID = args[0].trim() as unknown as number;
+    const projectID = Number(args[0].trim());
     
     try {
         const data = await CurseHelper.queryModById(projectID);
@@ -23,14 +27,14 @@ async function run(args: string[], messageRef: Message) {
         return ":white_check_mark: " + data.mod.name + " has been successfully added to the schedule";
     }
     catch(error) {
-        if (error === "NULL_slug!")
+        if (error.message === "NULL_slug!")
             return ":x: The project corresponding to that ID doesn't exist or can't be fetched";
-        else if (error === "Too_Many_Projects")
+        else if (error.message === "Too_Many_Projects")
             return ":x: You have reached the project number limit for this guild, please remove some";
-        else if (error === "Project_Already_Scheduled")
+        else if (error.message === "Project_Already_Scheduled")
             return ":x: This project was already added to this server's schedule";
         else
-            return ":x: Unexpected Error!";
+            return `:x: Unexpected Error: ${error.message}!`;
     }
 }
 

@@ -4,15 +4,19 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
+
+    if (args.length !== 1)
+        return ":x: Wrong number of arguments!"
+
     //Check if the project ID is an actual number before casting it
     if (args[0].match(/\d+/)[0] === '')
         return 'Project ID is invalid!';
     
-    const projectID = args[0] as unknown as number;
+    const projectID = Number(args[0]);
     const wasRemoved = GuildHandler.removeProjectFromSchedule(messageRef.guild.id, projectID);
-    CacheHandler.removeProjectById(messageRef.guild.id, projectID);
     
     if (wasRemoved) {
+        CacheHandler.removeProjectById(messageRef.guild.id, projectID);
         return ":recycle: Project removed successfully!"
     }
     else
