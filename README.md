@@ -27,7 +27,8 @@ If you want to self-host this discord bot you can do so by following these steps
 ```json
 {
   "token": "<Your Application Token>",
-  "devMode": false
+  "devMode": false,
+  "ownerId": "<Owner Permission Level User Id>"
 }
 ```
 _you should replace the discord client token to start the bot with your own (you can get one in the Discord Applications dev portal)_
