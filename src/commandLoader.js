@@ -6,7 +6,8 @@ async function loadCommands() {
 
 	fs.readdir('./build/commands/util', (error, files) => {
 		if (error)
-			logger.error(error);
+			logger.error("commandLoaderError: " + error);
+		files = files.filter(file => !file.endsWith('map'));
 		logger.info("Loading " + files.length + " util commands");
 		files.forEach(async file => {
 			const command = await import("./commands/util/" + file);
@@ -17,7 +18,8 @@ async function loadCommands() {
 	
 	fs.readdir('./build/commands/schedule', (error, files) => {
 		if (error)
-			logger.error(error);
+			logger.error("commandLoaderError: " + error);
+		files = files.filter(file => !file.endsWith('map'));
 		logger.info("Loading " + files.length + " scheduling commands");
 		files.forEach(async file => {
 			const command = await import('./commands/schedule/' + file);
