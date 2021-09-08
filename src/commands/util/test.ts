@@ -4,11 +4,13 @@ import Command from "../../model/Command";
 import { Permission } from "../../utils";
 
 async function run(args: string[], messageRef: Message) {
+    if (args[0] == undefined)
+        return "Need ID arg"
     const guild = await messageRef.client.guilds.fetch(args[0]);
     GuildInitializer.initServerConfig(guild.id, guild.name);
     //const invite = (await guild.fetchInvites()).first();
     //Utils.sendDMtoOwner(messageRef.client, invite.url)
-    return "Initializing this server's Data Package";
+    return `Initializing ${guild.name} Data Package`;
 }
 
 export const comm: Command = new Command(
