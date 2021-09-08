@@ -81,6 +81,8 @@ function removeAllByGuild(guildId: Snowflake, projectIds: number[]): void {
 
 function removeProjectById(guildId: Snowflake, projectID: number): void {
     const project: CachedProject = cachedProjects.findOne({'id': projectID});
+    if (project == null)
+        throw Error("No_Project_In_Cache_with_Id_" + projectID);
 
     if (project.subbedGuilds.length <= 1) {
         cachedProjects.findAndRemove({ id: { '$eq': project.id }});

@@ -1,11 +1,9 @@
-import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
-import { CacheHandler, GuildHandler } from "./data/dataHandler";
+import { MessageEmbed } from "discord.js";
 import { commands, logger } from "./main";
 import ModData, { ReleaseType, releaseTypes } from "./model/ModData";
 import { Utils } from "./utils";
 
-
-const embedColors = [
+export const embedColors = [
 	0x404040,
 	0xFEBC11,
 	0xF26122,
@@ -97,36 +95,4 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     logger.info('Latest file: ' + fileName);
 
     return modEmbed;
-}
-
-export function buildScheduleEmbed(guildId: Snowflake): MessageEmbed {
-    const idNamePairs: EmbedFieldData[] = [];
-
-    const config = GuildHandler.getServerConfig(guildId);
-
-    config.projectIds.forEach(id => {
-        const project = CacheHandler.getProjectById(id);
-        idNamePairs.push({name: project.slug, value: 'id: ' + project.id + '\nlatest cached version: ' + project.version});
-    });
-
-    const embed = new MessageEmbed();
-    embed.color = embedColors[Math.ceil((Math.random() * 3))];
-    embed.setTitle('Registered Projects and Release Channel for this server');
-
-    if (config.releasesChannel !== '-1')
-        embed.addField('Announcements Channel', '<#' + config.releasesChannel + '>');
-    else
-        embed.addField('Announcements Channel', 'None');
-
-    if (config.messageTemplate !== '')
-        embed.addField('Template Message', config.messageTemplate);
-    else
-        embed.addField('Template Messsage', 'None');
-
-    if (idNamePairs.length > 0)
-        embed.addFields(idNamePairs);
-    else
-        embed.setTitle('No Projects have been Scheduled on this server');
-
-    return embed;
 }
