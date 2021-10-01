@@ -37,6 +37,8 @@ function buildScheduleEmbed(guildId: Snowflake): {main: MessageEmbed, extras: Me
 
     config.projectIds.forEach(id => {
         const project = CacheHandler.getProjectById(id);
+        if (project == null)
+            return;
         idNamePairs.push({name: project.slug, value: 'id: ' + project.id + '\nlatest cached version: ' + project.version});
     });
 

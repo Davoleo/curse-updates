@@ -182,9 +182,9 @@ setInterval(() => {
 }, 1000 * 60 * 60)
 // 1 Hour
 
-process.on('unhandledRejection', (reason, promise) => {
-	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
+//process.on('unhandledRejection', (reason, promise) => {
+//	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
 	//throw reason;
-})
+//})
 
 botClient.login(config.token);
