@@ -155,9 +155,10 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 			}
 		}
 		catch(error) {
-			if (error == "DiscordAPIError: Missing Access") {
+			if (error == "DiscordAPIError: Missing Access" || error == "DiscordAPIError: Unknown Channel") {
+				botClient.guilds.fetch(guild.serverId).then(guild => guild.owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + guild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel."))
 				GuildHandler.resetReleaseChannel(guild.serverId);
-				Utils.sendDMtoOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server https://discordapp.com/api/guilds/" + guild.serverId + "/widget.json");
+				Utils.sendDMtoOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server: " + guild.serverName + ` (${guild.serverId})`);
 			}
 			Utils.sendDMtoOwner(botClient, 'Error sending mod update information in one of the guilds: ' + error);
 			logger.warn('WARNING: A promise was rejected!', error);
