@@ -30,25 +30,29 @@ loadCommands().then(comms => {
 
 botClient.on('message', (message: Message) => {
 
-	//Initialize the guild if its config is null
+	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
+
 	if (message.guild !== null && message.guild.available) {
+		//Initialize the guild if its config is null
 		if (GuildHandler.getServerConfig(message.guild.id) == null) {
 			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
 			logger.info(`Initializing guild config... :  ${message.guild.name}`)
 		}
-	}
-	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
 
-	// Handle pinging the bot
-	if (message.content === '<@!' + botClient.user.id + '>') {
-		GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
-		message.channel.send("Hey, my prefix in this server is: `" + prefix + '`\nTry out `' + prefix + 'help` to get a list of commands');
+		// Handle pinging the bot
+		if (message.content === '<@!' + botClient.user.id + '>') {
+			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
+			message.channel.send("Hey, my prefix in this server is: `" + prefix + '`\nTry out `' + prefix + 'help` to get a list of commands');
+		}
+
+		// logger.info(message)
+		if (devMode && message.guild.id !== '500396398324350989' && message.guild.id !== '473145328439132160') {
+			return;
+		}
+
 	}
 
-	// logger.info(message)
-	if (devMode && message.guild.id !== '500396398324350989' && message.guild.id !== '473145328439132160') {
-		return;
-	}
+	
 	if (!ready) {
 		return;
 	}
@@ -156,12 +160,15 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 		}
 		catch(error) {
 			if (error == "DiscordAPIError: Missing Access" || error == "DiscordAPIError: Unknown Channel") {
-				botClient.guilds.fetch(guild.serverId).then(guild => guild.owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + guild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel."))
-				GuildHandler.resetReleaseChannel(guild.serverId);
-				Utils.sendDMtoOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server: " + guild.serverName + ` (${guild.serverId})`);
+				const discordGuild = await botClient.guilds.fetch(guild.serverId);
+				await discordGuild.owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + discordGuild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel.")
+				Utils.sendDMtoOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server: " + discordGuild.name + ` (${discordGuild.id})`);
+				GuildHandler.resetReleaseChannel(discordGuild.id);
 			}
-			Utils.sendDMtoOwner(botClient, 'Error sending mod update information in one of the guilds: ' + error);
-			logger.warn('WARNING: A promise was rejected!', error);
+			else {
+				Utils.sendDMtoOwner(botClient, 'Error sending mod update information in one of the guilds: ' + error);
+				logger.warn('WARNING: A promise was rejected!', error);
+			}
 		}
 	}
 }
