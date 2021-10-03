@@ -30,7 +30,7 @@ loadCommands().then(comms => {
 
 botClient.on('message', (message: Message) => {
 
-	const prefix = message.guild !== null ? GuildHandler.getServerConfig(message.guild.id).prefix : '||';
+	let prefix = '||';
 
 	if (message.guild !== null && message.guild.available) {
 		//Initialize the guild if its config is null
@@ -38,6 +38,8 @@ botClient.on('message', (message: Message) => {
 			GuildInitializer.initServerConfig(message.guild.id, message.guild.name);
 			logger.info(`Initializing guild config... :  ${message.guild.name}`)
 		}
+
+		prefix = GuildHandler.getServerConfig(message.guild.id).prefix;
 
 		// Handle pinging the bot
 		if (message.content === '<@!' + botClient.user.id + '>') {
