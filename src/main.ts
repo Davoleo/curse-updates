@@ -5,7 +5,7 @@ import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed, } from './embedBuilder';
-import { Client, Guild, Message, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, Guild, GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
 import Command from './model/Command';
 import { loadCommands } from './commandLoader';
 
@@ -52,6 +52,9 @@ botClient.on('message', (message: Message) => {
 			return;
 		}
 
+		if (message.channel instanceof GuildChannel && !message.channel.permissionsFor(message.guild.me).has("SEND_MESSAGES")) {
+			return;
+		}
 	}
 
 	
