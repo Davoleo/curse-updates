@@ -116,7 +116,11 @@ botClient.on('message', (message: Message) => {
 botClient.on('guildDelete', (guild: Guild) => {
 	//Remove data for servers the bot has been kicked/banned from
 	GuildInitializer.removeServerConfig(guild.id);
-})
+});
+
+botClient.on("error", (err) => {
+	logger.error("Error while comunicating with bot client: " + err.message);
+});
 
 // -------------------------- Scheduled Check --------------------------------------
 
