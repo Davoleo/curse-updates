@@ -11,7 +11,7 @@ import { loadCommands } from './commandLoader';
 
 export const botClient = new Client();
 
-export const logger: Logger = new Logger("bot.log");
+export const logger: Logger = new Logger();
 
 const devMode = config.devMode;
 let ready = false;

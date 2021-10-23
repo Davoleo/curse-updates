@@ -1,5 +1,5 @@
 import { Client, Message, StringResolvable } from 'discord.js';
-import { createWriteStream, WriteStream } from 'fs';
+import { createWriteStream, existsSync, mkdirSync, WriteStream } from 'fs';
 import * as config from './data/config.json';
 
 ///The different levels of permission that may be needed to execute a certain command
@@ -15,9 +15,14 @@ export class Logger {
 	private filename: string;
 	private logStream: WriteStream;
 
-	constructor(filename: string) {
-		this.filename = filename;
-		this.logStream = createWriteStream(filename, {});
+	constructor() {
+		if (!existsSync("logs"))
+			mkdirSync("logs");
+		
+		this.filename = "logs/" + Logger.getCurrentDateTime().replace(/\/|:/g, '-') + "_bot.log";		
+		this.logStream = createWriteStream(this.filename, { autoClose: true });
+		console.log("Logger Initialized");
+		
 	}
 
 	private appendLogLine(line: string, ...extras: unknown[]): void {
@@ -29,22 +34,27 @@ export class Logger {
 			this.logStream.write(JSON.stringify(extras) + '\n');
 	}
 
+	private static getCurrentDateTime(): string {
+		const now = new Date();
+		return now.toLocaleDateString('en-GB') + '_' + now.toLocaleTimeString('en-GB');
+	}
+
 	public info(message: string, ...params: StringResolvable[]): void {
-		const prefixedMessage = "[INFO] curse_updates: " + message;
+		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [INFO] curse_updates: ${message}`;
 		console.log(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);
 	}
 
 	public warn(message: string, ...params: StringResolvable[]): void {
-		const prefixedMessage = "[WARN] curse_updates: " + message;
+		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [WARN] curse_updates: ${message}`;
 		console.warn(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);
 	}
 
 	public error(message: string, ...params: StringResolvable[]): void {
-		const prefixedMessage = "[ERROR] curse_updates: " + message;
+		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [ERROR] curse_updates: ${message}`;
 		console.error(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);

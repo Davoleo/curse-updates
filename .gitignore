@@ -20,7 +20,7 @@ curseforge-updates.psd
 data.db
 
 # Log file
-bot.log
+logs/
 
 # Remote VPS Data Analysis folder
 remote_data
