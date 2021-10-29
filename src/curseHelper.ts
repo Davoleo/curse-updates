@@ -2,6 +2,7 @@ import * as CFAPI from 'mc-curseforge-api';
 import ModData from './model/ModData';
 
 async function queryModById(id: number): Promise<ModData> {
+
     const mod = await CFAPI.getMod(id);
 
     //const files = await mod.getFiles();

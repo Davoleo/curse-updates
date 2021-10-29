@@ -189,7 +189,7 @@ setInterval(() => {
 			sendUpdateAnnouncements(updates);
 		}
 	})
-	.catch(error => logger.warn("WARNING: A promise was rejected!\n", error));
+	.catch(error => logger.error("There was an error when querying cached projects: ", error));
 
 }, 1000 * 60 * 15);
 // 15 Minutes
