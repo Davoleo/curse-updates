@@ -4,7 +4,7 @@
         "outDir": "./build",
         "sourceMap": true,
         "allowJs": true,
-        "target": "ES5",
+        "target": "ES6",
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "allowUnreachableCode": false,
