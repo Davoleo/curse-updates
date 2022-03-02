@@ -5,18 +5,18 @@ import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed, } from './embedBuilder';
-import { Client, Guild, GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, Guild, GuildChannel, Interaction, Message, MessageEmbed, TextChannel } from 'discord.js';
 import Command from './model/Command';
 import { loadCommands } from './commandLoader';
 
-export const botClient = new Client();
+export const botClient = new Client({intents: 'GUILDS'});
 
 export const logger: Logger = new Logger();
 
 const devMode = config.devMode;
 let ready = false;
 
-botClient.on('ready', () => {
+botClient.once('ready', () => {
 	logger.info(`Logged in as ${botClient.user.tag}!`);
 
 	Utils.updateBotStatus(botClient, devMode);
@@ -27,6 +27,14 @@ loadCommands().then(comms => {
 	commands = comms;
 	ready = true;
 });
+
+botClient.on('interactionCreate', (interaction) => {
+
+});
+
+botClient.on("interaction", (interaction) => {
+	
+})
 
 botClient.on('message', (message: Message) => {
 
