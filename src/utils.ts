@@ -63,7 +63,7 @@ export class Logger {
 
 export class Utils {
 
-	static sendDMtoOwner(client: Client, message: string): void {
+	static sendDMtoBotOwner(client: Client, message: string): void {
 		client.users.fetch(config.ownerId).then(owner => {
 			owner.send(message);
 		})
