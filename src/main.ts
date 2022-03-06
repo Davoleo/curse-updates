@@ -104,7 +104,7 @@ botClient.on('message', (message: Message) => {
 						}
 					})
 					.catch(error => {
-						Utils.sendDMtoOwner(botClient, "WARNING: Error during permission evaluation: " + error);
+						Utils.sendDMtoBotOwner(botClient, "WARNING: Error during permission evaluation: " + error);
 						logger.warn("WARNING: Error during permission evaluation: ", error);
 					});
 				}
@@ -170,12 +170,17 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 		catch(error) {
 			if (error == "DiscordAPIError: Missing Access" || error == "DiscordAPIError: Unknown Channel") {
 				const discordGuild = await botClient.guilds.fetch(guild.serverId);
-				await discordGuild.owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + discordGuild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel.")
-				Utils.sendDMtoOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server: " + discordGuild.name + ` (${discordGuild.id})`);
+				
+				botClient.users.fetch(discordGuild.ownerID)
+				.then(owner => {
+					owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + discordGuild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel.")
+				})
+				Utils.sendDMtoBotOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server: " + discordGuild.name + ` (${discordGuild.id})`);
+				
 				GuildHandler.resetReleaseChannel(discordGuild.id);
 			}
 			else {
-				Utils.sendDMtoOwner(botClient, 'Error sending mod update information in one of the guilds: ' + error);
+				Utils.sendDMtoBotOwner(botClient, 'Error sending mod update information in one of the guilds: ' + error);
 				logger.warn('WARNING: A promise was rejected!', error);
 			}
 		}
