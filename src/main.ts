@@ -175,6 +175,8 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 				.then(owner => {
 					owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + discordGuild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel.")
 				})
+				.catch(() => {/* At this point we just give up warning the server owner and reset the channel right away */});
+				
 				Utils.sendDMtoBotOwner(botClient, "CHANNEL ACCESS ERROR - Resetting the annoucement channel for server: " + discordGuild.name + ` (${discordGuild.id})`);
 				
 				GuildHandler.resetReleaseChannel(discordGuild.id);
