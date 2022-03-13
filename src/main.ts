@@ -28,13 +28,13 @@ loadCommands().then(comms => {
 	ready = true;
 });
 
-botClient.on('interactionCreate', (interaction) => {
 
+botClient.on('interactionCreate', async (interaction) => {
+	if (interaction.isCommand()) {
+		if (interaction.commandName == 'ping')
+			await interaction.reply("QUANTUM PONG! :ping_pong:");
+	}
 });
-
-botClient.on("interaction", (interaction) => {
-	
-})
 
 botClient.on('message', (message: Message) => {
 
@@ -170,7 +170,7 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 						await channel.send(guild.messageTemplate);
 					}
 					if (embed != undefined) {
-						await channel.send(embed);
+						await channel.send("NOT IMPLEMENTED YET!!" /*embed*/);
 					}
 				}
 			}
@@ -179,7 +179,7 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 			if (error == "DiscordAPIError: Missing Access" || error == "DiscordAPIError: Unknown Channel") {
 				const discordGuild = await botClient.guilds.fetch(guild.serverId);
 				
-				botClient.users.fetch(discordGuild.ownerID)
+				botClient.users.fetch(discordGuild.ownerId)
 				.then(owner => {
 					owner.send("CHANNEL ACCESS ERROR - Resetting the annoucement channel for your server: " + discordGuild.name + "\nPlease Give the bot enough permission levels to write in the annoucements channel.")
 				})
@@ -195,6 +195,7 @@ async function sendUpdateAnnouncements(updates: Map<number, MessageEmbed>) {
 	}
 }
 
+/*
 setInterval(() => {
 	queryCacheUpdates()
 	.then(updates => {
@@ -206,6 +207,7 @@ setInterval(() => {
 
 }, 1000 * 60 * 15);
 // 15 Minutes
+*/
 
 setInterval(() => {
 	Utils.updateBotStatus(botClient, devMode);
