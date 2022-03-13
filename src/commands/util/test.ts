@@ -16,7 +16,7 @@ async function run(args: string[], messageRef: Message) {
 export const comm: Command = new Command(
     'test', 
     {
-        description: 'does hacky tests [it actually does nothing except testing some functions] - Internal Command only runnable by the bot author',
+        description: 'Tests some functions - Internal Command only runnable by the bot author',
         isGuild: false,
         action: run,
         permLevel: Permission.OWNER,
