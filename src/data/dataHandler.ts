@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
-import * as Loki from 'lokijs'
+import LokiConstructor from "lokijs";
 import { logger } from "../main";
 
-const storage = new Loki("data.db", {
+const storage = new LokiConstructor("data.db", {
     autoload: true,
     autoloadCallback: databaseInit,
     autosave: true,
