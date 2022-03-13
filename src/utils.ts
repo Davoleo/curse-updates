@@ -1,4 +1,4 @@
-import { Client, Message, StringResolvable } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import { createWriteStream, existsSync, mkdirSync, WriteStream } from 'fs';
 import * as config from './data/config.json';
 
@@ -39,21 +39,21 @@ export class Logger {
 		return now.toLocaleDateString('en-GB') + '_' + now.toLocaleTimeString('en-GB');
 	}
 
-	public info(message: string, ...params: StringResolvable[]): void {
+	public info(message: string, ...params: string[]): void {
 		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [INFO] curse_updates: ${message}`;
 		console.log(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);
 	}
 
-	public warn(message: string, ...params: StringResolvable[]): void {
+	public warn(message: string, ...params: string[]): void {
 		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [WARN] curse_updates: ${message}`;
 		console.warn(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);
 	}
 
-	public error(message: string, ...params: StringResolvable[]): void {
+	public error(message: string, ...params: string[]): void {
 		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [ERROR] curse_updates: ${message}`;
 		console.error(prefixedMessage, ...params);
 
@@ -108,20 +108,24 @@ export class Utils {
 			client.user.setPresence({
 				status: 'dnd',
 				afk: false,
-				activity: {
-					name: ' with Davoleo in VSCode',
-					type: 'PLAYING',
-				},
+				activities: [
+					{
+						name: ' with Davoleo in VSCode',
+						type: 'PLAYING',
+					}
+				],
 			});
 		}
 		else {
 			client.user.setPresence({
 				status: 'online',
 				afk: false,
-				activity: {
-					name: ' for updates on CF',
-					type: 'WATCHING',
-				},
+				activities: [
+					{
+						name: ' for updates on CF',
+						type: 'WATCHING',
+					}
+				],
 			});
 		}
 	}
