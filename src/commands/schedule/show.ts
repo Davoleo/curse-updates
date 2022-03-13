@@ -12,7 +12,7 @@ function run(args: string[], messageRef: Message) {
         return embeds.main;
     }
     else {
-        messageRef.channel.send(embeds.main)
+        messageRef.channel.send("Not Yet Implemented!!" /*embeds.main*/)
         return embeds.extras;
     }
 }

@@ -1,8 +1,7 @@
 import { Permission } from "../utils";
+import { SlashCommandBuilder, SlashCommandMentionableOption } from "@discordjs/builders";
 
-export default class Command {
-    public name: string;
-    public description: string;
+export default class Command extends SlashCommandBuilder {
     public category?: string = "";
     public isGuildCommand:  boolean;
     public action: CallableFunction;
@@ -11,15 +10,24 @@ export default class Command {
     public async: boolean;
 
     constructor(name: string, options: CommandOptions) {
-        this.name = name;
-        this.description = options.description;
+        super();
+        this.setName(name);
+        this.setDescription(options.description);
         if (options.category !== undefined)
             this.category = options.category;
         this.isGuildCommand = options.isGuild;
-        this.action = options.action;
         this.permissionLevel = options.permLevel;
         this.argNames = options.argNames;
         this.async = options.async;
+    }
+
+    export() {
+        return {
+            data: {
+
+            },
+            execute: this.action
+        }
     }
 }
 
