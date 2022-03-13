@@ -9,8 +9,12 @@
         "noFallthroughCasesInSwitch": true,
         "allowUnreachableCode": false,
         "noImplicitAny": true,
+
+        //Project Module Settings
+        "module": "CommonJS",
         "moduleResolution": "node",
         "resolveJsonModule": true,
+        "esModuleInterop": true,
 
         "typeRoots": ["./typings", "./node_modules/@types"]
     },
