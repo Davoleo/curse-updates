@@ -3,7 +3,7 @@ import { EmbedFieldData, Message, MessageEmbed, Snowflake } from "discord.js";
 import { CacheHandler, GuildHandler } from "../../data/dataHandler";
 import { embedColors } from "../../embedBuilder";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
     const embeds = buildScheduleEmbed(messageRef.guild.id)
@@ -24,7 +24,7 @@ export const comm: Command = new Command(
         description: 'Shows the scheduled project updates announcements of the current server and the announcements channel',
         isGuild: true,
         action: run,
-        permLevel: Permission.USER,
+        permLevel: CommandPermission.USER,
         argNames: [],
         async: false
     }

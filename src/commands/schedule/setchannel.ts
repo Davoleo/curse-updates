@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
     
@@ -26,7 +26,7 @@ export const comm: Command = new Command(
         description: 'Sets the channel this command is sent to as the projects update annoucements channel of the current server',
         isGuild: true,
         action: run,
-        permLevel: Permission.MODERATOR,
+        permLevel: CommandPermission.MODERATOR,
         argNames: ["channel"],
         async: false
     }

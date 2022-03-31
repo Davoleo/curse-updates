@@ -1,6 +1,6 @@
 import { commands } from "../../main";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 async function run() {
 
@@ -24,7 +24,7 @@ export const comm: Command = new Command(
         description: "does nothing - Internal Command only runnable by the bot author",
         isGuild: true,
         action: run,
-        permLevel: Permission.OWNER,
+        permLevel: CommandPermission.OWNER,
         argNames: [],
         async: true
     }

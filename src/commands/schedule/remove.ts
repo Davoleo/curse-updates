@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { CacheHandler, GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 function run(args: string[], messageRef: Message) {
 
@@ -30,7 +30,7 @@ export const comm: Command = new Command(
         description: 'Removes a Curseforge project from the scheduled check that runs once every 15 minutes',
         isGuild: true,
         action: run,
-        permLevel: Permission.MODERATOR,
+        permLevel: CommandPermission.MODERATOR,
         argNames: ["ProjectID"],
         async: false
     }

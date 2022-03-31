@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { GuildInitializer } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 async function run(args: string[], messageRef: Message) {
     if (args[0] == undefined)
@@ -19,7 +19,7 @@ export const comm: Command = new Command(
         description: 'Tests some functions - Internal Command only runnable by the bot author',
         isGuild: false,
         action: run,
-        permLevel: Permission.OWNER,
+        permLevel: CommandPermission.OWNER,
         argNames: ['id'],
         async: true
     }

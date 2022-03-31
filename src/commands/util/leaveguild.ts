@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 async function run(args: string[], messageRef: Message) {
     const guild = await messageRef.client.guilds.fetch(args[0]);
@@ -14,7 +14,7 @@ export const comm: Command = new Command(
         description: 'Leaves the guild given a certain guild ID',
         isGuild: false,
         action: run,
-        permLevel: Permission.OWNER,
+        permLevel: CommandPermission.OWNER,
         argNames: ['id'],
         async: true
     }

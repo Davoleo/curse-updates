@@ -5,9 +5,7 @@ import { Routes } from 'discord-api-types/v9'
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { REST } from '@discordjs/rest';
 
-
 async function loadCommands() {
-
 
 	let testCommandsArray = [
 		new SlashCommandBuilder().setName('ping').setDescription('QUANTUM PING PONG GAME!')

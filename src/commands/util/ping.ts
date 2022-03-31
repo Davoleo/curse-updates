@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandGroup } from "../../model/CommandGroup";
+import { CommandPermission } from "../../utils";
 
 function run(_: string[], messageRef: Message) {
     messageRef.channel.send("Pinging...").then((pingMessage) => {
@@ -14,12 +15,7 @@ function run(_: string[], messageRef: Message) {
 
 export const comm: Command = new Command(
     'ping', 
-    {
-        description: 'Sends a message with information about the latency of the bot response',
-        isGuild: false,
-        action: run,
-        permLevel: Permission.USER,
-        argNames: [],
-        async: false
-    }
+    'Sends a message with information about the latency of the bot response',
+    CommandGroup.GENERAL,
+    CommandPermission.USER
 );

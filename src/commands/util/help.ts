@@ -1,6 +1,6 @@
 import { buildHelpEmbed } from "../../embedBuilder";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 function run(args: string[]) {
     const category = args[0];
@@ -14,7 +14,7 @@ export const comm: Command = new Command(
         description: 'Sends an embed message with names and descriptions of commands in the written category',
         isGuild: false,
         action: run,
-        permLevel: Permission.USER,
+        permLevel: CommandPermission.USER,
         argNames: ["category"],
         async: false
     }

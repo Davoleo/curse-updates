@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 function run(args: string[], message: Message) {
     if (args === [] || args[0].length > 3) {
@@ -19,7 +19,7 @@ export const comm: Command = new Command(
         description: 'Changes the command prefix of the bot to the string passed as an argument',
         isGuild: true,
         action: run,
-        permLevel: Permission.MODERATOR,
+        permLevel: CommandPermission.MODERATOR,
         argNames: ["newPrefix"],
         async: false
     }

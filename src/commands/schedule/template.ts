@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission } from "../../utils";
+import { CommandPermission } from "../../utils";
 import { devMode } from "../../data/config.json"
 
 function run(args: string[], messageRef: Message) {
@@ -29,7 +29,7 @@ export const comm: Command = new Command(
         description: 'Sets a template message that is sent together with the update embed once a project update is released (empty template will reset this setting)',
         isGuild: true,
         action: run,
-        permLevel: Permission.MODERATOR,
+        permLevel: CommandPermission.MODERATOR,
         argNames: ["announcementMessage"],
         async: false
     }

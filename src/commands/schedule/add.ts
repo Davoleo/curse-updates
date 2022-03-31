@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { CurseHelper } from "../../curseHelper";
 import { CacheHandler, GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
-import { Permission, Utils } from "../../utils";
+import { CommandPermission, Utils } from "../../utils";
 
 async function run(args: string[], messageRef: Message) {
 
@@ -45,7 +45,7 @@ export const comm: Command = new Command(
         description: 'Adds a Curseforge project to the scheduled check that runs once every 15 minutes',
         isGuild: true,
         action: run,
-        permLevel: Permission.MODERATOR,
+        permLevel: CommandPermission.MODERATOR,
         argNames: ["ProjectID"],
         async: true
     }

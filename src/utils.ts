@@ -1,13 +1,20 @@
-import { Client, Message } from 'discord.js';
+import { Snowflake } from 'discord-api-types/globals';
+import { Client, Permissions } from 'discord.js';
 import { createWriteStream, existsSync, mkdirSync, WriteStream } from 'fs';
 import * as config from './data/config.json';
 
 ///The different levels of permission that may be needed to execute a certain command
-export enum Permission {
+export enum CommandPermission {
     USER,
     MODERATOR,
     ADMINISTRATOR,
     OWNER
+}
+
+enum LogLevel {
+	ERROR,
+	WARN,
+	INFO
 }
 
 export class Logger {
@@ -39,25 +46,34 @@ export class Logger {
 		return now.toLocaleDateString('en-GB') + '_' + now.toLocaleTimeString('en-GB');
 	}
 
-	public info(message: string, ...params: string[]): void {
-		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [INFO] curse_updates: ${message}`;
+	private log(level: LogLevel, message: string, ...params: string[]): void {
+		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [${LogLevel[level]}] curse_updates: ${message}`;
+		switch(level) {
+			case LogLevel.ERROR:
+				console.error(prefixedMessage, ...params);
+			break;
+			case LogLevel.WARN:
+				console.warn(prefixedMessage, ...params);
+			break;
+			case LogLevel.INFO:
+				console.log(prefixedMessage, ...params);
+			break;
+		}
 		console.log(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);
 	}
 
-	public warn(message: string, ...params: string[]): void {
-		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [WARN] curse_updates: ${message}`;
-		console.warn(prefixedMessage, ...params);
+	public info(message: string, ...params: string[]): void {
+		this.log(LogLevel.INFO, message, ...params);
+	}
 
-		this.appendLogLine(prefixedMessage, ...params);
+	public warn(message: string, ...params: string[]): void {
+		this.log(LogLevel.WARN, message, ...params);
 	}
 
 	public error(message: string, ...params: string[]): void {
-		const prefixedMessage = `[${Logger.getCurrentDateTime()}] [ERROR] curse_updates: ${message}`;
-		console.error(prefixedMessage, ...params);
-
-		this.appendLogLine(prefixedMessage, ...params);
+		this.log(LogLevel.ERROR, message, ...params);
 	}
 }
 
@@ -69,31 +85,27 @@ export class Utils {
 		})
 	}
 
-	static async hasPermission(message: Message, permissionLevel: Permission): Promise<boolean> {
-		const authorId = message.author.id;
+	static hasPermission(authorId: Snowflake, discordPermissions: Permissions, permissionLevel: CommandPermission): boolean {
 
-		if (message.guild !== null && message.guild.available !== false) {
-			const guildMember = await message.guild.members.fetch(authorId);
-
-			switch (permissionLevel) {
-				case Permission.OWNER:
-					return authorId === config.ownerId;
-				case Permission.ADMINISTRATOR:
-					return guildMember.permissions.has("ADMINISTRATOR");
-				case Permission.MODERATOR:
-					return guildMember.permissions.has("MANAGE_CHANNELS");
-				case Permission.USER:
-					return true;
-				default:
-					return false;
-			}
-		}
-		else {
-			//Guild is not available we only check for owner level permission
-			if (permissionLevel == Permission.OWNER)
+		//Guild is not available we only check for owner level permission
+		if (discordPermissions === null) {
+			if (permissionLevel == CommandPermission.OWNER)
 				return authorId === config.ownerId;
-			else 
+			else
 				return true;
+		}
+
+		switch (permissionLevel) {
+			case CommandPermission.OWNER:
+				return authorId === config.ownerId;
+			case CommandPermission.ADMINISTRATOR:
+				return discordPermissions.has("MANAGE_GUILD", true) || discordPermissions.has("MANAGE_ROLES", true);
+			case CommandPermission.MODERATOR:
+				return discordPermissions.has("MANAGE_MESSAGES");
+			case CommandPermission.USER:
+				return true;
+			default:
+				return false;
 		}
 	}
 
