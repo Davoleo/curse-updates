@@ -1,8 +1,8 @@
-import { commands } from "../../main";
 import Command from "../../model/Command";
+import { CommandGroup } from "../../model/CommandGroup";
 import { CommandPermission } from "../../utils";
 
-async function run() {
+function updatestuff() {
 
     // const commandData = [];
     // commands.forEach(command => {
@@ -18,14 +18,10 @@ async function run() {
     return 'dogsong intensifies';
 }
 
-export const comm: Command = new Command(
+export const comm = new Command(
     'updatestuff', 
-    {
-        description: "does nothing - Internal Command only runnable by the bot author",
-        isGuild: true,
-        action: run,
-        permLevel: CommandPermission.OWNER,
-        argNames: [],
-        async: true
-    }
-);
+    "does nothing - Internal Command only runnable by the bot author",
+    CommandGroup.GENERAL,
+    CommandPermission.OWNER
+)
+.setAction(updatestuff);

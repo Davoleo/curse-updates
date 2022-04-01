@@ -1,9 +1,9 @@
-import { Message } from "discord.js";
-import { GuildInitializer } from "../../data/dataHandler";
 import Command from "../../model/Command";
+import { CommandGroup } from "../../model/CommandGroup";
 import { CommandPermission } from "../../utils";
 
-async function run(args: string[], messageRef: Message) {
+/*
+function test(args: string[], messageRef: Message) {
     if (args[0] == undefined)
         return "Need ID arg"
     const guild = await messageRef.client.guilds.fetch(args[0]);
@@ -12,15 +12,11 @@ async function run(args: string[], messageRef: Message) {
     //Utils.sendDMtoOwner(messageRef.client, invite.url)
     return `Initializing ${guild.name} Data Package`;
 }
+*/
 
-export const comm: Command = new Command(
+export const comm = new Command(
     'test', 
-    {
-        description: 'Tests some functions - Internal Command only runnable by the bot author',
-        isGuild: false,
-        action: run,
-        permLevel: CommandPermission.OWNER,
-        argNames: ['id'],
-        async: true
-    }
+    'Tests some functions - Internal Command only runnable by the bot author',
+    CommandGroup.GENERAL,
+    CommandPermission.OWNER
 );

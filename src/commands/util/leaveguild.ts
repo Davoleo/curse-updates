@@ -1,21 +1,24 @@
-import { Message } from "discord.js";
+import { CommandInteraction, Snowflake } from "discord.js";
+import { botClient } from "../../main";
 import Command from "../../model/Command";
+import { CommandGroup } from "../../model/CommandGroup";
 import { CommandPermission } from "../../utils";
 
-async function run(args: string[], messageRef: Message) {
-    const guild = await messageRef.client.guilds.fetch(args[0]);
+async function leaveguild(interaction: CommandInteraction) {
+    const id: Snowflake = interaction.options.getString('id', true)
+    const guild = await botClient.guilds.fetch(id);
     guild.leave();
-    return `Guild "${guild.name}" has been left`;
+    interaction.reply(`Guild "${guild.name}" has been left`);
 }
 
-export const comm: Command = new Command(
+export const comm = new Command(
     'leaveguild', 
-    {
-        description: 'Leaves the guild given a certain guild ID',
-        isGuild: false,
-        action: run,
-        permLevel: CommandPermission.OWNER,
-        argNames: ['id'],
-        async: true
-    }
-);
+    'Leaves the guild given a certain guild ID',
+    CommandGroup.GENERAL,
+    CommandPermission.OWNER
+).addStringOption(option => option
+    .setName('id')
+    .setDescription('The id of the guild the bot will leave')
+    .setRequired(true)
+)
+.setAction(leaveguild)

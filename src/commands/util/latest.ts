@@ -1,37 +1,24 @@
-import { MessageEmbed } from "discord.js";
-import { CurseHelper } from "../../curseHelper";
-import { buildModEmbed } from "../../embedBuilder";
+import { CommandInteraction } from "discord.js";
 import Command from "../../model/Command";
+import { CommandGroup } from "../../model/CommandGroup";
 import { CommandPermission } from "../../utils";
 
-async function run(args: string[]) {
-    if (args[0] !== '') {
-
-        //Check if the project ID is an actual number before casting it
-        if (args[0].match(/\d+/)[0] === '')
-            return 'Project ID is invalid!';
-
-        const modData = await CurseHelper.queryModById(Number(args[0]));
-		const response: MessageEmbed = buildModEmbed(modData);
+function latest(interaction: CommandInteraction) {
+    
+    //const modData = await CurseHelper.queryModById(Number(args[0]));
+	//const response: MessageEmbed = buildModEmbed(modData);
         
-        if (response !== undefined && response !== null) {
-            return response;
-        }
-        else {
-            return "Invalid Response!"
-        }
-    } else 
-        return "Project ID argument can't be empty!"
+    interaction.reply("Should be querying project: " + interaction.options.getInteger('project id', true));
 }
 
 export const comm: Command = new Command(
     'latest', 
-    {
-        description: 'Queries CurseForge to get information regarding the latest version of a project',
-        isGuild: true,
-        action: run,
-        permLevel: CommandPermission.USER,
-        argNames: ["ProjectID"],
-        async: true
-    }
-);
+    'Queries CurseForge to get information regarding the latest version of a project',
+    CommandGroup.GENERAL,
+    CommandPermission.USER
+).addIntegerOption(option => option
+    .setName('project id')
+    .setDescription('The id of the CurseForge Project to fetch')
+    .setRequired(true)
+)
+.setAction(latest)
