@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
-import Command from "../../model/Command";
-import { CommandGroup } from "../../model/CommandGroup";
-import { CommandPermission } from "../../utils";
+import Command from "../model/Command";
+import { CommandGroup } from "../model/CommandGroup";
+import { CommandPermission } from "../utils";
 
 function help(interaction: CommandInteraction) {
     const category = interaction.options.getString('category', false);
@@ -9,7 +9,7 @@ function help(interaction: CommandInteraction) {
     interaction.reply('Showing help for category: ' + category !== null ? category : 'general')
 }
 
-export const comm = new Command(
+export const command = new Command(
     'help', 
     'Sends an embed message with names and descriptions of commands in the written category',
     CommandGroup.GENERAL,

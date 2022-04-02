@@ -8,7 +8,7 @@ export default class Command extends SlashCommandBuilder {
 
     public readonly category: CommandGroup;
     public readonly isGuildCommand:  boolean;
-    private _action: CommandHandler = null;
+    private _actions: Map<string, CommandHandler> = null;
     public readonly permissionLevel: CommandPermission;
 
     constructor(name: string, description: string, group: CommandGroup, permission: CommandPermission) {
@@ -20,16 +20,21 @@ export default class Command extends SlashCommandBuilder {
         this.permissionLevel = permission;
     }
 
-    execute(interaction: CommandInteraction): void {
-        this._action(interaction);
+    execute(interaction: CommandInteraction, subcommand = ""): void {
+        if (this._actions.has(subcommand))
+            this._actions.get(subcommand).apply(interaction);
     }
+    
+    //? Maybe Remove
+    // getAction(subcommand = ""): CommandHandler {
+    //     if (this._actions.has(subcommand))
+    //         return this._actions.get(subcommand);
+    //     else
+    //         return () => {/* noop */};
+    // }
 
-    get action(): CommandHandler {
-        return this._action;
-    }
-
-    setAction(func: CommandHandler): Command {
-        this._action = func;
+    setAction(func: CommandHandler, subcommand = ""): Command {
+        this._actions.set(subcommand, func);
         return this;
     }
 }

@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
-import Command from "../../model/Command";
-import { CommandGroup } from "../../model/CommandGroup";
-import { CommandPermission } from "../../utils";
+import Command from "../model/Command";
+import { CommandGroup } from "../model/CommandGroup";
+import { CommandPermission } from "../utils";
 
 function ping(interaction: CommandInteraction) {
     interaction.reply({content: "Pinging...", fetchReply: true}).then((reply: Message) => {
@@ -11,7 +11,7 @@ function ping(interaction: CommandInteraction) {
     });
 }
 
-export const comm = new Command(
+export const command = new Command(
     'ping', 
     'Sends a message with information about the latency of the bot response',
     CommandGroup.GENERAL,

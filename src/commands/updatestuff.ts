@@ -1,6 +1,6 @@
-import Command from "../../model/Command";
-import { CommandGroup } from "../../model/CommandGroup";
-import { CommandPermission } from "../../utils";
+import Command from "../model/Command";
+import { CommandGroup } from "../model/CommandGroup";
+import { CommandPermission } from "../utils";
 
 function updatestuff() {
 
@@ -18,7 +18,7 @@ function updatestuff() {
     return 'dogsong intensifies';
 }
 
-export const comm = new Command(
+export const command = new Command(
     'updatestuff', 
     "does nothing - Internal Command only runnable by the bot author",
     CommandGroup.GENERAL,

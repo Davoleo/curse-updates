@@ -5,7 +5,7 @@ import { Routes } from 'discord-api-types/v9'
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { REST } from '@discordjs/rest';
 
-async function loadCommands() {
+function loadCommands() {
 
 	let testCommandsArray = [
 		new SlashCommandBuilder().setName('ping').setDescription('QUANTUM PING PONG GAME!')
@@ -18,33 +18,33 @@ async function loadCommands() {
 	.then(() => console.log("Succesfully registered example slash command."))
 	.catch(console.warn);
 
-	// const commands = [];
+	const commands = [];
 
-	// fs.readdir('./build/commands/util', (error, files) => {
-	// 	if (error)
-	// 		logger.error("commandLoaderError: " + error);
-	// 	files = files.filter(file => !file.endsWith('map'));
-	// 	logger.info("Loading " + files.length + " util commands");
-	// 	files.forEach(async file => {
-	// 		const command = await import("./commands/util/" + file);
-	// 		// logger.info(command.comm);
-	// 		commands.push(command.comm);
-	// 	});
-	// });
+	fs.readdir('./build/commands/util', (error, files) => {
+		if (error)
+			logger.error("commandLoaderError: " + error);
+		files = files.filter(file => !file.endsWith('map'));
+		logger.info("Loading " + files.length + " util commands");
+		files.forEach(async file => {
+			const command = await import("./commands/util/" + file);
+			// logger.info(command.comm);
+			commands.push(command.comm);
+		});
+	});
 	
-	// fs.readdir('./build/commands/schedule', (error, files) => {
-	// 	if (error)
-	// 		logger.error("commandLoaderError: " + error);
-	// 	files = files.filter(file => !file.endsWith('map'));
-	// 	logger.info("Loading " + files.length + " scheduling commands");
-	// 	files.forEach(async file => {
-	// 		const command = await import('./commands/schedule/' + file);
-	// 		// logger.info(command.comm);
-	// 		commands.push(command.comm);
-	// 	});
-	// });
+	fs.readdir('./build/commands/schedule', (error, files) => {
+		if (error)
+			logger.error("commandLoaderError: " + error);
+		files = files.filter(file => !file.endsWith('map'));
+		logger.info("Loading " + files.length + " scheduling commands");
+		files.forEach(async file => {
+			const command = await import('./commands/schedule/' + file);
+			// logger.info(command.comm);
+			commands.push(command.comm);
+		});
+	});
 
-	// return commands;
+	return commands;
 }
 
 exports.loadCommands = loadCommands;
