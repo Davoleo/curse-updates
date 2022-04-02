@@ -1,15 +1,21 @@
+import { Mod, ModFile } from "node-curseforge";
+
 export default interface ModData {
     mod: Mod;
     latestFile: ModFile;
 }
 
-export interface ReleaseType {
-    name: string;
-    color: number;
-}
+/**
+ * Indexable via @type FileReleaseType
+ */
+export const RELEASE_COLORS = [
+    0x404040,   //UNKNOWN
+    0x14B866,   //RELEASE
+    0x0E9BD8,   //BETA
+    0xD3CAE8    //ALPHA
+];
 
-export const releaseTypes: ReleaseType[] = [];
-releaseTypes[3] = { name: "Alpha", color: 0xD3CAE8 };
-releaseTypes[2] = { name: "Beta", color: 0x0E9BD8 };
-releaseTypes[1] = { name: "Release", color: 0x14B866 };
-releaseTypes[0] = { name: "Version", color: 0x404040 };
+// export type ReleaseType = {
+//     type: FileReleaseType, 
+//     color: typeof releaseColors[FileReleaseType]
+// };

@@ -4,17 +4,16 @@ import { CachedProject } from './model/BotConfig';
 import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler';
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
-import { buildModEmbed, } from './embedBuilder';
+import { buildModEmbed } from './embedBuilder';
 import { Client, Guild, GuildChannel, Interaction, Message, MessageEmbed, TextChannel } from 'discord.js';
 import Command from './model/Command';
-import { loadCommands } from './commandLoader';
+import { initCommands, loadCommandFiles } from './commandLoader';
 
 export const botClient = new Client({intents: 'GUILDS'});
 
 export const logger: Logger = new Logger();
 
 const devMode = config.devMode;
-let ready = false;
 
 botClient.once('ready', () => {
 	logger.info(`Logged in as ${botClient.user.tag}!`);
@@ -22,17 +21,21 @@ botClient.once('ready', () => {
 	Utils.updateBotStatus(botClient, devMode);
 });
 
-export let commands: Command[] = null;
-loadCommands().then(comms => { 
-	commands = comms;
-	ready = true;
-});
+//Load Commands from js files
+export const commands: Command[] = loadCommandFiles();
+const commandsMap: Map<string, Command> = new Map();
+for (const command of commands) {
+	commandsMap.set(command.name, command);
+}
 
+//Load Slash Commands
+initCommands(commands);
 
 botClient.on('interactionCreate', async (interaction) => {
 	if (interaction.isCommand()) {
-		if (interaction.commandName == 'ping')
-			await interaction.reply("QUANTUM PONG! :ping_pong:");
+		const command = commandsMap.get(interaction.command.name)
+		if (Utils.hasPermission(interaction.user.id, interaction.memberPermissions, command.permissionLevel))
+			command.execute(interaction);
 	}
 });
 
@@ -65,11 +68,6 @@ botClient.on('message', (message: Message) => {
 		}
 	}
 
-	
-	if (!ready) {
-		return;
-	}
-
 	let cmdString = message.content;
 	if (cmdString.startsWith(prefix)) {
 		//Trim the prefix
@@ -78,45 +76,45 @@ botClient.on('message', (message: Message) => {
 
 		commands.forEach(command => {
 			
-			const splitCommand = cmdString.split(' ');
-			let sliver = splitCommand.shift();
+			// const splitCommand = cmdString.split(' ');
+			// let sliver = splitCommand.shift();
 
-			//Check the command category
-			if (command.category === '' || sliver === command.category) {
+			// //Check the command category
+			// if (command.category === '' || sliver === command.category) {
 
-				if (command.category !== '') {
-					sliver = splitCommand.shift();
-				}
+			// 	if (command.category !== '') {
+			// 		sliver = splitCommand.shift();
+			// 	}
 
-				//Check the command name
-				if (sliver === command.name) {
-					//Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
-					Utils.hasPermission(message, command.permissionLevel).then((pass) => {
-						if(pass) {
-							//TODO Deduplicate code here and below
-							//Handle command execution differently depending if it's a sync or async command
-							if (!command.async) {
-								const response = command.action(splitCommand, message);
-								if (response !== '')
-									message.channel.send(response);
-							} 
-							else {
-								command.action(splitCommand, message).then((response: unknown) => {
-									message.channel.send(response);
-								})
-								.catch((error: string) => {
-									logger.warn("ERROR: async command execution: ", error)
-									message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
-								})
-							}
-						}
-					})
-					.catch(error => {
-						Utils.sendDMtoBotOwner(botClient, "WARNING: Error during permission evaluation: " + error);
-						logger.warn("WARNING: Error during permission evaluation: ", error);
-					});
-				}
-			}
+			// 	//Check the command name
+			// 	if (sliver === command.name) {
+			// 		//Checks if the message was sent in a server and if the user who sent the message has the required permissions to run the command
+			// 		Utils.hasPermission(message, command.permissionLevel).then((pass) => {
+			// 			if(pass) {
+			// 				//TODO Deduplicate code here and below
+			// 				//Handle command execution differently depending if it's a sync or async command
+			// 				if (!command.async) {
+			// 					const response = command.action(splitCommand, message);
+			// 					if (response !== '')
+			// 						message.channel.send(response);
+			// 				} 
+			// 				else {
+			// 					command.action(splitCommand, message).then((response: unknown) => {
+			// 						message.channel.send(response);
+			// 					})
+			// 					.catch((error: string) => {
+			// 						logger.warn("ERROR: async command execution: ", error)
+			// 						message.channel.send('There was an error during the async execution of the command `' + prefix + command.name +  '`, Error: ' + error);
+			// 					})
+			// 				}
+			// 			}
+			// 		})
+			// 		.catch(error => {
+			// 			Utils.sendDMtoBotOwner(botClient, "WARNING: Error during permission evaluation: " + error);
+			// 			logger.warn("WARNING: Error during permission evaluation: ", error);
+			// 		});
+			// 	}
+			// }
 		});
 	}
 });
@@ -142,7 +140,7 @@ async function queryCacheUpdates(): Promise<Map<number, MessageEmbed>> {
 	for(const project of projects) {		
 		//logger.info('Checking project: ' + project.id);
 		const data = await CurseHelper.queryModById(project.id);
-		const newVersion = Utils.getFilenameFromURL(data.latestFile.download_url);
+		const newVersion = Utils.getFilenameFromURL(data.latestFile.downloadUrl);
 		if (project.version !== newVersion) {
 			const embed = buildModEmbed(data);
 			CacheHandler.updateCachedProject(project.id, newVersion);

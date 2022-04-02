@@ -1,7 +1,9 @@
 import { CommandInteraction } from "discord.js";
+import { CurseHelper } from "../../curseHelper";
+import { CacheHandler, GuildHandler } from "../../data/dataHandler";
 import Command from "../../model/Command";
 import { CommandGroup } from "../../model/CommandGroup";
-import { CommandPermission } from "../../utils";
+import { CommandPermission, Utils } from "../../utils";
 
 const PROJECT_ID_KEY = 'project id'
 
@@ -11,12 +13,12 @@ async function add(interaction: CommandInteraction) {
     
     try {
         const data = await CurseHelper.queryModById(projectID);
-        const filename = Utils.getFilenameFromURL(data.latestFile.download_url);
-        if (data.mod.key == undefined)
+        const filename = Utils.getFilenameFromURL(data.latestFile.downloadUrl);
+        if (data.mod.slug == undefined)
             throw Error("NULL_slug!")
 
         GuildHandler.addProjectToSchedule(interaction.guildId, projectID);
-        CacheHandler.addProjectToCache(projectID, data.mod.key, filename, interaction.guildId, true);
+        CacheHandler.addProjectToCache(projectID, data.mod.slug, filename, interaction.guildId, true);
 
         return ":white_check_mark: " + data.mod.name + " has been successfully added to the schedule";
     }
@@ -46,15 +48,15 @@ function remove(interaction: CommandInteraction) {
 }
 
 function show(interaction: CommandInteraction) {
-    const embeds = buildScheduleEmbed(interaction.guildId)
+    // const embeds = buildScheduleEmbed(interaction.guildId)
 
-    if (embeds.extras === null) {
-        return embeds.main;
-    }
-    else {
-        interaction.reply("Not Yet Implemented!!" /*embeds.main*/)
-        return embeds.extras;
-    }
+    // if (embeds.extras === null) {
+    //     return embeds.main;
+    // }
+    // else {
+    //     interaction.reply("Not Yet Implemented!!" /*embeds.main*/)
+    //     return embeds.extras;
+    // }
 }
 
 function clear(interaction: CommandInteraction) {

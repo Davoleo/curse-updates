@@ -1,14 +1,15 @@
 import { CommandInteraction } from "discord.js";
+import { CurseHelper } from "../curseHelper";
+import { buildModEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandGroup } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
-function latest(interaction: CommandInteraction) {
+async function latest(interaction: CommandInteraction) {
     
-    //const modData = await CurseHelper.queryModById(Number(args[0]));
-	//const response: MessageEmbed = buildModEmbed(modData);
-        
-    interaction.reply("Should be querying project: " + interaction.options.getInteger('project id', true));
+    const modData = await CurseHelper.queryModById(interaction.options.getInteger('project id', true));
+	const response = buildModEmbed(modData);
+    interaction.reply({embeds: [response]});
 }
 
 export const command: Command = new Command(

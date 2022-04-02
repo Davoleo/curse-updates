@@ -22,9 +22,9 @@ function run(args: string[], messageRef: Message) {
     }
 }
 
-export const comm: Command = new Command(
-    'template', 
-    {
+export const comm = {
+    name: 'template', 
+    data: {
         category: "schedule",
         description: 'Sets a template message that is sent together with the update embed once a project update is released (empty template will reset this setting)',
         isGuild: true,
@@ -33,4 +33,4 @@ export const comm: Command = new Command(
         argNames: ["announcementMessage"],
         async: false
     }
-);
+}

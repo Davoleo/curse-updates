@@ -8,7 +8,7 @@ export default class Command extends SlashCommandBuilder {
 
     public readonly category: CommandGroup;
     public readonly isGuildCommand:  boolean;
-    private _actions: Map<string, CommandHandler> = null;
+    private _actions: Map<string, CommandHandler> = new Map();
     public readonly permissionLevel: CommandPermission;
 
     constructor(name: string, description: string, group: CommandGroup, permission: CommandPermission) {

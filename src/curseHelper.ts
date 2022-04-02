@@ -1,22 +1,21 @@
-import * as CFAPI from 'mc-curseforge-api';
+import Curseforge, { Game } from 'node-curseforge';
+import * as config from './data/config.json'
 import ModData from './model/ModData';
 
+const CFAPI = new Curseforge(config.curseForgeAPIKey);
+let mcapi: Game = null;
+
+async function init(): Promise<void> {
+    mcapi = await CFAPI.get_game('minecraft');
+}
+
 async function queryModById(id: number): Promise<ModData> {
-
-    const mod = await CFAPI.getMod(id);
-
-    //const files = await mod.getFiles();
-    //const latestFile = files.length === 0 ? files[files.length - 1] : mod.latestFiles[mod.latestFiles.length - 1];
-    //logger.info("First Attempt: ", files[files.length - 1]);
-    
-    //if (mod.latestFiles[mod.latestFiles.length - 1] !== undefined) {
-        //const filename = Utils.getFilenameFromURL(mod.latestFiles[mod.latestFiles.length - 1].download_url);
-        //logger.info(`Latest ${mod.name} File: `, filename);
-    //}
+    const mod = await CFAPI.get_mod(id);
+    const latestFile = mod.latestFiles[mod.latestFiles.length - 1];
     
     return {
         mod: mod,
-        latestFile: mod.latestFiles[mod.latestFiles.length - 1]
+        latestFile: latestFile
     }
 }
 

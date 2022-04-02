@@ -1,9 +1,5 @@
 import { Snowflake } from "discord.js";
 
-export interface JSONConfig {
-    token: string;
-}
-
 export interface ServerConfig {
     serverId: Snowflake;
     serverName: string;

@@ -19,9 +19,9 @@ function run(args: string[], messageRef: Message) {
     }
 }
 
-export const comm: Command = new Command(
-    'setchannel', 
-    {
+export const comm = {
+    name: 'setchannel', 
+    data: {
         category: "schedule",
         description: 'Sets the channel this command is sent to as the projects update annoucements channel of the current server',
         isGuild: true,
@@ -30,4 +30,4 @@ export const comm: Command = new Command(
         argNames: ["channel"],
         async: false
     }
-);
+};
