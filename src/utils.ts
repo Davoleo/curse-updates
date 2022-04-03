@@ -59,7 +59,6 @@ export class Logger {
 				console.log(prefixedMessage, ...params);
 			break;
 		}
-		console.log(prefixedMessage, ...params);
 
 		this.appendLogLine(prefixedMessage, ...params);
 	}
