@@ -15,25 +15,27 @@ export const logger: Logger = new Logger();
 
 const devMode = config.devMode;
 
+const commandsMap: Map<string, Command> = new Map();
+//Load Commands from js files
+loadCommandFiles().then(commands => {
+	//Init Slash Commands
+	initCommands(commands);
+
+	//Add loaded commands to a global Map
+	for (const command of commands) {
+		commandsMap.set(command.name, command);
+	}
+})
+
 botClient.once('ready', () => {
 	logger.info(`Logged in as ${botClient.user.tag}!`);
 
 	Utils.updateBotStatus(botClient, devMode);
 });
 
-//Load Commands from js files
-export const commands: Command[] = loadCommandFiles();
-const commandsMap: Map<string, Command> = new Map();
-for (const command of commands) {
-	commandsMap.set(command.name, command);
-}
-
-//Load Slash Commands
-initCommands(commands);
-
 botClient.on('interactionCreate', async (interaction) => {
 	if (interaction.isCommand()) {
-		const command = commandsMap.get(interaction.command.name)
+		const command = commandsMap.get(interaction.commandName)
 		if (Utils.hasPermission(interaction.user.id, interaction.memberPermissions, command.permissionLevel))
 			command.execute(interaction);
 	}
@@ -74,8 +76,9 @@ botClient.on('message', (message: Message) => {
 		cmdString = cmdString.replace(prefix, "");
 		cmdString = cmdString.trim();
 
-		commands.forEach(command => {
-			
+		message.channel.send("HEHE, te NANDAYO!")
+
+		//commands.forEach(command => {
 			// const splitCommand = cmdString.split(' ');
 			// let sliver = splitCommand.shift();
 
@@ -115,7 +118,7 @@ botClient.on('message', (message: Message) => {
 			// 		});
 			// 	}
 			// }
-		});
+		//});
 	}
 });
 

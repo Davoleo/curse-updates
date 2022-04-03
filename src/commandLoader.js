@@ -4,18 +4,18 @@ import * as config from './data/config.json';
 import { Routes } from 'discord-api-types/v9'
 import { REST } from '@discordjs/rest';
 
-function loadCommandFiles() {
+async function loadCommandFiles() {
 
 	let commands = [];
 	
 	let files = fs.readdirSync('./build/commands');
 	files = files.filter(file => file.endsWith('.js'));
 	logger.info("Loading " + files.length + " commands");
-	files.forEach(async file => {
+	for (const file of files) {
 		const script = await import('./commands/' + file);
-		// logger.info(command.comm);
+		//logger.info(script);
 		commands.push(script.command);
-	});
+	}
 
 	return commands;
 }
