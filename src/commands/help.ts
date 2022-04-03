@@ -6,7 +6,7 @@ import { CommandPermission } from "../utils";
 function help(interaction: CommandInteraction) {
     const category = interaction.options.getString('category', false);
     //const embed = buildHelpEmbed('Commands: ', category);
-    interaction.reply('Showing help for category: ' + category !== null ? category : 'general')
+    interaction.reply('Showing help for category: ' + (category !== null ? category : 'general'))
 }
 
 export const command = new Command(

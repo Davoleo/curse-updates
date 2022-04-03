@@ -7,7 +7,7 @@ import { CommandPermission } from "../utils";
 
 async function latest(interaction: CommandInteraction) {
     
-    const modData = await CurseHelper.queryModById(interaction.options.getInteger('project id', true));
+    const modData = await CurseHelper.queryModById(interaction.options.getInteger('project_id', true));
 	const response = buildModEmbed(modData);
     interaction.reply({embeds: [response]});
 }

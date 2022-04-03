@@ -22,7 +22,7 @@ export default class Command extends SlashCommandBuilder {
 
     execute(interaction: CommandInteraction, subcommand = ""): void {
         if (this._actions.has(subcommand))
-            this._actions.get(subcommand).apply(interaction);
+            this._actions.get(subcommand)(interaction);
     }
     
     //? Maybe Remove
