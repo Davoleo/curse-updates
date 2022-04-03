@@ -18,7 +18,7 @@ export const command: Command = new Command(
     CommandGroup.GENERAL,
     CommandPermission.USER
 ).addIntegerOption(option => option
-    .setName('project id')
+    .setName('project_id')
     .setDescription('The id of the CurseForge Project to fetch')
     .setRequired(true)
     .setMinValue(1)
