@@ -16,7 +16,8 @@ export const command = new Command(
     CommandPermission.USER
 )
 .addStringOption(option => option
-    .setName('category')    
+    .setName('category')
+    .setDescription("The Category you want to see help of")
     .setRequired(false)
     .setChoices([
         ["General Category", "general"],
