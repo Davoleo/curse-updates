@@ -7,7 +7,7 @@ type CommandHandler = (interaction: CommandInteraction) => void
 export default class Command extends SlashCommandBuilder {
 
     public readonly category: CommandGroup;
-    public readonly isGuildCommand:  boolean;
+    public readonly isGlobal:  boolean;
     private _actions: Map<string, CommandHandler> = new Map();
     public readonly permissionLevel: CommandPermission;
 
@@ -16,7 +16,7 @@ export default class Command extends SlashCommandBuilder {
         this.setName(name);
         this.setDescription(description);
         this.category = group;
-        this.setDefaultPermission(permission === CommandPermission.USER);
+        this.setDefaultPermission(permission !== CommandPermission.OWNER);
         this.permissionLevel = permission;
     }
 
