@@ -5,15 +5,13 @@ import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler
 import * as config from './data/config.json';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed } from './embedBuilder';
-import { Client, Guild, GuildChannel, Interaction, Message, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, Guild, GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
 import Command from './model/Command';
 import { initCommands, loadCommandFiles } from './commandLoader';
 
 export const botClient = new Client({intents: 'GUILDS'});
 
 export const logger: Logger = new Logger();
-
-const devMode = config.devMode;
 
 const commandsMap: Map<string, Command> = new Map();
 //Load Commands from js files
@@ -29,8 +27,7 @@ loadCommandFiles().then(commands => {
 
 botClient.once('ready', () => {
 	logger.info(`Logged in as ${botClient.user.tag}!`);
-
-	Utils.updateBotStatus(botClient, devMode);
+	Utils.updateBotStatus(botClient, config.devMode);
 });
 
 botClient.on('interactionCreate', async (interaction) => {
@@ -61,7 +58,7 @@ botClient.on('message', (message: Message) => {
 		}
 
 		// logger.info(message)
-		if (devMode && message.guild.id !== '500396398324350989' && message.guild.id !== '473145328439132160') {
+		if (config.devMode && message.guild.id !== '500396398324350989' && message.guild.id !== '473145328439132160') {
 			return;
 		}
 
@@ -211,7 +208,7 @@ setInterval(() => {
 */
 
 setInterval(() => {
-	Utils.updateBotStatus(botClient, devMode);
+	Utils.updateBotStatus(botClient, config.devMode);
 }, 1000 * 60 * 60)
 // 1 Hour
 
