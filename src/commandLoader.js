@@ -28,7 +28,11 @@ function initCommands(commands) {
 
 	if (config.devMode) {
 		rest.put(Routes.applicationGuildCommands(config.botId, config.testingServer), {body: jsonCommands})
-		.then(() => logger.info("Succesfully registered Slash Commands"))
+		.then(() => logger.info("Succesfully registered Slash Commands to Testing Server 1"))
+		.catch(console.warn)
+
+		rest.put(Routes.applicationGuildCommands(config.botId, config.testingServer2), {body: jsonCommands})
+		.then(() => logger.info("Succesfully registered Slash Commands to Testing Server 2"))
 		.catch(console.warn)
 	}
 }

@@ -10,14 +10,15 @@ libs/
 #Node Modules
 node_modules/
 
-# Configuration File
-config.json
+# Environment Configuration File
+.env
 
 # Logo
 curseforge-updates.psd
 
 # DB File
 data.db
+src/data/database.db
 
 # Log file
 logs/
