@@ -1,8 +1,8 @@
 import Curseforge, { Game } from 'node-curseforge';
-import * as config from './data/config.json'
+import Environment from './model/Environment';
 import ModData from './model/ModData';
 
-const CFAPI = new Curseforge(config.curseForgeAPIKey);
+const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 let mcapi: Game = null;
 
 async function init(): Promise<void> {

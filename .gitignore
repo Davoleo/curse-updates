@@ -16,12 +16,14 @@ node_modules/
 # Logo
 curseforge-updates.psd
 
-# DB File
+# New SQLite DB File and its db-journal
 data.db
-src/data/database.db
+data.db-journal
+# old LokiJS DB
+data.old.db
 
 # Log file
 logs/
 
-# Remote VPS Data Analysis folder
-remote_data
+# Data Analysis exports directory
+exports

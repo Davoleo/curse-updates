@@ -6,7 +6,8 @@
   "scripts": {
     "bot": "node build/main.js",
     "lint": "eslint . --ext .ts",
-    "build": "tsc"
+    "build": "tsc",
+    "seed": "node prisma/seed.js"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
+    "@prisma/client": "^3.12.0",
     "@types/lokijs": "^1.5.7",
     "@types/node": "^17.0.21",
     "@types/ws": "^8.5.3",
