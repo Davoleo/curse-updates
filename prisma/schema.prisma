@@ -8,25 +8,34 @@ generator client {
 }
 
 model ServerConfig {
-    serverId String @id
-    serverName String
+    id                  String @id
+    serverName          String
     announcementConfigs AnnouncementsConfig[]
-    projects CachedProject[] @relation(references: [projectId])
+    projects            AssignedProject[]
+}
+
+model AssignedProject {
+    project     CachedProject   @relation(fields: [projectId], references: [id])
+    projectId   Int
+    server      ServerConfig    @relation(fields: [serverId], references: [id])
+    serverId    String
+
+    @@id([projectId, serverId])
 }
 
 model AnnouncementsConfig {
-    id Int @id @default(autoincrement())
-    serverId String
-    server ServerConfig @relation(fields: [serverId], references: [serverId])
-    channel String?
-    message String?
+    id          Int             @id @default(autoincrement())
+    serverId    String
+    server      ServerConfig    @relation(fields: [serverId], references: [id])
+    channel     String?
+    message     String?
 }
 
 model CachedProject {
-    projectId Int @id
-    slug String @unique
-    version String
-    subscribedGuilds ServerConfig[] @relation(references: [serverId])
+    id              Int             @id
+    slug            String          @unique
+    version         String
+    subscribedGuilds AssignedProject[]
 }
 
     //     serverId: Snowflake;
