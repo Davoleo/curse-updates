@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const { mkdirSync, writeFileSync, existsSync } = require('fs');
 const loki = require('lokijs');
 
-const oldDatabase = new loki("../data.old.db", {
+const oldDatabase = new loki("data.old.db", {
     autoload: true,
     autoloadCallback: lokiLoadComplete
 });
@@ -30,13 +30,13 @@ function lokiLoadComplete() {
 
 function exportLokiJS() {
 
-    if (!existsSync('../exports'))
-        mkdirSync('../exports');
+    if (!existsSync('exports'))
+        mkdirSync('exports');
 
     serversExport = oldDatabase.getCollection("server_config").find({});
-    writeFileSync('../exports/server_config_export.json', JSON.stringify(serversExport))
+    writeFileSync('exports/server_config_export.json', JSON.stringify(serversExport))
     projectsExport = oldDatabase.getCollection("cached_projects").find({});
-    writeFileSync('../exports/cached_projects_export.json', JSON.stringify(projectsExport));
+    writeFileSync('exports/cached_projects_export.json', JSON.stringify(projectsExport));
 
     /*
     lokiExport = serversExport.slice();

@@ -6,7 +6,9 @@
   "scripts": {
     "bot": "node build/main.js",
     "lint": "eslint . --ext .ts",
-    "build": "tsc",
+    "build": "tsc"
+  },
+  "prisma": {
     "seed": "node prisma/seed.js"
   },
   "repository": {
