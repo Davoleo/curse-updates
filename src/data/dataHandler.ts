@@ -3,36 +3,9 @@ import { CachedProject, ServerConfig } from "../model/BotConfig";
 import { logger } from "../main";
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient({
+export const dbclient = new PrismaClient({
     log: ["query", "info", "warn", "error"]
 });
-
-function databaseInit() {
-    serverCollection = storage.getCollection("server_config");
-    if (serverCollection === null)
-        serverCollection = storage.addCollection('server_config');
-
-    cachedProjects = storage.getCollection("cached_projects");
-    if (cachedProjects === null)
-        cachedProjects = storage.addCollection('cached_projects');
-
-    logger.info("Database has been initialized!")
-}
-
-function initServerConfig(serverId: Snowflake, serverName: string): void {
-    const oldServer = serverCollection.findOne({'serverId': serverId});
-
-    if (oldServer == undefined) {
-        serverCollection.insert({
-            serverId: serverId,
-            serverName: serverName,
-            prefix: '||',
-            releasesChannel: '-1',
-            messageTemplate: '',
-            projectIds: []
-        });
-    }
-}
 
 function removeServerConfig(serverId: Snowflake): boolean {
     const server = serverCollection.find({'serverId': serverId});
