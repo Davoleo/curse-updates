@@ -18,4 +18,8 @@
 
         "typeRoots": ["./typings", "./node_modules/@types"]
     },
+    "exclude": [
+        "./prisma/**/*",
+        "./build/**/*"
+    ]
 }

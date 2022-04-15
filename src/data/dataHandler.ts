@@ -1,17 +1,11 @@
 import { Snowflake } from "discord.js";
 import { CachedProject, ServerConfig } from "../model/BotConfig";
-import LokiConstructor from "lokijs";
 import { logger } from "../main";
+import { PrismaClient } from "@prisma/client";
 
-const storage = new LokiConstructor("data.db", {
-    autoload: true,
-    autoloadCallback: databaseInit,
-    autosave: true,
-    autosaveInterval: 8000
+export const prisma = new PrismaClient({
+    log: ["query", "info", "warn", "error"]
 });
-
-let serverCollection: Collection<ServerConfig>;
-let cachedProjects: Collection<CachedProject>;
 
 function databaseInit() {
     serverCollection = storage.getCollection("server_config");

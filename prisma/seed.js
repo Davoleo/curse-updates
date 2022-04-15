@@ -1,24 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { PrismaClient } = require('@prisma/client');
-const { mkdirSync, writeFileSync, existsSync } = require('fs');
-const loki = require('lokijs');
-
-const oldDatabase = new loki("data.old.db", {
-    autoload: true,
-    autoloadCallback: lokiLoadComplete
-});
+const { readFileSync } = require('fs');
 
 const prisma = new PrismaClient();
 
-let lokiExport;
-let serversExport;
-let projectsExport;
+function main() {
 
-function lokiLoadComplete() {
-    
-    exportLokiJS();
+    let projectsExport = JSON.parse(readFileSync('exports/cached_projects_export.json'));
+    let serversExport = JSON.parse(readFileSync('exports/server_config_export.json'));
 
-    seedPrisma()
+    seedPrisma(projectsExport, serversExport)
     .then(() => console.log("Seeding Complete"))
     .catch((err) => {
         console.error(err);
@@ -28,41 +19,7 @@ function lokiLoadComplete() {
     })
 }
 
-function exportLokiJS() {
-
-    if (!existsSync('exports'))
-        mkdirSync('exports');
-
-    serversExport = oldDatabase.getCollection("server_config").find({});
-    writeFileSync('exports/server_config_export.json', JSON.stringify(serversExport))
-    projectsExport = oldDatabase.getCollection("cached_projects").find({});
-    writeFileSync('exports/cached_projects_export.json', JSON.stringify(projectsExport));
-
-    /*
-    lokiExport = serversExport.slice();
-
-    console.dir(lokiExport);
-
-    for (let i = 0; i < lokiExport.length; i++) {
-        for (let j = 0; j < lokiExport[i].projectIds.length; j++) {
-            if (j === 0) 
-                lokiExport[i].projects = [];
-
-            projectsExport.forEach(cachedProject => {
-                if (lokiExport[i].projectIds[j] === cachedProject.id);
-                    lokiExport[i].projects[j] = cachedProject;
-            })
-        }
-
-        delete lokiExport[i].projectIds;
-    }
-
-    writeFileSync('../exports/loki_export.json', JSON.stringify(lokiExport));
-    */
-    oldDatabase.close();
-}
-
-async function seedPrisma() {
+async function seedPrisma(projectsExport, serversExport) {
 
     for (const oldCondig of projectsExport) {
         await prisma.cachedProject.upsert({
@@ -112,3 +69,5 @@ async function seedPrisma() {
         }
     }
 }
+
+main();
