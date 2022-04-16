@@ -46,6 +46,7 @@ async function seedPrisma(projectsExport, serversExport) {
                 serverName: oldConfig.serverName,
                 announcementConfigs: {
                     create: {
+                        id: 0,
                         channel: oldConfig.releasesChannel === '-1' ? undefined : oldConfig.releasesChannel
                     } 
                 }

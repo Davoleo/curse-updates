@@ -24,11 +24,14 @@ model AssignedProject {
 }
 
 model AnnouncementsConfig {
-    id          Int             @id @default(autoincrement())
-    serverId    String
-    server      ServerConfig    @relation(fields: [serverId], references: [id])
-    channel     String?
-    message     String?
+    id              Int
+    serverId        String
+    server          ServerConfig    @relation(fields: [serverId], references: [id])
+    channel         String?
+    message         String?
+    gameVerFilter   String?
+
+    @@id([id, serverId])
 }
 
 model CachedProject {

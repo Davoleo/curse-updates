@@ -16,10 +16,12 @@ CREATE TABLE "AssignedProject" (
 
 -- CreateTable
 CREATE TABLE "AnnouncementsConfig" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" INTEGER NOT NULL,
     "serverId" TEXT NOT NULL,
     "channel" TEXT,
     "message" TEXT,
+
+    PRIMARY KEY ("id", "serverId"),
     CONSTRAINT "AnnouncementsConfig_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "ServerConfig" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
