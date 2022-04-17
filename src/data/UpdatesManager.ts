@@ -2,11 +2,11 @@ import { AnnouncementsConfig } from "@prisma/client";
 import { Snowflake } from "discord.js";
 import { dbclient } from "./dataHandler";
 
-export default class NotificationManager {
+export default class UpdatesManager {
 
     private constructor(public serverId: Snowflake, public announcementsConfig: AnnouncementsConfig[]) {}
 
-    static async ofServer(id: Snowflake): Promise<NotificationManager> {
+    static async ofServer(id: Snowflake): Promise<UpdatesManager> {
         const configs = await dbclient.announcementsConfig.findMany({
             where: {
                 serverId: id,
@@ -16,7 +16,7 @@ export default class NotificationManager {
             }
         });
 
-        return new NotificationManager(id, configs)
+        return new UpdatesManager(id, configs)
     }
 
     async save() {

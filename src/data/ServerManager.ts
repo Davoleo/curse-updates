@@ -1,15 +1,16 @@
 import * as assert from "assert";
 import { Snowflake } from "discord.js";
 import { dbclient } from "./dataHandler";
+import UpdatesManager from "./UpdatesManager";
 
 export default class ServerManager {
 
     serverId: Snowflake;
-    serverName: string = null;
+    serverName: string;
     projects: number[] = null;
 
     private queried: boolean;
-    private projectsToRemove: Set<number> = new Set();
+    private projectsToRemove: Set<number> = null;
 
     private constructor(serverId: Snowflake, serverName: string) {
         this.serverId = serverId;
@@ -53,6 +54,7 @@ export default class ServerManager {
         });
         this.projects = assigned.map(assigned => assigned.projectId);
 
+        this.projectsToRemove = new Set();
         this.queried = true;
         return this;
     }
@@ -85,7 +87,11 @@ export default class ServerManager {
         return this;
     }
 
-    remove(): void {
+    async getUpdateSettings() {
+        return UpdatesManager.ofServer(this.serverId);
+    }
+
+    removeSelf(): void {
         dbclient.serverConfig.delete({
             where: {
                 id: this.serverId

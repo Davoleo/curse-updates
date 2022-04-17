@@ -1,4 +1,4 @@
-import { CommandInteraction, Snowflake } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { CurseHelper } from "../../curseHelper";
 import CacheManager from "../../data/CacheManager";
 import ServerManager from "../../data/ServerManager";
@@ -8,25 +8,21 @@ import { CommandPermission } from "../../utils";
 
 const PROJECT_ID_KEY = 'project id'
 
-async function getOrInitServer(id: Snowflake, name: string): Promise<ServerManager> {
-    if (await ServerManager.exists(id))
-        return await ServerManager.ofServer(id).query();
-    else
-        return ServerManager.fromScratch(id, name);
-}
-
 async function add(interaction: CommandInteraction) {
 
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
     
     try {
         const data = await CurseHelper.queryModById(projectID);
+        const serverId = interaction.guildId;
 
-        const manager = await getOrInitServer(interaction.guildId, interaction.guild.name);
-        manager.addProject(projectID);
-        CacheManager.addProject(interaction.guildId, data.mod.id, data.mod.slug, data.latestFile.fileName);
-
-        interaction.reply(":white_check_mark: " + data.mod.name + " has been successfully added to the schedule")
+        const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.fromScratch(serverId, interaction.guild.name);
+        await serverManager.querySchedule();
+        serverManager.addProject(projectID);
+        await serverManager.save();
+        
+        CacheManager.addProject(serverId, data.mod.id, data.mod.slug, data.latestFile.fileName);
+        interaction.reply(":white_check_mark: " + data.mod.name + " has been successfully added to the schedule");
     }
     catch(error) {
         if (error instanceof Error)
@@ -39,14 +35,25 @@ async function add(interaction: CommandInteraction) {
 async function remove(interaction: CommandInteraction) {
     
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
-    const wasRemoved = GuildHandler.removeProjectFromSchedule(interaction.guildId, projectID);
-    
-    if (wasRemoved) {
-        CacheHandler.removeProjectById(interaction.guildId, projectID);
-        return ":recycle: Project removed successfully!"
+    const serverManager = await ServerManager.ofServer(interaction.guildId);
+
+    if (serverManager === null) 
+    {
+        interaction.reply(":x: Can't remove projects from a server with empty schedule!")
+        return;
     }
-    else
-        return ":x: Couldn't find a project with that ID in the bot schedule"
+
+    try {
+        //Remove project from the schedule
+        serverManager.removeProject(projectID);
+        //Save to DB and Run a check to see if the project still needs to be in the cache
+        await serverManager.save();
+        CacheManager.cleanupProject(projectID);
+        interaction.reply(":recycle: Project `(ID: " + projectID + ")` removed successfully!");
+    }
+    catch(error) {
+        interaction.reply(":x: Couldn't find a project with `ID = " + projectID + "` in the bot schedule");
+    }
 }
 
 function show(interaction: CommandInteraction) {
@@ -61,11 +68,22 @@ function show(interaction: CommandInteraction) {
     // }
 }
 
-function clear(interaction: CommandInteraction) {
-    const projectIDs = GuildHandler.getServerConfig(interaction.guildId).projectIds;
-    GuildHandler.clearProjectsSchedule(interaction.guildId);
-    CacheHandler.removeAllByGuild(interaction.guildId, projectIDs);
-    return ':warning: Schedule was cleared successfully!';
+async function clear(interaction: CommandInteraction) {
+    const manager = await ServerManager.ofServer(interaction.guildId);
+    if (manager === null) {
+        interaction.reply(":x: Can't clear schedule of a server that already has empty schedule.");
+        return;
+    }
+    await manager.querySchedule();
+    manager.clearProjects();
+
+    await manager.save();
+
+    for (const proj of manager.projects) {
+        CacheManager.cleanupProject(proj);
+    }
+
+    interaction.reply(':warning: Schedule was cleared successfully!');
 }
 
 export const command = new Command(

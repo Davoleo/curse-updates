@@ -65,7 +65,7 @@ export default class CacheManager {
         });
 
         if (matches.length === 0) {
-            //TODO Remove project from Cache
+            await this.removeProject(id);
         }
     }
 
