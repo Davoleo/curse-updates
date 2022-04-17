@@ -11,22 +11,22 @@ export default class ServerManager {
     private queried: boolean;
     private projectsToRemove: Set<number> = new Set();
 
-    private constructor(serverId: Snowflake, serverName = "") {
+    private constructor(serverId: Snowflake, serverName: string) {
         this.serverId = serverId;
-
-        this.queried = serverName !== "";
-
-        if (serverName !== "") {
-            // Server is being created from scratch -> everything is empty
-            this.serverName = serverName;
-            this.projects = [];
-        }
+        this.serverName = serverName;
+        this.projects = [];
     }
 
     // ----- Initialization -----
 
-    static ofServer(id: Snowflake): ServerManager {
-        return new ServerManager(id);
+    static async ofServer(id: Snowflake): Promise<ServerManager> {
+        const match = await dbclient.serverConfig.findUnique({
+            where: {
+                id: id
+            }
+        });
+        
+        return match === null ? null : new ServerManager(id, match.serverName);
     }
 
     static fromScratch(id: Snowflake, name: string): ServerManager {
@@ -41,17 +41,10 @@ export default class ServerManager {
     }
 
     //DB Load
-    async query(): Promise<ServerManager> {
+    async querySchedule(): Promise<ServerManager> {
 
         if (this.queried)
             return this;
-
-        const server = await dbclient.serverConfig.findUnique({
-            where: {
-                id: this.serverId
-            }
-        });
-        this.serverName = server.serverName;
 
         const assigned = await dbclient.assignedProject.findMany({
             where: {

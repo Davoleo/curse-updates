@@ -1,11 +1,19 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, Snowflake } from "discord.js";
 import { CurseHelper } from "../../curseHelper";
-import { CacheHandler, GuildHandler } from "../../data/dataHandler";
+import CacheManager from "../../data/CacheManager";
+import ServerManager from "../../data/ServerManager";
 import Command from "../../model/Command";
 import { CommandGroup } from "../../model/CommandGroup";
-import { CommandPermission, Utils } from "../../utils";
+import { CommandPermission } from "../../utils";
 
 const PROJECT_ID_KEY = 'project id'
+
+async function getOrInitServer(id: Snowflake, name: string): Promise<ServerManager> {
+    if (await ServerManager.exists(id))
+        return await ServerManager.ofServer(id).query();
+    else
+        return ServerManager.fromScratch(id, name);
+}
 
 async function add(interaction: CommandInteraction) {
 
@@ -13,28 +21,22 @@ async function add(interaction: CommandInteraction) {
     
     try {
         const data = await CurseHelper.queryModById(projectID);
-        const filename = Utils.getFilenameFromURL(data.latestFile.downloadUrl);
-        if (data.mod.slug == undefined)
-            throw Error("NULL_slug!")
 
-        GuildHandler.addProjectToSchedule(interaction.guildId, projectID);
-        CacheHandler.addProjectToCache(projectID, data.mod.slug, filename, interaction.guildId, true);
+        const manager = await getOrInitServer(interaction.guildId, interaction.guild.name);
+        manager.addProject(projectID);
+        CacheManager.addProject(interaction.guildId, data.mod.id, data.mod.slug, data.latestFile.fileName);
 
-        return ":white_check_mark: " + data.mod.name + " has been successfully added to the schedule";
+        interaction.reply(":white_check_mark: " + data.mod.name + " has been successfully added to the schedule")
     }
     catch(error) {
-        if (error.message === "NULL_slug!")
-            return ":x: The project corresponding to that ID doesn't exist or can't be fetched";
-        else if (error.message === "Too_Many_Projects")
-            return ":x: You have reached the project number limit for this guild, please remove some";
-        else if (error.message === "Project_Already_Scheduled")
-            return ":x: This project was already added to this server's schedule";
+        if (error instanceof Error)
+            interaction.reply({content: `:x: ${error.name} Error: ${error.message}`, ephemeral: true});
         else
-            return `:x: Unexpected Error: ${error.message}!`;
+            interaction.reply({content: ":x: UNKNOWN ERROR!", ephemeral: true});
     }
 }
 
-function remove(interaction: CommandInteraction) {
+async function remove(interaction: CommandInteraction) {
     
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
     const wasRemoved = GuildHandler.removeProjectFromSchedule(interaction.guildId, projectID);
