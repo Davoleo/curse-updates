@@ -7,10 +7,10 @@ export default class ServerManager {
 
     serverId: Snowflake;
     serverName: string;
-    projects: number[] = null;
+    projects: number[];
 
     private queried: boolean;
-    private projectsToRemove: Set<number> = null;
+    private projectsToRemove: Set<number> | null = new Set();
 
     private constructor(serverId: Snowflake, serverName: string) {
         this.serverId = serverId;
@@ -20,7 +20,7 @@ export default class ServerManager {
 
     // ----- Initialization -----
 
-    static async ofServer(id: Snowflake): Promise<ServerManager> {
+    static async ofServer(id: Snowflake): Promise<ServerManager | null> {
         const match = await dbclient.serverConfig.findUnique({
             where: {
                 id: id
