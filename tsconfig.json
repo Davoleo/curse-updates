@@ -9,6 +9,7 @@
         "noFallthroughCasesInSwitch": true,
         "allowUnreachableCode": false,
         "noImplicitAny": true,
+        "strictNullChecks": true,
 
         //Project Module Settings
         // "module": "CommonJS",
