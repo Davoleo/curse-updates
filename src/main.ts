@@ -1,7 +1,5 @@
 import { setInterval } from 'timers';
 import { Logger, Utils } from './utils';
-import { CachedProject } from './model/BotConfig';
-import { CacheHandler, GuildHandler, GuildInitializer } from './data/dataHandler';
 import { CurseHelper } from './curseHelper';
 import { buildModEmbed } from './embedBuilder';
 import { Client, Guild, GuildChannel, Message, MessageEmbed, TextChannel } from 'discord.js';
@@ -33,8 +31,7 @@ botClient.once('ready', () => {
 botClient.on('interactionCreate', async (interaction) => {
 	if (interaction.isCommand()) {
 		const command = commandsMap.get(interaction.commandName)
-		if (Utils.hasPermission(interaction.user.id, interaction.memberPermissions, command.permissionLevel))
-			command.execute(interaction);
+			command!.execute(interaction);
 	}
 });
 

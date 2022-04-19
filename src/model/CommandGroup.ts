@@ -4,3 +4,8 @@ export enum CommandGroup {
 }
 
 export type CommandGroupStrings = keyof typeof CommandGroup;
+
+export enum CommandScope {
+    EVERYWHERE,
+    SERVER
+}
