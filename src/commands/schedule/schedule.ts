@@ -2,8 +2,9 @@ import { CommandInteraction } from "discord.js";
 import { CurseHelper } from "../../curseHelper";
 import CacheManager from "../../data/CacheManager";
 import ServerManager from "../../data/ServerManager";
+import { buildScheduleEmbed } from "../../embedBuilder";
 import Command from "../../model/Command";
-import { CommandGroup } from "../../model/CommandGroup";
+import { CommandScope } from "../../model/CommandGroup";
 import { CommandPermission } from "../../utils";
 
 const PROJECT_ID_KEY = 'project id'
@@ -14,9 +15,9 @@ async function add(interaction: CommandInteraction) {
     
     try {
         const data = await CurseHelper.queryModById(projectID);
-        const serverId = interaction.guildId;
+        const serverId = interaction.guildId!;
 
-        const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.fromScratch(serverId, interaction.guild.name);
+        const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.fromScratch(serverId, interaction.guild!.name);
         await serverManager.querySchedule();
         serverManager.addProject(projectID);
         await serverManager.save();
@@ -35,11 +36,11 @@ async function add(interaction: CommandInteraction) {
 async function remove(interaction: CommandInteraction) {
     
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
-    const serverManager = await ServerManager.ofServer(interaction.guildId);
+    const serverManager = await ServerManager.ofServer(interaction.guildId!);
 
     if (serverManager === null) 
     {
-        interaction.reply(":x: Can't remove projects from a server with empty schedule!")
+        interaction.reply(":x: Can't remove projects from a server with empty schedule!");
         return;
     }
 
@@ -56,24 +57,19 @@ async function remove(interaction: CommandInteraction) {
     }
 }
 
-function show(interaction: CommandInteraction) {
-    // const embeds = buildScheduleEmbed(interaction.guildId)
-
-    // if (embeds.extras === null) {
-    //     return embeds.main;
-    // }
-    // else {
-    //     interaction.reply("Not Yet Implemented!!" /*embeds.main*/)
-    //     return embeds.extras;
-    // }
+async function show(interaction: CommandInteraction) {
+    const embeds = await buildScheduleEmbed(interaction.guildId!)
+    interaction.reply({embeds: embeds})
 }
 
 async function clear(interaction: CommandInteraction) {
-    const manager = await ServerManager.ofServer(interaction.guildId);
+    const manager = await ServerManager.ofServer(interaction.guildId!);
+
     if (manager === null) {
         interaction.reply(":x: Can't clear schedule of a server that already has empty schedule.");
         return;
     }
+
     await manager.querySchedule();
     manager.clearProjects();
 
@@ -88,8 +84,8 @@ async function clear(interaction: CommandInteraction) {
 
 export const command = new Command(
     'schedule',
-    "Allows management of the current server's update schedule",
-    CommandGroup.SCHEDULE,
+    "Management of current server's scheduled projects",
+    CommandScope.SERVER,
     CommandPermission.MODERATOR
 )
 .setAction(add, add.name)
