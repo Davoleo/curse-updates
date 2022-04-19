@@ -1,5 +1,7 @@
-import { MessageEmbed, Snowflake } from "discord.js";
+import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
 import { FileReleaseType } from "node-curseforge/dist/objects/enums";
+import CacheManager from "./data/CacheManager";
+import ServerManager from "./data/ServerManager";
 import ModData, { RELEASE_COLORS } from "./model/ModData";
 
 export const embedColors = [
@@ -89,47 +91,43 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     return modEmbed;
 }
 
-// function buildScheduleEmbed(guildId: Snowflake): {main: MessageEmbed, extras: MessageEmbed} {
-//     const idNamePairs: EmbedFieldData[] = [];
+export async function buildScheduleEmbed(serverId: Snowflake): Promise<MessageEmbed[]> {
+    const serverConfig = await ServerManager.ofServer(serverId);
+    const embeds = [new MessageEmbed()];
+    
+    if (serverConfig !== null) {
+        await serverConfig.querySchedule();
 
-//     const config = GuildHandler.getServerConfig(guildId);
+        const mainEmbedPairs: EmbedFieldData[] = await Promise.all(serverConfig.projects.map(async id => {
+            const project = await CacheManager.getCachedProject(id);
+            return {
+                name: project.slug, 
+                value: 'id: ' + project.id + '\nlatest cached version: ' + project.version
+            };
+        }))
 
-//     config.projectIds.forEach(id => {
-//         const project = CacheHandler.getProjectById(id);
-//         if (project == null)
-//             return;
-//         idNamePairs.push({name: project.slug, value: 'id: ' + project.id + '\nlatest cached version: ' + project.version});
-//     });
+        if (mainEmbedPairs.length > 0) {
+            embeds[0].setTitle('Registered Projects and Release Channel for this server');
+            embeds[0].addFields(mainEmbedPairs);
+        }
+        else {
+            embeds[0].setTitle('No Projects have been Scheduled on this server');
+            return embeds;
+        }
+        
+        //Discord Embed Field Limit is currently 25 so if the mod entries fields are over 23 we build a second embed containing the remaining projects
+        if (mainEmbedPairs.length > 25) {
+            const extraEmbed = new MessageEmbed();
+            extraEmbed.setTitle("Scheduled Projects Page 2")
+            extraEmbed.addFields(mainEmbedPairs.slice(25));
 
-//     const embColor = embedColors[Math.ceil((Math.random() * 3))]
+            embeds.push(extraEmbed);
+        }
 
-//     //Discord Embed Field Limit is currently 25 so if the mod entries fields are over 23 we build a second embed containing the remaining projects
-//     let extraEmbed = null;
-//     if (idNamePairs.length > 23) {
-//         extraEmbed = new MessageEmbed();
-//         extraEmbed.setTitle("Scheduled Projects Page 2")
-//         extraEmbed.addFields(idNamePairs.slice(23));
-//         extraEmbed.color = embColor;
-//     }
+        //Set Embed Colors
+        const embColor = embedColors[Math.ceil((Math.random() * 3))]
+        embeds.forEach(embed => embed.color = embColor)
+    }
 
-//     const embed = new MessageEmbed();
-//     embed.color = embedColors[Math.ceil((Math.random() * 3))];
-//     embed.setTitle('Registered Projects and Release Channel for this server');
-
-//     if (config.releasesChannel !== '-1')
-//         embed.addField('Announcements Channel', '<#' + config.releasesChannel + '>');
-//     else
-//         embed.addField('Announcements Channel', 'None');
-
-//     if (config.messageTemplate !== '')
-//         embed.addField('Template Message', config.messageTemplate);
-//     else
-//         embed.addField('Template Messsage', 'None');
-
-//     if (idNamePairs.length > 0)
-//         embed.addFields(idNamePairs);
-//     else
-//         embed.setTitle('No Projects have been Scheduled on this server');
-
-//     return { main: embed, extras: extraEmbed };
-// }
+    return embeds;
+}
