@@ -30,6 +30,7 @@ model AnnouncementsConfig {
     channel         String?
     message         String?
     gameVerFilter   String?
+    projectsFilter  String?
 
     @@id([id, serverId])
 }
