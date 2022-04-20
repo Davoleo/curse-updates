@@ -1,6 +1,8 @@
 import { SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
 import { ChannelType } from "discord-api-types/v9";
 import { CommandInteraction } from "discord.js";
+import { CurseHelper } from "../../curseHelper";
+import ServerManager from "../../data/ServerManager";
 import UpdatesManager from "../../data/UpdatesManager";
 import Command from "../../model/Command";
 import { CommandScope } from "../../model/CommandGroup";
@@ -32,35 +34,120 @@ const GAME_VERSIONS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandSt
     
 const PROJECTS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
     .setName('projects whitelist')
-    .setDescription("Project Ids whitelist in this format: `ID1|ID2|..` (Empty Option means all included)")
+    .setDescription("Project Ids whitelist in this format: `PROJ1|PROJ2|..` (Empty Option means all included)")
+
 
 async function newtemplate(interaction: CommandInteraction) {
-    //TODO Implement
+    const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
+    const newMessage = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name);
+
+    const settings = await UpdatesManager.ofServer(interaction.guildId!);
+    settings.addReportTemplate(channel?.id, newMessage !== null ? newMessage : undefined)
+    await settings.save();
 }
 
 async function setchannel(interaction: CommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
 
+    //non-guild scopes are excluded before -> guildId is not null
     const settings = await UpdatesManager.ofServer(interaction.guildId!);
 
+    if (settings.isTemplateInvalid(configId)) {
+        interaction.reply(":x: That Announcement Template doesn't exist!");
+        return;
+    }
+
     settings.editReportChannel(configId, channel?.id)
+    await settings.save();
     if (channel !== null)
         interaction.reply(':white_check_mark: Scheduled projects updates will start to appear in <#' + channel.id + '> once a new project update is published!');
     else
-        interaction.reply(':white_check_mark: Scheduled updates has been reset.')
+        interaction.reply(':white_check_mark: Scheduled updates channel has been reset.')
 }
 
 async function removetemplate(interaction: CommandInteraction) {
-    //TODO Implement
+    const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
+
+    //non-guild scopes are excluded before -> guildId is not null
+    const settings = await UpdatesManager.ofServer(interaction.guildId!);
+
+    if (settings.isTemplateInvalid(configId)) {
+        interaction.reply(":x: That Announcement Template doesn't exist!");
+        return;
+    }
+
+    settings.removeReportTemplate(configId);
+    await settings.save();
+    interaction.reply(":white_check_mark: Announcements Template N°" + configId + " has been removed successfully.")
+
 }
 
 async function setmessage(interaction: CommandInteraction) {
-    //TODO Implement
+    const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
+
+    //non-guild scopes are excluded before -> guildId is not null
+    const settings = await UpdatesManager.ofServer(interaction.guildId!);
+
+    if (settings.isTemplateInvalid(configId)) {
+        interaction.reply(":x: That Announcement Template doesn't exist!");
+        return;
+    }
+
+    const newMessage = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name);
+    settings.editReportMessage(configId, newMessage ?? undefined);
+
+    await settings.save();
+
+    if (newMessage !== null) 
+        interaction.reply(":white_check_mark: Updates-Attached Message template has been succesully edited");
+    else
+        interaction.reply(":white_check_mark: Updates-Attached Message template has been reset to \"\"!");
 }
 
 async function setfilters(interaction: CommandInteraction) {
-    //TODO Implement
+    const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
+    const gameVerString = interaction.options.getString(GAME_VERSIONS_FILTER_OPTION.name);
+    const projectString = interaction.options.getString(PROJECTS_FILTER_OPTION.name);
+
+    const settings = await UpdatesManager.ofServer(interaction.guildId!);
+
+    const gameVers = gameVerString?.split('|');
+    if (gameVers !== undefined) {
+        for (const ver of gameVers) {
+            if (!CurseHelper.gameVersions.has(ver)) {
+                interaction.reply(":x: Game Versions filter format is invalid, please fix try again.");
+                return;
+            }
+        }
+    }
+    settings.setGameVersionFilter(configId, gameVers);
+
+    const projects = projectString?.split('|');
+    if (projects !== undefined) {
+
+        const serverConfig = (await ServerManager.ofServer(interaction.guildId!))!;
+        await serverConfig.querySchedule();
+        
+        for (const proj of projects) {
+            const projId = Number(proj);
+            if (Number.isNaN(projId)) {
+                interaction.reply(":x: One of the project Ids in the whitelist filter is malformed, please fix and try again.");
+                return;
+            }
+            if (!serverConfig.projects.has(projId)) {
+                interaction.reply(":x: One of the project Ids in the whitelist filter is not part of this server's scheduled projects, either add it or remove it from the whitelist.")
+                return;
+            }
+        }
+    }
+    settings.setProjectsFilter(configId, gameVers);
+
+    settings.save();
+
+    interaction.reply(":white_check_mark: Announcement Filters edited succesfully!\n" +
+    "Game Version Filter: " + (gameVers !== undefined ? 'set' : 'reset') + " to `" + gameVerString + '`\n' +
+    "Projects Filter: " + (projects !== undefined ? 'set' : 'reset') + " to `" + projectString + '`');
 }
 
 async function showconfigs(interaction: CommandInteraction) {
