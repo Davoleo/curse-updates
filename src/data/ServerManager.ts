@@ -7,7 +7,7 @@ export default class ServerManager {
 
     serverId: Snowflake;
     serverName: string;
-    projects: number[];
+    projects: Set<number>;
 
     private queried: boolean;
     private projectsToRemove: Set<number> | null = new Set();
@@ -15,7 +15,7 @@ export default class ServerManager {
     private constructor(serverId: Snowflake, serverName: string) {
         this.serverId = serverId;
         this.serverName = serverName;
-        this.projects = [];
+        this.projects = new Set();
     }
 
     // ----- Initialization -----
@@ -52,7 +52,8 @@ export default class ServerManager {
                 serverId: this.serverId
             }
         });
-        this.projects = assigned.map(assigned => assigned.projectId);
+        this.projects = new Set();
+        assigned.forEach(assigned => this.projects.add(assigned.projectId));
 
         this.projectsToRemove = new Set();
         this.queried = true;
@@ -69,15 +70,15 @@ export default class ServerManager {
                     serverId: this.serverId
                 }
             });
-            this.projects = [];
+            this.projects = new Set();
         }
         else {
-            for (const index of this.projectsToRemove) {
+            for (const proj of this.projectsToRemove) {
                 await dbclient.assignedProject.delete({
                     where: {
                         projectId_serverId: {
                             serverId: this.serverId,
-                            projectId: this.projects[index]
+                            projectId: proj
                         }
                     }
                 })
@@ -103,13 +104,13 @@ export default class ServerManager {
     addProject(id: number): void {
         assert(this.queried)
 
-        if (this.projects.length >= 30)
+        if (this.projects.size >= 30)
             throw Error("Too many Assigned projects! Remove something first.");
 
-        if (this.projects.indexOf(id) !== -1)
+        if (this.projects.has(id))
             throw Error("Project already Scheduled!");
 
-        this.projects.push(id);
+        this.projects.add(id);
     }
 
     removeProject(id: number): void {
@@ -119,18 +120,16 @@ export default class ServerManager {
         if (this.projectsToRemove === null)
             return;
 
-        const index = this.projects.indexOf(id);
-
-        if (index === -1) 
+        if (!this.projects.has(id)) 
             throw Error("There's no project with that id number!");
     
-        this.projectsToRemove.add(index);
+        this.projectsToRemove.add(id);
     }
 
     clearProjects(): void {
         assert(this.queried);
 
-        if (this.projects.length === 0)
+        if (this.projects.size === 0)
             return;
 
         this.projectsToRemove = null;
