@@ -3,10 +3,19 @@ import Environment from './model/Environment';
 import ModData from './model/ModData';
 
 const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
-let mcapi: Game = null;
+
+let games: Game[]
+const gameVersions: Set<string> = new Set();
 
 async function init(): Promise<void> {
-    mcapi = await CFAPI.get_game('minecraft');
+    games = await CFAPI.get_games();
+
+    for (const game of games) {
+        const versions = await CFAPI.get_game_versions(game);
+        for (const verGroup of versions)
+            for (const version of verGroup.versions) 
+                gameVersions.add(version);
+    }
 }
 
 async function queryModById(id: number): Promise<ModData> {
@@ -19,6 +28,23 @@ async function queryModById(id: number): Promise<ModData> {
     }
 }
 
+function modExists(id: number): boolean {
+    new Boolean(async (resolve: (arg0: boolean) => any) => {
+        await CFAPI.get_mod(id)
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    }).valueOf();
+    try {
+        
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
 export const CurseHelper = {
-    queryModById
+    gameVersions,
+    init,
+    queryModById,
+    modExists,
 }
