@@ -11,6 +11,8 @@ export const botClient = new Client({intents: 'GUILDS'});
 
 export const logger: Logger = new Logger();
 
+CurseHelper.init();
+
 const commandsMap: Map<string, Command> = new Map();
 //Load Commands from js files
 loadCommandFiles().then(commands => {
