@@ -8,13 +8,13 @@ export default class CacheManager {
         return await dbclient.cachedProject.findMany();
     }
 
-    static async getCachedProject(idOrSlug: number | string): Promise<CachedProject> {
+    static async getCachedProject(idOrSlug: number | string): Promise<CachedProject | null> {
         return await dbclient.cachedProject.findUnique({
             where: {
                 id: typeof idOrSlug === 'number' ? idOrSlug : undefined,
                 slug: typeof idOrSlug === 'string' ? idOrSlug : undefined,
             }
-        })
+        });
     }
 
     static async editProjectVersion(idOrSlug: number | string, newVersion: string): Promise<void> {
