@@ -2,6 +2,7 @@ import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
 import { FileReleaseType } from "node-curseforge/dist/objects/enums";
 import CacheManager from "./data/CacheManager";
 import ServerManager from "./data/ServerManager";
+import { commandsMap } from "./main";
 import ModData, { RELEASE_COLORS } from "./model/ModData";
 
 export const embedColors = [
@@ -10,35 +11,26 @@ export const embedColors = [
 	0xF26122,
 ];
 
-// export function buildHelpEmbed(title: string, category: string): MessageEmbed {
+export function buildHelpEmbed(commandName = ""): MessageEmbed {
 
-//     const embed = new MessageEmbed();
-//     embed.setTitle(title);
+    const embed = new MessageEmbed();
+    embed.setTitle(commandName === "" ? "Showing Help for All commands" : `Showing Help for ${commandName} subcommands`);
 
-//     if (category === 'general') {
-//         category = '';
-//     }
+    if (commandName !== "") {
+        const subcommands = commandsMap.get(commandName)?.getSubCommands();
+        if (subcommands === undefined || subcommands.length === 0)
+            embed.setDescription("This command doesn't exist or doesn't have any subcommands!");
+        else
+            subcommands.forEach(subcommand => embed.addField(subcommand.name, subcommand.description))
+    }
+    else {
+        commandsMap.forEach(command => embed.addField(command.name, command.description));
+    }
 
-//     commands.forEach(command => {
-//         if (command.category === category) {
-
-//             let argString = '';
-//             if (command.argNames.length > 0)
-//                 command.argNames.forEach(arg => argString += (" `" + arg + "`"));
-
-//             embed.addField(category + ' ' +  command.name + argString, command.description);
-//         }
-//     });
-
-//     if (embed.fields.length === 0) {
-//         embed.setDescription("No commands found for specified category.\nTip: write `help` with any of the categories listed below to get a list of commands!");
-//         embed.addField("Categories: ", "`general`\n`schedule`")
-//     }
-
-//     // Set a Random Embed Color
-//     embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
-//     return embed;
-// }
+    // Set a Random Embed Color
+    embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+    return embed;
+}
 
 export function buildModEmbed(projectData: ModData): MessageEmbed {
 
@@ -98,13 +90,13 @@ export async function buildScheduleEmbed(serverId: Snowflake): Promise<MessageEm
     if (serverConfig !== null) {
         await serverConfig.querySchedule();
 
-        const mainEmbedPairs: EmbedFieldData[] = await Promise.all(serverConfig.projects.map(async id => {
+        const mainEmbedPairs: EmbedFieldData[] = await Promise.all(Array.from(serverConfig.projects, async id => {
             const project = await CacheManager.getCachedProject(id);
             return {
-                name: project.slug, 
-                value: 'id: ' + project.id + '\nlatest cached version: ' + project.version
+                name: project?.slug ?? 'null', 
+                value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null')
             };
-        }))
+        }));
 
         if (mainEmbedPairs.length > 0) {
             embeds[0].setTitle('Registered Projects and Release Channel for this server');
