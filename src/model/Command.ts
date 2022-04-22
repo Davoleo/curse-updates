@@ -1,14 +1,18 @@
 import { CommandPermission, Utils } from "../utils";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CommandScope } from "./CommandGroup";
 import { CommandInteraction } from "discord.js";
 
 type CommandHandler = (interaction: CommandInteraction) => void
+
+type NameAndDescription = {name: string, description: string}
 export default class Command extends SlashCommandBuilder {
 
     public readonly scope: CommandScope;
     private _actions: Map<string, CommandHandler> = new Map();
     public readonly permissionLevel: CommandPermission;
+
+    private readonly subcommandsData: NameAndDescription[] = [];
 
     constructor(name: string, description: string, scope: CommandScope, permission: CommandPermission) {
         super();
@@ -46,5 +50,21 @@ export default class Command extends SlashCommandBuilder {
     setAction(func: CommandHandler, subcommand = ""): Command {
         this._actions.set(subcommand, func);
         return this;
+    }
+    
+    addSubcommand(input: SlashCommandSubcommandBuilder | ((subcommandGroup: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder)): SlashCommandSubcommandsOnlyBuilder {
+        
+        if (input instanceof SlashCommandBuilder) {
+            this.subcommandsData.push(input);
+        }
+        else if (typeof input === 'function') {
+            this.subcommandsData.push(input(new SlashCommandSubcommandBuilder()));
+        }
+
+        return super.addSubcommand(input);
+    }
+
+    getSubCommands(): NameAndDescription[] {
+        return this.subcommandsData;
     }
 }
