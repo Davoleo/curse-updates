@@ -1,7 +1,7 @@
 import { CommandInteraction, Snowflake } from "discord.js";
 import { botClient } from "../main";
 import Command from "../model/Command";
-import { CommandGroup } from "../model/CommandGroup";
+import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
 async function leaveguild(interaction: CommandInteraction) {
@@ -14,7 +14,7 @@ async function leaveguild(interaction: CommandInteraction) {
 export const command = new Command(
     'leaveguild', 
     'Leaves the guild given a certain guild ID',
-    CommandGroup.GENERAL,
+    CommandScope.EVERYWHERE,
     CommandPermission.OWNER
 ).addStringOption(option => option
     .setName('id')

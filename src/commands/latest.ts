@@ -2,7 +2,7 @@ import { CommandInteraction } from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import { buildModEmbed } from "../embedBuilder";
 import Command from "../model/Command";
-import { CommandGroup } from "../model/CommandGroup";
+import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
 async function latest(interaction: CommandInteraction) {
@@ -15,7 +15,7 @@ async function latest(interaction: CommandInteraction) {
 export const command: Command = new Command(
     'latest', 
     'Queries CurseForge to get information regarding the latest version of a project',
-    CommandGroup.GENERAL,
+    CommandScope.EVERYWHERE,
     CommandPermission.USER
 ).addIntegerOption(option => option
     .setName('project_id')

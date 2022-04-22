@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import Command from "../model/Command";
-import { CommandGroup } from "../model/CommandGroup";
+import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
 function ping(interaction: CommandInteraction) {
@@ -14,7 +14,7 @@ function ping(interaction: CommandInteraction) {
 export const command = new Command(
     'ping', 
     'Sends a message with information about the latency of the bot response',
-    CommandGroup.GENERAL,
+    CommandScope.EVERYWHERE,
     CommandPermission.USER
 )
 .setAction(ping);

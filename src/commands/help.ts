@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import Command from "../model/Command";
-import { CommandGroup } from "../model/CommandGroup";
+import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
 function help(interaction: CommandInteraction) {
@@ -12,7 +12,7 @@ function help(interaction: CommandInteraction) {
 export const command = new Command(
     'help', 
     'Sends an embed message with names and descriptions of commands in the written category',
-    CommandGroup.GENERAL,
+    CommandScope.EVERYWHERE,
     CommandPermission.USER
 )
 .addStringOption(option => option

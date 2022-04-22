@@ -1,5 +1,5 @@
 import Command from "../model/Command";
-import { CommandGroup } from "../model/CommandGroup";
+import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
 function updatestuff() {
@@ -21,7 +21,7 @@ function updatestuff() {
 export const command = new Command(
     'updatestuff', 
     "does nothing - Internal Command only runnable by the bot author",
-    CommandGroup.GENERAL,
+    CommandScope.EVERYWHERE,
     CommandPermission.OWNER
 )
 .setAction(updatestuff);

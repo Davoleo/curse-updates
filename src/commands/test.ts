@@ -1,5 +1,5 @@
 import Command from "../model/Command";
-import { CommandGroup } from "../model/CommandGroup";
+import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../utils";
 
 /*
@@ -17,6 +17,6 @@ function test(args: string[], messageRef: Message) {
 export const command = new Command(
     'test', 
     'Tests some functions - Internal Command only runnable by the bot author',
-    CommandGroup.GENERAL,
+    CommandScope.EVERYWHERE,
     CommandPermission.OWNER
 );
