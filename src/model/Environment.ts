@@ -1,12 +1,14 @@
+
 import { Snowflake } from "discord.js";
 import { config } from "dotenv";
+import { Utils } from "../utils";
 
 /**
  * Singleton Typed Wrapper class for .env fields
  */
 export default class Environment {
 
-    private static INSTANCE: Environment = null;
+    private static INSTANCE: Environment;
 
     DiscordToken: string;
     OwnerId: Snowflake;
@@ -18,19 +20,26 @@ export default class Environment {
     CurseForgeAPIKey: string;
 
     private constructor() {
-        this.DiscordToken = process.env.DISCORD_TOKEN;
-        this.OwnerId = process.env.OWNER_ID;
-        this.BotId = process.env.BOT_ID;
-        this.DevMode = process.env.DEV_MODE.toUpperCase() === "TRUE"
-        this.TestingServers.push(process.env.TESTING_SERVER1, process.env.TESTING_SERVER2);
-        this.CurseForgeAPIKey = process.env.CURSEFORGE_API_KEY;
+        if (!Utils.allDefined([process.env.DISCORD_TOKEN, process.env.OWNER_ID, process.env.BOT_ID, process.env.CURSEFORGE_API_KEY]))
+            throw Error("One or more required Environment Constants are not defined, please review your .env file!")
+
+
+        this.DiscordToken = process.env.DISCORD_TOKEN!;
+        this.OwnerId = process.env.OWNER_ID!;
+        this.BotId = process.env.BOT_ID!;
+        this.DevMode = process.env.DEV_MODE?.toUpperCase() === "TRUE"
+        if (process.env.TESTING_SERVER1 || process.env.TESTING_SERVER2)
+            this.TestingServers = Utils.filterDefined([process.env.TESTING_SERVER1, process.env.TESTING_SERVER2])
+        else
+            this.DevMode = false;
+        this.CurseForgeAPIKey = process.env.CURSEFORGE_API_KEY!;
     }
 
     /**
      * Initializes Environment via dotenv
      */
     public static get(): Environment {
-        if (this.INSTANCE === null) {
+        if (!this.INSTANCE) {
             config();
             this.INSTANCE = new Environment();
         }
