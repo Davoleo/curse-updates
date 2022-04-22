@@ -1,12 +1,12 @@
 import { SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
 import { ChannelType } from "discord-api-types/v9";
 import { CommandInteraction } from "discord.js";
-import { CurseHelper } from "../../curseHelper";
-import ServerManager from "../../data/ServerManager";
-import UpdatesManager from "../../data/UpdatesManager";
-import Command from "../../model/Command";
-import { CommandScope } from "../../model/CommandGroup";
-import { CommandPermission } from "../../utils";
+import { CurseHelper } from "../curseHelper";
+import ServerManager from "../data/ServerManager";
+import UpdatesManager from "../data/UpdatesManager";
+import Command from "../model/Command";
+import { CommandScope } from "../model/CommandGroup";
+import { CommandPermission } from "../utils";
 
 const ACCEPTED_CHANNEL_TYPES = [
     ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText

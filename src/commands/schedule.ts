@@ -1,11 +1,11 @@
 import { CommandInteraction } from "discord.js";
-import { CurseHelper } from "../../curseHelper";
-import CacheManager from "../../data/CacheManager";
-import ServerManager from "../../data/ServerManager";
-import { buildScheduleEmbed } from "../../embedBuilder";
-import Command from "../../model/Command";
-import { CommandScope } from "../../model/CommandGroup";
-import { CommandPermission } from "../../utils";
+import { CurseHelper } from "../curseHelper";
+import CacheManager from "../data/CacheManager";
+import ServerManager from "../data/ServerManager";
+import { buildScheduleEmbed } from "../embedBuilder";
+import Command from "../model/Command";
+import { CommandScope } from "../model/CommandGroup";
+import { CommandPermission } from "../utils";
 
 const PROJECT_ID_KEY = 'project id'
 
