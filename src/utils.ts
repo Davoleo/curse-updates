@@ -110,11 +110,6 @@ export class Utils {
 		}
 	}
 
-	static getFilenameFromURL(url: string): string {
-		const splitUrl = url.split('/');
-		return splitUrl[splitUrl.length - 1];
-	}
-
 	static updateBotStatus(botUser: ClientUser, devMode: boolean): void {
 		// Set the bot status
 		botUser.setPresence({
