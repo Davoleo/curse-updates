@@ -30,7 +30,7 @@ export default class ServerManager {
         return match === null ? null : new ServerManager(id, match.serverName);
     }
 
-    static fromScratch(id: Snowflake, name: string): ServerManager {
+    static create(id: Snowflake, name: string): ServerManager {
         dbclient.serverConfig.create({
             data: {
                 id: id,
@@ -39,6 +39,11 @@ export default class ServerManager {
         });
 
         return new ServerManager(id, name);
+    }
+
+    static async all(): Promise<ServerManager[]> {
+        const configs = await dbclient.serverConfig.findMany();
+        return configs.map(conf => new ServerManager(conf.id, conf.serverName));
     }
 
     //DB Load

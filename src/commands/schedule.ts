@@ -17,7 +17,7 @@ async function add(interaction: CommandInteraction) {
         const data = await CurseHelper.queryModById(projectID);
         const serverId = interaction.guildId!;
 
-        const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.fromScratch(serverId, interaction.guild!.name);
+        const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.create(serverId, interaction.guild!.name);
         await serverManager.querySchedule();
         serverManager.addProject(projectID);
         await serverManager.save();
