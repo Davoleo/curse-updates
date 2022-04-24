@@ -6,6 +6,7 @@ import { initCommands, loadCommandFiles } from './commandLoader';
 import Environment from './model/Environment';
 import * as assert from 'assert';
 import ServerManager from './data/ServerManager';
+import { initScheduler } from './scheduler';
 
 export const botClient = new Client({intents: 'GUILDS'});
 
@@ -51,5 +52,7 @@ botClient.on("error", (err) => {
 //	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
 	//throw reason;
 //})
+
+initScheduler();
 
 botClient.login(Environment.get().DiscordToken);
