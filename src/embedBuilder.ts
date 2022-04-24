@@ -74,7 +74,7 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     modEmbed.addField('New Version File', modFile.fileName, true);
     modEmbed.addField('Size', fileSizeString, true);
     modEmbed.addField('Type', FileReleaseType[modFile.releaseType]);
-    modEmbed.addField('Minecraft Versions', modFile.gameVersions.join(', '));
+    modEmbed.addField('Game Versions', modFile.gameVersions.join(', '));
     modEmbed.addField('Links', '[Download](' + modFile.downloadUrl.replace(/ /g, '%20') + ')\t|\t[Wiki](' + mod.links.wikiUrl + ')\t|\t[Project](' + mod.links.websiteUrl + ')\t|\t[Source Code](' + mod.links.sourceUrl + ')');
     modEmbed.setTimestamp(modFile.fileDate);
 

@@ -1,4 +1,4 @@
-import Curseforge, { Game } from 'node-curseforge';
+import Curseforge, { Game, Mod, ModFile } from 'node-curseforge';
 import Environment from './model/Environment';
 import ModData from './model/ModData';
 
@@ -6,6 +6,11 @@ const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 
 let games: Game[]
 const gameVersions: Set<string> = new Set();
+
+const modAndModFileKeys: string[] = [
+    ...Object.keys(Mod.prototype),
+    ...Object.keys(ModFile.prototype)
+];
 
 async function init(): Promise<void> {
     games = await CFAPI.get_games();
@@ -29,6 +34,7 @@ async function queryModById(id: number): Promise<ModData> {
 }
 
 function modExists(id: number): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     new Boolean(async (resolve: (arg0: boolean) => any) => {
         await CFAPI.get_mod(id)
         .then(() => resolve(true))
@@ -44,6 +50,7 @@ function modExists(id: number): boolean {
 
 export const CurseHelper = {
     gameVersions,
+    modKeys: modAndModFileKeys,
     init,
     queryModById,
     modExists,
