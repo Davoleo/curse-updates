@@ -112,7 +112,7 @@ export const command = new Command(
 )
 .addSubcommand(subcommand => subcommand
     .setName(show.name)
-    .setDescription("Shows the scheduled project updates announcements of the current server and the announcements channel")
+    .setDescription("Shows current server's update schedule and designated announcements channel")
 )
 .addSubcommand(subcommand => subcommand
     .setName(clear.name)

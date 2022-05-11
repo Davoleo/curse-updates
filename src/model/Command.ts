@@ -2,7 +2,6 @@ import { CommandPermission, Utils } from "../util/discord";
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CommandScope } from "./CommandGroup";
 import { CommandInteraction } from "discord.js";
-import { assert } from "console";
 
 type CommandHandler = (interaction: CommandInteraction) => void
 
@@ -21,6 +20,7 @@ export default class Command extends SlashCommandBuilder {
         this.setDescription(description);
         this.setDefaultPermission(permission !== CommandPermission.OWNER);
         this.permissionLevel = permission;
+        this.scope = scope;
     }
 
     execute(interaction: CommandInteraction, subcommand = ""): void {
@@ -54,12 +54,13 @@ export default class Command extends SlashCommandBuilder {
     }
     
     addSubcommand(input: SlashCommandSubcommandBuilder | ((subcommandGroup: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder)): SlashCommandSubcommandsOnlyBuilder {
-        
+
         if (input instanceof SlashCommandBuilder) {
             this.subcommandsData.push(input);
         }
         else if (typeof input === 'function') {
-            this.subcommandsData.push(input(new SlashCommandSubcommandBuilder()));
+            const subCommand = input(new SlashCommandSubcommandBuilder());
+            this.subcommandsData.push(subCommand);
         }
 
         return super.addSubcommand(input);
