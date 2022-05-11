@@ -7,7 +7,7 @@ import { buildModEmbed } from "./embedBuilder";
 import { botClient, logger } from "./main";
 import Environment from "./model/Environment";
 import ModData from "./model/ModData";
-import { Utils } from "./utils";
+import { Utils } from "./util/discord";
 
 // -------------------------- Scheduled Check --------------------------------------
 

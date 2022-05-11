@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../utils";
+import { CommandPermission } from "../util/discord";
 
 function help(interaction: CommandInteraction) {
     const category = interaction.options.getString('category', false);

@@ -6,7 +6,7 @@ import ServerManager from "../data/ServerManager";
 import UpdatesManager from "../data/UpdatesManager";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../utils";
+import { CommandPermission } from "../util/discord";
 
 const ACCEPTED_CHANNEL_TYPES = [
     ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText

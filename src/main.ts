@@ -1,4 +1,4 @@
-import { Logger, Utils } from './utils';
+import { Utils } from './util/discord';
 import { CurseHelper } from './curseHelper';
 import { Client, Guild } from 'discord.js';
 import Command from './model/Command';
@@ -7,6 +7,7 @@ import Environment from './model/Environment';
 import * as assert from 'assert';
 import ServerManager from './data/ServerManager';
 import { initScheduler } from './scheduler';
+import { Logger } from './util/log';
 
 export const botClient = new Client({intents: 'GUILDS'});
 

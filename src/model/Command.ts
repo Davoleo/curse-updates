@@ -1,7 +1,8 @@
-import { CommandPermission, Utils } from "../utils";
+import { CommandPermission, Utils } from "../util/discord";
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CommandScope } from "./CommandGroup";
 import { CommandInteraction } from "discord.js";
+import { assert } from "console";
 
 type CommandHandler = (interaction: CommandInteraction) => void
 

@@ -5,7 +5,7 @@ import ServerManager from "../data/ServerManager";
 import { buildScheduleEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../utils";
+import { CommandPermission } from "../util/discord";
 
 const PROJECT_ID_KEY = 'project id'
 

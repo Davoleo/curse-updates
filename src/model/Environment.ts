@@ -1,7 +1,7 @@
 
 import { Snowflake } from "discord.js";
 import { config } from "dotenv";
-import { Utils } from "../utils";
+import { utilFunctions } from "../util/functions";
 
 /**
  * Singleton Typed Wrapper class for .env fields
@@ -20,7 +20,7 @@ export default class Environment {
     CurseForgeAPIKey: string;
 
     private constructor() {
-        if (!Utils.allDefined([process.env.DISCORD_TOKEN, process.env.OWNER_ID, process.env.BOT_ID, process.env.CURSEFORGE_API_KEY]))
+        if (!utilFunctions.allDefined([process.env.DISCORD_TOKEN, process.env.OWNER_ID, process.env.BOT_ID, process.env.CURSEFORGE_API_KEY]))
             throw Error("One or more required Environment Constants are not defined, please review your .env file!")
 
 
@@ -29,7 +29,7 @@ export default class Environment {
         this.BotId = process.env.BOT_ID!;
         this.DevMode = process.env.DEV_MODE?.toUpperCase() === "TRUE"
         if (process.env.TESTING_SERVER1 || process.env.TESTING_SERVER2)
-            this.TestingServers = Utils.filterDefined([process.env.TESTING_SERVER1, process.env.TESTING_SERVER2])
+            this.TestingServers = utilFunctions.filterDefined([process.env.TESTING_SERVER1, process.env.TESTING_SERVER2])
         else
             this.DevMode = false;
         this.CurseForgeAPIKey = process.env.CURSEFORGE_API_KEY!;

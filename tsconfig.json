@@ -12,7 +12,7 @@
         "strictNullChecks": true,
 
         //Project Module Settings
-        // "module": "CommonJS",
+        "module": "CommonJS",
         "moduleResolution": "node",
         // "resolveJsonModule": true,
         // "esModuleInterop": true,

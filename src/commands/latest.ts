@@ -3,7 +3,7 @@ import { CurseHelper } from "../curseHelper";
 import { buildModEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../utils";
+import { CommandPermission } from "../util/discord";
 
 async function latest(interaction: CommandInteraction) {
     

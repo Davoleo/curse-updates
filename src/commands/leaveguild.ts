@@ -2,7 +2,7 @@ import { CommandInteraction, Snowflake } from "discord.js";
 import { botClient } from "../main";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../utils";
+import { CommandPermission } from "../util/discord";
 
 async function leaveguild(interaction: CommandInteraction) {
     const id: Snowflake = interaction.options.getString('id', true)
