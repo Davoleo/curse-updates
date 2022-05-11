@@ -19,9 +19,13 @@ export const command = new Command(
     .setName('category')
     .setDescription("The Category you want to see help of")
     .setRequired(false)
-    .setChoices([
-        ["General Category", "general"],
-        ["Schedule Category", "schedule"]
-    ])
+    .setChoices({
+        name: "General Category", 
+        value: "general"
+    },
+    {
+        name: "Schedule Category",
+        value: "schedule"
+    })
 )
 .setAction(help)

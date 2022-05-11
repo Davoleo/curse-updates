@@ -8,16 +8,18 @@ import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";
 
-const ACCEPTED_CHANNEL_TYPES = [
-    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText
-] as number[];
+//const ACCEPTED_CHANNEL_TYPES = [
+//    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText
+//] as number[];
 // Took me at least half an hour to figure out this library is not smart enough to accept that array as it is and that it must be cast to
 // a number[] to be used in "addChannelTypes"
+//
+// Legacy workaround, issue has been fixed in @discordjs/builders 0.13.0
 
 const CHANNEL_OPTION: SlashCommandChannelOption = new SlashCommandChannelOption()
     .setName('channel')
     .setDescription("The Channel updates should be sent into")
-    .addChannelTypes(ACCEPTED_CHANNEL_TYPES);
+    .addChannelTypes(ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText);
 
 const UPDATES_CONFIG_ID_OPTION: SlashCommandIntegerOption = new SlashCommandIntegerOption()
     .setName('announcement id')
