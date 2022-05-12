@@ -4,8 +4,7 @@ import ModData from './model/ModData';
 
 const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 
-let games: Game[]
-const gameVersions: Set<string> = new Set();
+const gameVersions: Map<Game, Set<string>> = new Map();
 
 const modAndModFileKeys: string[] = [
     ...Object.keys(Mod.prototype),
@@ -13,15 +12,18 @@ const modAndModFileKeys: string[] = [
 ];
 
 async function init(): Promise<void> {
-    games = await CFAPI.get_games();
+    (await CFAPI.get_games(0, 50)).forEach(game => {
+        gameVersions.set(game, new Set());
+    });
 
-    for (const game of games) {
-        const versions = await CFAPI.get_game_versions(game);
+    for (const pair of gameVersions) {
+        const versions = await CFAPI.get_game_versions(pair[0]);
         for (const verGroup of versions)
             for (const version of verGroup.versions) 
-                gameVersions.add(version);
+                pair[1].add(version);
     }
 }
+
 
 async function queryModById(id: number): Promise<ModData> {
     const mod = await CFAPI.get_mod(id);
