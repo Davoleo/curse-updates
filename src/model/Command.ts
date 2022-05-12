@@ -2,6 +2,7 @@ import { CommandPermission, Utils } from "../util/discord";
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CommandScope } from "./CommandGroup";
 import { CommandInteraction } from "discord.js";
+import { logger } from "../main";
 
 type CommandHandler = (interaction: CommandInteraction) => void
 
@@ -36,8 +37,19 @@ export default class Command extends SlashCommandBuilder {
             return;
         }
 
-        if (this._actions.has(subcommand))
+        try {
+            if (this._actions.has(subcommand))
             this._actions.get(subcommand)!(interaction);
+        }
+        catch(error) {
+            if (error instanceof Error) {
+                interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
+                interaction.followUp(error.message);
+            
+                logger.warn("Running command: " + this.name + " " + subcommand + "has failed!!");
+                logger.error(error.name + ': ' + error.message);
+            }
+        }
     }
     
     //? Maybe Remove
