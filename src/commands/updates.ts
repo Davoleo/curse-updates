@@ -22,20 +22,20 @@ const CHANNEL_OPTION: SlashCommandChannelOption = new SlashCommandChannelOption(
     .addChannelTypes(ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText);
 
 const UPDATES_CONFIG_ID_OPTION: SlashCommandIntegerOption = new SlashCommandIntegerOption()
-    .setName('announcement id')
+    .setName('announcement_id')
     .setDescription("The id of the updates config you want to manage")
     .setMinValue(0);
 
 const TEMPLATE_MESSAGE_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
-    .setName('template message')
+    .setName('template_message')
     .setDescription("The text Message sent together with new updates embeds (or snowflake id of the message)");
 
 const GAME_VERSIONS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
-    .setName('game versions')
+    .setName('game_versions')
     .setDescription("Game versions whitelist in this format: `VER1|VER2|..` (Empty Option means all included)");
     
 const PROJECTS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
-    .setName('projects whitelist')
+    .setName('projects_whitelist')
     .setDescription("Project Ids whitelist in this format: `PROJ1|PROJ2|..` (Empty Option means all included)")
 
 
@@ -117,7 +117,16 @@ async function setfilters(interaction: CommandInteraction) {
     const gameVers = gameVerString?.split('|');
     if (gameVers !== undefined) {
         for (const ver of gameVers) {
-            if (!CurseHelper.gameVersions.has(ver)) {
+            let found = false;
+            //TODO Implement Game-specific game version filtering in the format of ("game:version")
+            CurseHelper.gameVersions.forEach((versions) => { 
+                if (versions.has(ver)) {
+                    found = true;
+                    return;
+                }
+            });
+
+            if (!found) {
                 interaction.reply(":x: Game Versions filter format is invalid, please fix try again.");
                 return;
             }

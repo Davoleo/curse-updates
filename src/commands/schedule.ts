@@ -3,11 +3,12 @@ import { CurseHelper } from "../curseHelper";
 import CacheManager from "../data/CacheManager";
 import ServerManager from "../data/ServerManager";
 import { buildScheduleEmbed } from "../embedBuilder";
+import { logger } from "../main";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";
 
-const PROJECT_ID_KEY = 'project id'
+const PROJECT_ID_KEY = 'project_id'
 
 async function add(interaction: CommandInteraction) {
 
@@ -58,8 +59,9 @@ async function remove(interaction: CommandInteraction) {
 }
 
 async function show(interaction: CommandInteraction) {
-    const embeds = await buildScheduleEmbed(interaction.guildId!)
-    interaction.reply({embeds: embeds})
+    const embeds = await buildScheduleEmbed(interaction.guildId!);
+    logger.info("")
+    interaction.reply({embeds: embeds});
 }
 
 async function clear(interaction: CommandInteraction) {
