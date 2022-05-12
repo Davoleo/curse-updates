@@ -25,7 +25,10 @@ loadCommandFiles().then(commands => {
 	}
 });
 
-CurseHelper.init();
+CurseHelper.init().catch(err => {
+	console.warn("Error while initializing CurseForge Games");
+	console.error(err);
+});
 
 botClient.once('ready', () => {
 	assert(botClient.user);
