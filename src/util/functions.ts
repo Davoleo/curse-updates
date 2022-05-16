@@ -15,7 +15,12 @@ function filterDefined<T>(array: Array<T | undefined | null>): Array<T> {
     return filtered;
 }
 
+function sleep(milliseconds: number) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
 export const utilFunctions = {
     allDefined,
-    filterDefined
+    filterDefined,
+    sleep
 }

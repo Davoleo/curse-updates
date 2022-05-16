@@ -12,15 +12,24 @@ const modAndModFileKeys: string[] = [
 ];
 
 async function init(): Promise<void> {
-    (await CFAPI.get_games(0, 50)).forEach(game => {
+    const games = await CFAPI.get_games(0, 50);
+    games.forEach(game => {
         gameVersions.set(game, new Set());
+        console.log(game.name + ' ' + game.id);
     });
 
     for (const pair of gameVersions) {
-        const versions = await CFAPI.get_game_versions(pair[0]);
+        const game = pair[0];
+        //Manually Skip 'Terraria' and 'StarCraft II' until node-curseforge is fixed
+        if (game.id === 431 || game.id === 65)
+            continue;
+        const versions = await CFAPI.get_game_versions(game);
+        console.log(pair[0].name);
         for (const verGroup of versions)
             for (const version of verGroup.versions) 
                 pair[1].add(version);
+
+        //console.warn("Error while querying: " + pair[0].name + "'s game_versions")
     }
 }
 
