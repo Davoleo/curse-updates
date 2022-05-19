@@ -15,7 +15,6 @@ async function init(): Promise<void> {
     const games = await CFAPI.get_games(0, 50);
     games.forEach(game => {
         gameVersions.set(game, new Set());
-        console.log(game.name + ' ' + game.id);
     });
 
     for (const pair of gameVersions) {
@@ -24,7 +23,7 @@ async function init(): Promise<void> {
         if (game.id === 431 || game.id === 65)
             continue;
         const versions = await CFAPI.get_game_versions(game);
-        console.log(pair[0].name);
+        //console.debug(pair[0].name);
         for (const verGroup of versions)
             for (const version of verGroup.versions) 
                 pair[1].add(version);

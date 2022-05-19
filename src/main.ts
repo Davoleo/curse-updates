@@ -8,10 +8,13 @@ import * as assert from 'assert';
 import ServerManager from './data/ServerManager';
 import { initScheduler } from './scheduler';
 import { Logger } from './util/log';
+import { DBHelper } from './data/dataHandler';
 
 export const botClient = new Client({intents: 'GUILDS'});
 
 export const logger: Logger = new Logger();
+
+DBHelper.init();
 
 export const commandsMap: Map<string, Command> = new Map();
 //Load Commands from js files
@@ -38,8 +41,9 @@ botClient.once('ready', () => {
 
 botClient.on('interactionCreate', async (interaction) => {
 	if (interaction.isCommand()) {
-		const command = commandsMap.get(interaction.commandName)
-			command!.execute(interaction);
+		const command = commandsMap.get(interaction.commandName);
+		const subcommand = interaction.options.getSubcommand() ?? "";
+		command!.execute(interaction, subcommand);
 	}
 });
 

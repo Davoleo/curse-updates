@@ -24,7 +24,7 @@ export default class Command extends SlashCommandBuilder {
         this.scope = scope;
     }
 
-    execute(interaction: CommandInteraction, subcommand = ""): void {
+    execute(interaction: CommandInteraction, subcommand: string): void {
         //Check if the user has permission to run the command
         if (!Utils.hasPermission(interaction.user.id, interaction.memberPermissions, this.permissionLevel)) {
             interaction.reply(":x: You don't have enough permissions to run this command.");
@@ -39,7 +39,7 @@ export default class Command extends SlashCommandBuilder {
 
         try {
             if (this._actions.has(subcommand))
-            this._actions.get(subcommand)!(interaction);
+                this._actions.get(subcommand)!(interaction);
         }
         catch(error) {
             if (error instanceof Error) {
