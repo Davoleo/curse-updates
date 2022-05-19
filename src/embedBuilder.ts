@@ -74,7 +74,7 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     modEmbed.addField('New Version File', modFile.fileName, true);
     modEmbed.addField('Size', fileSizeString, true);
     modEmbed.addField('Type', FileReleaseType[modFile.releaseType]);
-    modEmbed.addField('Game Versions', modFile.gameVersions.join(', '));
+    modEmbed.addField('Game Versions', '[' + modFile.gameVersions.join(', ') + ']');
     modEmbed.addField('Links', '[Download](' + modFile.downloadUrl.replace(/ /g, '%20') + ')\t|\t[Wiki](' + mod.links.wikiUrl + ')\t|\t[Project](' + mod.links.websiteUrl + ')\t|\t[Source Code](' + mod.links.sourceUrl + ')');
     modEmbed.setTimestamp(modFile.fileDate);
 
@@ -90,13 +90,14 @@ export async function buildScheduleEmbed(serverId: Snowflake): Promise<MessageEm
     if (serverConfig !== null) {
         await serverConfig.querySchedule();
 
-        const mainEmbedPairs: EmbedFieldData[] = await Promise.all(Array.from(serverConfig.projects, async id => {
+        const mainEmbedPairs: EmbedFieldData[] = [];
+        for (const id of serverConfig.projects) {
             const project = await CacheManager.getCachedProject(id);
-            return {
-                name: project?.slug ?? 'null', 
+            mainEmbedPairs.push({
+                name: project?.slug ?? 'null',
                 value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null')
-            };
-        }));
+            });
+        }
 
         if (mainEmbedPairs.length > 0) {
             embeds[0].setTitle('Registered Projects and Release Channel for this server');
