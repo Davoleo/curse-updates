@@ -33,7 +33,7 @@ export default class CacheManager {
         await dbclient.cachedProject.upsert({
             where: {
                 id: id,
-                slug: slug
+                slug: !id ? slug : undefined
             },
             update: {},
             create: {
