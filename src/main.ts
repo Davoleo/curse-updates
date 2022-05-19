@@ -42,7 +42,7 @@ botClient.once('ready', () => {
 botClient.on('interactionCreate', async (interaction) => {
 	if (interaction.isCommand()) {
 		const command = commandsMap.get(interaction.commandName);
-		const subcommand = interaction.options.getSubcommand() ?? "";
+		const subcommand = interaction.options.getSubcommand(false) ?? "";
 		command!.execute(interaction, subcommand);
 	}
 });
