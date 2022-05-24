@@ -100,11 +100,11 @@ export async function buildScheduleEmbed(serverId: Snowflake): Promise<MessageEm
         }
 
         if (mainEmbedPairs.length > 0) {
-            embeds[0].setTitle('Registered Projects and Release Channel for this server');
+            embeds[0].setTitle(serverConfig.serverName + '\'s Registered Projects');
             embeds[0].addFields(mainEmbedPairs);
         }
         else {
-            embeds[0].setTitle('No Projects have been Scheduled on this server');
+            embeds[0].setTitle('No Projects have been Scheduled on ' + serverConfig.serverName);
             return embeds;
         }
         
@@ -124,3 +124,4 @@ export async function buildScheduleEmbed(serverId: Snowflake): Promise<MessageEm
 
     return embeds;
 }
+
