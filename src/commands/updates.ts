@@ -46,6 +46,7 @@ async function newtemplate(interaction: CommandInteraction) {
     const settings = await UpdatesManager.ofServer(interaction.guildId!);
     settings.addReportTemplate(channel?.id, newMessage !== null ? newMessage : undefined)
     await settings.save();
+    interaction.reply(":white_check_mark: A new updates config has been created!")
 }
 
 async function setchannel(interaction: CommandInteraction) {
