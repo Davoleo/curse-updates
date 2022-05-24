@@ -90,6 +90,24 @@ export default class ServerManager {
             }
         }
 
+        for (const proj of this.projects) {
+            await dbclient.assignedProject.upsert({
+                where: {
+                    projectId_serverId: {
+                        serverId: this.serverId,
+                        projectId: proj
+                    }
+                },
+                update: {},
+                create: {
+                    serverId: this.serverId,
+                    project: {
+                        
+                    }
+                }
+            });
+        }
+
         return this;
     }
 
