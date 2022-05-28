@@ -1,5 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, PrismaPromise } from "@prisma/client";
 import { logger } from "../main";
+
+const activeTransactions: Map<string, PrismaPromise<unknown>[]> = new Map();
 
 export const dbclient = new PrismaClient({
     log: [
@@ -40,6 +42,32 @@ function init() {
     });
 }
 
+/**
+ * @param id of the transaction
+ */
+function enqueueInTransaction(id: string, queryPromise: PrismaPromise<unknown>) {
+    if (activeTransactions.has(id)) {
+        activeTransactions.get(id)?.push(queryPromise);
+    }
+    else {
+        activeTransactions.set(id, [queryPromise]);
+    }
+}
+
+async function runTransaction(id: string): Promise<unknown[]> {
+    if (activeTransactions.has(id)) {
+        const transaction = activeTransactions.get(id);
+        activeTransactions.delete(id);
+        return await dbclient.$transaction(transaction!);
+    }
+    else {
+        throw new Error('No active transaction for id: ' + id);
+    }
+    
+}
+
 export const DBHelper = {
-    init
+    init,
+    enqueueInTransaction,
+    runTransaction
 }

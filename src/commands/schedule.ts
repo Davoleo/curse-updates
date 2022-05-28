@@ -1,6 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import CacheManager from "../data/CacheManager";
+import { DBHelper } from "../data/dataHandler";
 import ServerManager from "../data/ServerManager";
 import { buildScheduleEmbed } from "../embedBuilder";
 import { logger } from "../main";
@@ -21,9 +22,12 @@ async function add(interaction: CommandInteraction) {
         const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.create(serverId, interaction.guild!.name);
         await serverManager.querySchedule();
         serverManager.addProject(projectID);
-        await serverManager.save();
-        
+
+        //Transaction
+        serverManager.save();
         CacheManager.addProject(serverId, data.mod.id, data.mod.slug, data.latestFile.fileName);
+        DBHelper.runTransaction(serverId);
+
         interaction.reply(":white_check_mark: " + data.mod.name + " has been successfully added to the schedule");
     }
     catch(error) {
@@ -49,8 +53,11 @@ async function remove(interaction: CommandInteraction) {
         //Remove project from the schedule
         serverManager.removeProject(projectID);
         //Save to DB and Run a check to see if the project still needs to be in the cache
-        await serverManager.save();
-        CacheManager.cleanupProject(projectID);
+        
+        serverManager.save()
+        CacheManager.cleanupProject(serverManager.serverId, projectID);
+        DBHelper.runTransaction(serverManager.serverId);
+
         interaction.reply(":recycle: Project `(ID: " + projectID + ")` removed successfully!");
     }
     catch(error) {
@@ -73,13 +80,15 @@ async function clear(interaction: CommandInteraction) {
     }
 
     await manager.querySchedule();
-    manager.clearProjects();
 
-    await manager.save();
+    manager.clearProjects();
+    manager.save();
 
     for (const proj of manager.projects) {
-        CacheManager.cleanupProject(proj);
+        CacheManager.cleanupProject(manager.serverId, proj);
     }
+
+    DBHelper.runTransaction(manager.serverId);
 
     interaction.reply(':warning: Schedule was cleared successfully!');
 }

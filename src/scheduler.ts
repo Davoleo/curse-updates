@@ -2,12 +2,15 @@ import { CachedProject } from "@prisma/client";
 import { MessageEmbed, MessageOptions, Snowflake, TextBasedChannel } from "discord.js";
 import { CurseHelper } from "./curseHelper";
 import CacheManager from "./data/CacheManager";
+import { DBHelper } from "./data/dataHandler";
 import ServerManager from "./data/ServerManager";
 import { buildModEmbed } from "./embedBuilder";
 import { botClient, logger } from "./main";
 import Environment from "./model/Environment";
 import ModData from "./model/ModData";
 import { Utils } from "./util/discord";
+
+export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 
 // -------------------------- Scheduled Check --------------------------------------
 
@@ -22,10 +25,13 @@ async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 		const data = await CurseHelper.queryModById(project.id);
 
 		if (project.version !== data.latestFile.fileName) {
-			CacheManager.editProjectVersion(project.id, data.latestFile.fileName);
+			CacheManager.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, data.latestFile.fileName);
 			updatedProjects.set(project.id, data);
 		}
 	}
+
+	//Run cached project updates
+	DBHelper.runTransaction(SCHEDULER_TRANSACTION_ID);
 
 	return updatedProjects;
 }

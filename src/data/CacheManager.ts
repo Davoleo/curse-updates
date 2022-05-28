@@ -1,6 +1,7 @@
 import { CachedProject } from "@prisma/client";
 import { Snowflake } from "discord.js";
-import { dbclient } from "./dataHandler";
+import { SCHEDULER_TRANSACTION_ID } from "../scheduler";
+import { dbclient, DBHelper } from "./dataHandler";
 
 export default class CacheManager {
 
@@ -17,47 +18,51 @@ export default class CacheManager {
         });
     }
 
-    static async editProjectVersion(idOrSlug: number | string, newVersion: string): Promise<void> {
-        await dbclient.cachedProject.update({
-            where: {
-                id: typeof idOrSlug === 'number' ? idOrSlug : undefined,
-                slug: typeof idOrSlug === 'string' ? idOrSlug : undefined,
-            },
-            data: {
-                version: newVersion,
-            }
-        })
+    static editProjectVersion(transactionId: string, idOrSlug: number | string, newVersion: string): void {
+        DBHelper.enqueueInTransaction(transactionId, 
+            dbclient.cachedProject.update({
+                where: {
+                    id: typeof idOrSlug === 'number' ? idOrSlug : undefined,
+                    slug: typeof idOrSlug === 'string' ? idOrSlug : undefined,
+                },
+                data: {
+                    version: newVersion,
+                }
+            })
+        );
     }
 
-    static async addProject(guildId: Snowflake, id: number, slug: string, latestVersion: string): Promise<void> {
-        await dbclient.cachedProject.upsert({
-            where: {
-                id: id,
-                slug: !id ? slug : undefined
-            },
-            update: {},
-            create: {
-                id: id,
-                slug: slug,
-                version: latestVersion,
-                subscribedGuilds: {
-                    connectOrCreate: {
-                        where: {
-                            projectId_serverId: {
-                                projectId: id,
+    static addProject(guildId: Snowflake, id: number, slug: string, latestVersion: string): void {
+        DBHelper.enqueueInTransaction(guildId, 
+            dbclient.cachedProject.upsert({
+                where: {
+                    id: id,
+                    slug: !id ? slug : undefined
+                },
+                update: {},
+                create: {
+                    id: id,
+                    slug: slug,
+                    version: latestVersion,
+                    subscribedGuilds: {
+                        connectOrCreate: {
+                            where: {
+                                projectId_serverId: {
+                                    projectId: id,
+                                    serverId: guildId
+                                }
+                            },
+                            create: {
                                 serverId: guildId
                             }
-                        },
-                        create: {
-                            serverId: guildId
                         }
                     }
                 }
-            }
-        })
+            })
+        );
     }
 
-    static async cleanupProject(id: number) {
+    static async cleanupProject(transactionId: string, id: number) {
         const matches = await dbclient.assignedProject.findMany({
             where: {
                 projectId: id
@@ -65,16 +70,18 @@ export default class CacheManager {
         });
 
         if (matches.length === 0) {
-            await this.removeProject(id);
+            await this.removeProject(transactionId, id);
         }
     }
 
-    static async removeProject(idOrSlug: number | string) {
-        await dbclient.cachedProject.delete({
-            where: {
-                id: typeof idOrSlug === 'number' ? idOrSlug : undefined,
-                slug: typeof idOrSlug === 'string' ? idOrSlug : undefined,
-            }
-        });
+    static async removeProject(transactionId: string, idOrSlug: number | string) {
+        DBHelper.enqueueInTransaction(transactionId, 
+            dbclient.cachedProject.delete({
+                where: {
+                    id: typeof idOrSlug === 'number' ? idOrSlug : undefined,
+                    slug: typeof idOrSlug === 'string' ? idOrSlug : undefined,
+                }
+            })
+        );
     }
 }

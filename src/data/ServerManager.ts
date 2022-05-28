@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import { Snowflake } from "discord.js";
-import { dbclient } from "./dataHandler";
+import { dbclient, DBHelper } from "./dataHandler";
 import UpdatesManager from "./UpdatesManager";
 
 export default class ServerManager {
@@ -66,49 +66,44 @@ export default class ServerManager {
     }
 
     //DB Save
-    async save(): Promise<ServerManager> {
+    save(): void {
         //Update Assigned Projects
         if (this.projectsToRemove === null) {
             //clearProjects was called
-            await dbclient.assignedProject.deleteMany({
-                where: {
-                    serverId: this.serverId
-                }
-            });
+            DBHelper.enqueueInTransaction(this.serverId, 
+                dbclient.assignedProject.deleteMany({
+                    where: {
+                        serverId: this.serverId
+                    }
+                })
+            );
             this.projects = new Set();
         }
         else {
             for (const proj of this.projectsToRemove) {
-                await dbclient.assignedProject.delete({
-                    where: {
-                        projectId_serverId: {
-                            serverId: this.serverId,
-                            projectId: proj
+                DBHelper.enqueueInTransaction(this.serverId, 
+                    dbclient.assignedProject.delete({
+                        where: {
+                            projectId_serverId: {
+                                serverId: this.serverId,
+                                projectId: proj
+                            }
                         }
-                    }
-                })
+                    })
+                );
             }
         }
 
         for (const proj of this.projects) {
-            await dbclient.assignedProject.upsert({
-                where: {
-                    projectId_serverId: {
-                        serverId: this.serverId,
-                        projectId: proj
+            DBHelper.enqueueInTransaction(this.serverId, 
+                dbclient.assignedProject.create({
+                    data: {
+                        projectId: proj,
+                        serverId: this.serverId
                     }
-                },
-                update: {},
-                create: {
-                    serverId: this.serverId,
-                    project: {
-                        
-                    }
-                }
-            });
+                })
+            );
         }
-
-        return this;
     }
 
     async getUpdateSettings() {
