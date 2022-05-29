@@ -2,6 +2,7 @@ import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
 import { FileReleaseType } from "node-curseforge/dist/objects/enums";
 import CacheManager from "./data/CacheManager";
 import ServerManager from "./data/ServerManager";
+import UpdatesManager from "./data/UpdatesManager";
 import { commandsMap } from "./main";
 import ModData, { RELEASE_COLORS } from "./model/ModData";
 
@@ -120,4 +121,24 @@ export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<M
     embeds.forEach(embed => embed.color = embColor)
 
     return embeds;
+}
+
+
+export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): Promise<MessageEmbed> {
+    const embed = new MessageEmbed();
+
+    embed.setTitle("Server's Announcements Configurations")
+
+    for (const config of updatesManager.config) {
+        if (config === null)
+            continue;
+        embed.addField("Announcement Channel", config.channel ? `<#${config.channel}>` : '`None`', false);
+        embed.addField("Template Message", config.message ?? '`None`', true);
+        embed.addField("Game Versions Filter", config.gameVerFilter ?? '`Empty`', true);
+        embed.addField("Projects Whitelist", config.projectsFilter ?? '`Disabled`', true);
+    }
+
+
+    embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+    return embed;
 }

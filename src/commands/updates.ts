@@ -5,6 +5,7 @@ import { CurseHelper } from "../curseHelper";
 import { DBHelper } from "../data/dataHandler";
 import ServerManager from "../data/ServerManager";
 import UpdatesManager from "../data/UpdatesManager";
+import { buildUpdateConfigsEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";
@@ -172,7 +173,9 @@ async function setfilters(interaction: CommandInteraction) {
 }
 
 async function showconfigs(interaction: CommandInteraction) {
-    //TODO Implement
+    const settings = await UpdatesManager.ofServer(interaction.guildId!);
+    const reply = await buildUpdateConfigsEmbed(settings);
+    interaction.reply({embeds: [reply]});
 }
 
 export const command = new Command(
