@@ -83,45 +83,41 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     return modEmbed;
 }
 
-export async function buildScheduleEmbed(serverId: Snowflake): Promise<MessageEmbed[]> {
-    const serverConfig = await ServerManager.ofServer(serverId);
+export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<MessageEmbed[]> {
     const embeds = [new MessageEmbed()];
-    
-    if (serverConfig !== null) {
-        await serverConfig.querySchedule();
 
-        const mainEmbedPairs: EmbedFieldData[] = [];
-        for (const id of serverConfig.projects) {
-            const project = await CacheManager.getCachedProject(id);
-            mainEmbedPairs.push({
-                name: project?.slug ?? 'null',
-                value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null')
-            });
-        }
+    await serverConfig.querySchedule();
 
-        if (mainEmbedPairs.length > 0) {
-            embeds[0].setTitle(serverConfig.serverName + '\'s Registered Projects');
-            embeds[0].addFields(mainEmbedPairs);
-        }
-        else {
-            embeds[0].setTitle('No Projects have been Scheduled on ' + serverConfig.serverName);
-            return embeds;
-        }
-        
-        //Discord Embed Field Limit is currently 25 so if the mod entries fields are over 23 we build a second embed containing the remaining projects
-        if (mainEmbedPairs.length > 25) {
-            const extraEmbed = new MessageEmbed();
-            extraEmbed.setTitle("Scheduled Projects Page 2")
-            extraEmbed.addFields(mainEmbedPairs.slice(25));
-
-            embeds.push(extraEmbed);
-        }
-
-        //Set Embed Colors
-        const embColor = embedColors[Math.ceil((Math.random() * 3))]
-        embeds.forEach(embed => embed.color = embColor)
+    const mainEmbedPairs: EmbedFieldData[] = [];
+    for (const id of serverConfig.projects) {
+        const project = await CacheManager.getCachedProject(id);
+        mainEmbedPairs.push({
+            name: project?.slug ?? 'null',
+            value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null')
+        });
     }
+
+    if (mainEmbedPairs.length > 0) {
+        embeds[0].setTitle(serverConfig.serverName + '\'s Registered Projects');
+        embeds[0].addFields(mainEmbedPairs);
+    }
+    else {
+        embeds[0].setTitle('No Projects have been Scheduled on ' + serverConfig.serverName);
+        return embeds;
+    }
+    
+    //Discord Embed Field Limit is currently 25 so if the mod entries fields are over 23 we build a second embed containing the remaining projects
+    if (mainEmbedPairs.length > 25) {
+        const extraEmbed = new MessageEmbed();
+        extraEmbed.setTitle("Scheduled Projects Page 2")
+        extraEmbed.addFields(mainEmbedPairs.slice(25));
+
+        embeds.push(extraEmbed);
+    }
+
+    //Set Embed Colors
+    const embColor = embedColors[Math.ceil((Math.random() * 3))]
+    embeds.forEach(embed => embed.color = embColor)
 
     return embeds;
 }
-

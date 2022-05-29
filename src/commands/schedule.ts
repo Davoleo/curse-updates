@@ -66,8 +66,14 @@ async function remove(interaction: CommandInteraction) {
 }
 
 async function show(interaction: CommandInteraction) {
-    const embeds = await buildScheduleEmbed(interaction.guildId!);
-    logger.info("")
+    const serverManager = await ServerManager.ofServer(interaction.guildId!);
+
+    if (serverManager === null) {
+        interaction.reply("This server is not registered in the Database");
+        return;
+    }
+
+    const embeds = await buildScheduleEmbed(serverManager);
     interaction.reply({embeds: embeds});
 }
 
