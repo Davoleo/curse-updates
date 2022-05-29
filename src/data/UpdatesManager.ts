@@ -1,7 +1,7 @@
 import { AnnouncementsConfig } from "@prisma/client";
 import * as assert from "assert";
 import { Snowflake } from "discord.js";
-import { dbclient } from "./dataHandler";
+import { dbclient, DBHelper } from "./dataHandler";
 
 export default class UpdatesManager {
 
@@ -20,45 +20,49 @@ export default class UpdatesManager {
         return new UpdatesManager(id, configs)
     }
 
-    async save() {
+    save() {
         // Update Announcement Templates
         for (const i of this.config.keys()) {
             if (this.config[i] === null) {
                 //Remove Annoucement Template
-                await dbclient.announcementsConfig.delete({
-                    where: {
-                        id_serverId: {
-                            id: i,
-                            serverId: this.serverId
+                DBHelper.enqueueInTransaction(this.serverId, 
+                    dbclient.announcementsConfig.delete({
+                        where: {
+                            id_serverId: {
+                                id: i,
+                                serverId: this.serverId
+                            }
                         }
-                    }
-                });
+                    })
+                );
             }
             else {
                 const newChannel = this.config[i]!.channel;
                 const newMessage = this.config[i]!.message;
                 const newGamesFilter = this.config[i]!.gameVerFilter;
                 const newProjectsFilter = this.config[i]!.projectsFilter;
-                await dbclient.announcementsConfig.upsert({
-                    where: {
-                        id_serverId: {
+                DBHelper.enqueueInTransaction(this.serverId, 
+                    dbclient.announcementsConfig.upsert({
+                        where: {
+                            id_serverId: {
+                                id: i,
+                                serverId: this.serverId
+                            }
+                        },
+                        create: {
                             id: i,
-                            serverId: this.serverId
+                            serverId: this.serverId,
+                            channel: newChannel,
+                            message: newMessage,
+                        },
+                        update: {
+                            channel: newChannel,
+                            message: newMessage,
+                            gameVerFilter: newGamesFilter,
+                            projectsFilter: newProjectsFilter
                         }
-                    },
-                    create: {
-                        id: i,
-                        serverId: this.serverId,
-                        channel: newChannel,
-                        message: newMessage,
-                    },
-                    update: {
-                        channel: newChannel,
-                        message: newMessage,
-                        gameVerFilter: newGamesFilter,
-                        projectsFilter: newProjectsFilter
-                    }
-                })
+                    })
+                );
             }
         }
     }

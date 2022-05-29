@@ -2,6 +2,7 @@ import { SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStrin
 import { ChannelType } from "discord-api-types/v9";
 import { CommandInteraction } from "discord.js";
 import { CurseHelper } from "../curseHelper";
+import { DBHelper } from "../data/dataHandler";
 import ServerManager from "../data/ServerManager";
 import UpdatesManager from "../data/UpdatesManager";
 import Command from "../model/Command";
@@ -36,7 +37,7 @@ const GAME_VERSIONS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandSt
     
 const PROJECTS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
     .setName('projects_whitelist')
-    .setDescription("Project Ids whitelist in this format: `PROJ1|PROJ2|..` (Empty Option means all included)")
+    .setDescription("Project Ids whitelist in this format: `PROJ1|PROJ2|..` (Empty Option means all included)");
 
 
 async function newtemplate(interaction: CommandInteraction) {
@@ -44,8 +45,10 @@ async function newtemplate(interaction: CommandInteraction) {
     const newMessage = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name);
 
     const settings = await UpdatesManager.ofServer(interaction.guildId!);
-    settings.addReportTemplate(channel?.id, newMessage !== null ? newMessage : undefined)
-    await settings.save();
+    settings.addReportTemplate(channel?.id, newMessage !== null ? newMessage : undefined);
+    settings.save();
+    DBHelper.runTransaction(settings.serverId);
+
     interaction.reply(":white_check_mark: A new updates config has been created!")
 }
 
@@ -62,7 +65,9 @@ async function setchannel(interaction: CommandInteraction) {
     }
 
     settings.editReportChannel(configId, channel?.id)
-    await settings.save();
+    settings.save();
+    DBHelper.runTransaction(settings.serverId);
+
     if (channel !== null)
         interaction.reply(':white_check_mark: Scheduled projects updates will start to appear in <#' + channel.id + '> once a new project update is published!');
     else
@@ -81,7 +86,9 @@ async function removetemplate(interaction: CommandInteraction) {
     }
 
     settings.removeReportTemplate(configId);
-    await settings.save();
+    settings.save();
+    DBHelper.runTransaction(settings.serverId);
+
     interaction.reply(":white_check_mark: Announcements Template N°" + configId + " has been removed successfully.")
 
 }
@@ -100,7 +107,8 @@ async function setmessage(interaction: CommandInteraction) {
     const newMessage = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name);
     settings.editReportMessage(configId, newMessage ?? undefined);
 
-    await settings.save();
+    settings.save();
+    DBHelper.runTransaction(settings.serverId);
 
     if (newMessage !== null) 
         interaction.reply(":white_check_mark: Updates-Attached Message template has been succesully edited");
@@ -156,6 +164,7 @@ async function setfilters(interaction: CommandInteraction) {
     settings.setProjectsFilter(configId, gameVers);
 
     settings.save();
+    DBHelper.runTransaction(settings.serverId);
 
     interaction.reply(":white_check_mark: Announcement Filters edited succesfully!\n" +
     "Game Version Filter: " + (gameVers !== undefined ? 'set' : 'reset') + " to `" + gameVerString + '`\n' +

@@ -1,6 +1,5 @@
 import { CachedProject } from "@prisma/client";
 import { Snowflake } from "discord.js";
-import { SCHEDULER_TRANSACTION_ID } from "../scheduler";
 import { dbclient, DBHelper } from "./dataHandler";
 
 export default class CacheManager {

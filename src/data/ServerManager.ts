@@ -107,7 +107,7 @@ export default class ServerManager {
     }
 
     async getUpdateSettings() {
-        return UpdatesManager.ofServer(this.serverId);
+        return await UpdatesManager.ofServer(this.serverId);
     }
 
     removeSelf(): void {
