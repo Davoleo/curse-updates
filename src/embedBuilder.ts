@@ -15,7 +15,7 @@ export const embedColors = [
 export function buildHelpEmbed(commandName = ""): MessageEmbed {
 
     const embed = new MessageEmbed();
-    embed.setTitle(commandName === "" ? "Showing Help for All commands" : `Showing Help for ${commandName} subcommands`);
+    embed.setTitle(commandName === "" ? "Showing Help for All commands" : `Showing Help for \`${commandName}\` subcommands`);
 
     if (commandName !== "") {
         const subcommands = commandsMap.get(commandName)?.getSubCommands();

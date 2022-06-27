@@ -1,12 +1,13 @@
 import { CommandInteraction } from "discord.js";
+import { buildHelpEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";
 
 function help(interaction: CommandInteraction) {
-    const category = interaction.options.getString('category', false);
-    //const embed = buildHelpEmbed('Commands: ', category);
-    interaction.reply('Showing help for category: ' + (category !== null ? category : 'general'))
+    const command = interaction.options.getString('command', false);
+    const embed = command ? buildHelpEmbed(command) : buildHelpEmbed();
+    interaction.reply({embeds: [embed]});
 }
 
 export const command = new Command(
@@ -16,15 +17,15 @@ export const command = new Command(
     CommandPermission.USER
 )
 .addStringOption(option => option
-    .setName('category')
-    .setDescription("The Category you want to see help of")
+    .setName('command')
+    .setDescription("The Command you want to see help of")
     .setRequired(false)
     .setChoices({
-        name: "General Category", 
-        value: "general"
+        name: "updates command", 
+        value: "updates"
     },
     {
-        name: "Schedule Category",
+        name: "schedule command",
         value: "schedule"
     })
 )
