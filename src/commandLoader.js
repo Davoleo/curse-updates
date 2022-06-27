@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { logger } from './main';
-import * as config from './data/config.json';
 import { Routes } from 'discord-api-types/v9'
 import { REST } from '@discordjs/rest';
+import Environment from './model/Environment';
 
 async function loadCommandFiles() {
 
@@ -22,16 +22,18 @@ async function loadCommandFiles() {
 
 function initCommands(commands) {
 	
-	const rest = new REST({version: '9'}).setToken(config.token);
+	const env = Environment.get()
+
+	const rest = new REST({version: '9'}).setToken(env.DiscordToken);
 
 	const jsonCommands =  commands.map((command) => command.toJSON());
 
-	if (config.devMode) {
-		rest.put(Routes.applicationGuildCommands(config.botId, config.testingServer), {body: jsonCommands})
+	if (env.DevMode) {
+		rest.put(Routes.applicationGuildCommands(env.botId, env.testingServer), {body: jsonCommands})
 		.then(() => logger.info("Succesfully registered Slash Commands to Testing Server 1"))
 		.catch(console.warn)
 
-		rest.put(Routes.applicationGuildCommands(config.botId, config.testingServer2), {body: jsonCommands})
+		rest.put(Routes.applicationGuildCommands(env.botId, env.testingServer2), {body: jsonCommands})
 		.then(() => logger.info("Succesfully registered Slash Commands to Testing Server 2"))
 		.catch(console.warn)
 	}
