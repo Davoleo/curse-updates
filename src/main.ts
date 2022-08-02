@@ -9,7 +9,6 @@ import ServerManager from './data/ServerManager';
 import { initScheduler } from './scheduler';
 import { Logger } from './util/log';
 import { DBHelper } from './data/dataHandler';
-
 export const botClient = new Client({intents: 'GUILDS'});
 
 export const logger: Logger = new Logger();
@@ -39,11 +38,17 @@ botClient.once('ready', () => {
 	Utils.updateBotStatus(botClient.user, Environment.get().DevMode);
 });
 
-botClient.on('interactionCreate', async (interaction) => {
+botClient.on('interactionCreate', (interaction) => {
 	if (interaction.isCommand()) {
 		const command = commandsMap.get(interaction.commandName);
 		const subcommand = interaction.options.getSubcommand(false) ?? "";
 		command!.execute(interaction, subcommand);
+	}
+
+	if (interaction.isAutocomplete()) {
+		console.log("Autocomplete Event");
+		const command = commandsMap.get(interaction.commandName);
+		command!.handleAutocomplete(interaction);
 	}
 });
 

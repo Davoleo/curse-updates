@@ -61,7 +61,7 @@ async function runTransaction(id: string): Promise<unknown[]> {
         return await dbclient.$transaction(transaction!);
     }
     else {
-        console.warn("Attempted to run transaction for non-existent id: " + id);
+        logger.warn("Attempted to run transaction for non-existent id: " + id);
         return Promise.reject('No active transaction for id: ' + id)
     }
     

@@ -1,16 +1,18 @@
 import { CommandPermission, Utils } from "../util/discord";
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CommandScope } from "./CommandGroup";
-import { CommandInteraction } from "discord.js";
+import { AutocompleteInteraction, CommandInteraction } from "discord.js";
 import { logger } from "../main";
 
-type CommandHandler = (interaction: CommandInteraction) => void
+type CommandHandler = (interaction: CommandInteraction) => void;
+type AutocompleteHandler = (interaction: AutocompleteInteraction) => void;
 
 type NameAndDescription = {name: string, description: string}
 export default class Command extends SlashCommandBuilder {
 
     public readonly scope: CommandScope;
     private _actions: Map<string, CommandHandler> = new Map();
+    private _autocompleteHandler: AutocompleteHandler | null;
     public readonly permissionLevel: CommandPermission;
 
     private readonly subcommandsData: NameAndDescription[] = [];
@@ -51,6 +53,12 @@ export default class Command extends SlashCommandBuilder {
             }
         }
     }
+
+    handleAutocomplete(interaction: AutocompleteInteraction): void {
+        if (this._autocompleteHandler) {
+            this._autocompleteHandler(interaction);
+        }
+    }
     
     //? Maybe Remove
     // getAction(subcommand = ""): CommandHandler {
@@ -62,6 +70,11 @@ export default class Command extends SlashCommandBuilder {
 
     setAction(func: CommandHandler, subcommand = ""): Command {
         this._actions.set(subcommand, func);
+        return this;
+    }
+
+    setAutocompleteHandler(handler: AutocompleteHandler): Command {
+        this._autocompleteHandler = handler;
         return this;
     }
     

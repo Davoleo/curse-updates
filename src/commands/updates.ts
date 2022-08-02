@@ -26,7 +26,8 @@ const CHANNEL_OPTION: SlashCommandChannelOption = new SlashCommandChannelOption(
 const UPDATES_CONFIG_ID_OPTION: SlashCommandIntegerOption = new SlashCommandIntegerOption()
     .setName('announcement_id')
     .setDescription("The id of the updates config you want to manage")
-    .setMinValue(0);
+    .setMinValue(0)
+    .setAutocomplete(true);
 
 const TEMPLATE_MESSAGE_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
     .setName('template_message')
@@ -190,6 +191,14 @@ export const command = new Command(
 .setAction(setchannel, setchannel.name)
 .setAction(setmessage, setmessage.name)
 .setAction(setfilters, setfilters.name)
+.setAutocompleteHandler(async (interaction) => {
+    console.log("Siamo già qua che è very good");
+    if (interaction.options.get(UPDATES_CONFIG_ID_OPTION.name) != null) {
+        const manager = await UpdatesManager.ofServer(interaction.guildId!)
+        const indexes = Object.keys(manager.config);
+        await interaction.respond(indexes.map(index => ({name: index, value: index})));
+    }
+})
 .addSubcommand(subcommand => subcommand
     .setName(newtemplate.name)
     .setDescription("Adds a new Announcements Config to the current server")
