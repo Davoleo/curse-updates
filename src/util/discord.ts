@@ -51,7 +51,7 @@ export class Utils {
 			afk: false,
 			activities: [
 				{
-					name: devMode ? ' with Davoleo in VSCode' : ' for updaes on CF',
+					name: devMode ? ' with my owner in Dev Mode' : ' for updaes on CF',
 					type: devMode ? 'PLAYING' : 'WATCHING',
 				}
 			],
