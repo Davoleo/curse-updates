@@ -20,6 +20,8 @@ async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 
 	const updatedProjects: Map<number, ModData> = new Map();
 
+	let anyUpdated = false;
+
 	for(const project of projects) {
 		//logger.info('Checking project: ' + project.id);
 		const data = await CurseHelper.queryModById(project.id);
@@ -27,11 +29,13 @@ async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 		if (project.version !== data.latestFile.fileName) {
 			CacheManager.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, data.latestFile.fileName);
 			updatedProjects.set(project.id, data);
+			anyUpdated = true;
 		}
 	}
 
 	//Run cached project updates
-	DBHelper.runTransaction(SCHEDULER_TRANSACTION_ID);
+	if (anyUpdated)
+		DBHelper.runTransaction(SCHEDULER_TRANSACTION_ID);
 
 	return updatedProjects;
 }
