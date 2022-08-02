@@ -40,7 +40,7 @@ export default class Environment {
      */
     public static get(): Environment {
         if (!this.INSTANCE) {
-            config();
+            config();  //load .env file
             this.INSTANCE = new Environment();
         }
         return this.INSTANCE;

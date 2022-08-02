@@ -1,4 +1,4 @@
-import { EmbedFieldData, MessageEmbed, Snowflake } from "discord.js";
+import { EmbedFieldData, MessageEmbed } from "discord.js";
 import { FileReleaseType } from "node-curseforge/dist/objects/enums";
 import CacheManager from "./data/CacheManager";
 import ServerManager from "./data/ServerManager";
