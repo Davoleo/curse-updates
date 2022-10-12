@@ -1,4 +1,4 @@
-import { EmbedFieldData, MessageEmbed } from "discord.js";
+import { EmbedField, EmbedBuilder, APIEmbedField } from "discord.js";
 import { FileReleaseType } from "node-curseforge/dist/objects/enums";
 import CacheManager from "./data/CacheManager";
 import ServerManager from "./data/ServerManager";
@@ -12,20 +12,22 @@ export const embedColors = [
 	0xF26122,
 ];
 
-export function buildHelpEmbed(commandName = ""): MessageEmbed {
+export function buildHelpEmbed(commandName = ""): EmbedBuilder {
 
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
     embed.setTitle(commandName === "" ? "Showing Help for All commands" : `Showing Help for \`${commandName}\` subcommands`);
 
     if (commandName !== "") {
-        const subcommands = commandsMap.get(commandName)?.getSubCommands();
+        const subcommands = commandsMap.get(commandName)?.getSubCommands().map(com => { return { name: com.name, value: com.description};});
         if (subcommands === undefined || subcommands.length === 0)
             embed.setDescription("This command doesn't exist or doesn't have any subcommands!");
         else
-            subcommands.forEach(subcommand => embed.addField(subcommand.name, subcommand.description))
+            embed.setFields(subcommands);
     }
     else {
-        commandsMap.forEach(command => embed.addField(command.name, command.description));
+        const fields: APIEmbedField[] = [];
+        commandsMap.forEach(command => fields.push({name: command.name, value: command.description}));
+        embed.setFields(fields);
     }
 
     // Set a Random Embed Color
@@ -33,12 +35,12 @@ export function buildHelpEmbed(commandName = ""): MessageEmbed {
     return embed;
 }
 
-export function buildModEmbed(projectData: ModData): MessageEmbed {
+export function buildModEmbed(projectData: ModData): EmbedBuilder {
 
     const mod = projectData.mod;
     const modFile = projectData.latestFile;
 
-    const modEmbed = new MessageEmbed();
+    const modEmbed = new EmbedBuilder();
 
     if (modFile == undefined || mod == undefined) {
         throw `ERROR: Querying the latest file of **${mod.name}** resulted in an \`undefined\` file!
@@ -84,17 +86,18 @@ export function buildModEmbed(projectData: ModData): MessageEmbed {
     return modEmbed;
 }
 
-export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<MessageEmbed[]> {
-    const embeds = [new MessageEmbed()];
+export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<EmbedBuilder[]> {
+    const embeds = [new EmbedBuilder()];
 
     await serverConfig.querySchedule();
 
-    const mainEmbedPairs: EmbedFieldData[] = [];
+    const mainEmbedPairs: EmbedField[] = [];
     for (const id of serverConfig.projects) {
         const project = await CacheManager.getCachedProject(id);
         mainEmbedPairs.push({
             name: project?.slug ?? 'null',
-            value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null')
+            value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null'),
+            inline: false
         });
     }
 
@@ -109,7 +112,7 @@ export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<M
     
     //Discord Embed Field Limit is currently 25 so if the mod entries fields are over 23 we build a second embed containing the remaining projects
     if (mainEmbedPairs.length > 25) {
-        const extraEmbed = new MessageEmbed();
+        const extraEmbed = new EmbedBuilder();
         extraEmbed.setTitle("Scheduled Projects Page 2")
         extraEmbed.addFields(mainEmbedPairs.slice(25));
 
@@ -124,8 +127,8 @@ export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<M
 }
 
 
-export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): Promise<MessageEmbed> {
-    const embed = new MessageEmbed();
+export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): Promise<EmbedBuilder> {
+    const embed = new EmbedBuilder();
 
     embed.setTitle("Server's Announcements Configurations")
 

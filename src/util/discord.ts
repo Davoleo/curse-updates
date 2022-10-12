@@ -1,5 +1,5 @@
 import { Snowflake } from 'discord-api-types/globals';
-import { Client, ClientUser, Permissions } from 'discord.js';
+import { ActivityType, Client, ClientUser, PermissionFlagsBits, Permissions, PermissionsBitField } from 'discord.js';
 import Environment from '../model/Environment';
 
 ///The different levels of permission that may be needed to execute a certain command
@@ -20,7 +20,7 @@ export class Utils {
 		});
 	}
 
-	static hasPermission(authorId: Snowflake, discordPermissions: Permissions | null, permissionLevel: CommandPermission): boolean {
+	static hasPermission(authorId: Snowflake, discordPermissions: Readonly<PermissionsBitField> | null, permissionLevel: CommandPermission): boolean {
 
 		//Guild is not available we only check for owner level permission
 		if (discordPermissions === null) {
@@ -34,9 +34,9 @@ export class Utils {
 			case CommandPermission.OWNER:
 				return authorId === env.OwnerId;
 			case CommandPermission.ADMINISTRATOR:
-				return discordPermissions.has("MANAGE_GUILD", true) || discordPermissions.has("MANAGE_ROLES", true);
+				return discordPermissions.has(PermissionFlagsBits.ManageGuild, true) || discordPermissions.has(PermissionFlagsBits.ManageRoles, true);
 			case CommandPermission.MODERATOR:
-				return discordPermissions.has("MANAGE_MESSAGES");
+				return discordPermissions.has(PermissionFlagsBits.ManageMessages);
 			case CommandPermission.USER:
 				return true;
 			default:
@@ -52,7 +52,7 @@ export class Utils {
 			activities: [
 				{
 					name: devMode ? ' with my owner in Dev Mode' : ' for updaes on CF',
-					type: devMode ? 'PLAYING' : 'WATCHING',
+					type: devMode ? ActivityType.Playing : ActivityType.Watching,
 				}
 			],
 		});

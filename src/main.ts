@@ -4,12 +4,12 @@ import { Client, Guild } from 'discord.js';
 import Command from './model/Command';
 import { initCommands, loadCommandFiles } from './commandLoader';
 import Environment from './model/Environment';
-import * as assert from 'assert';
 import ServerManager from './data/ServerManager';
 import { initScheduler } from './scheduler';
 import { Logger } from './util/log';
 import { DBHelper } from './data/dataHandler';
-export const botClient = new Client({intents: 'GUILDS'});
+import assert from 'assert';
+export const botClient = new Client({intents: 'Guilds'});
 
 export const logger: Logger = new Logger();
 
@@ -33,7 +33,7 @@ CurseHelper.init().catch(err => {
 });
 
 botClient.once('ready', () => {
-	assert(botClient.user);
+	assert(botClient.user !== null);
 	logger.info(`Logged in as ${botClient.user.tag}!`);
 	Utils.updateBotStatus(botClient.user, Environment.get().DevMode);
 });

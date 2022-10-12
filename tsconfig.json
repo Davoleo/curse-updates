@@ -15,7 +15,7 @@
         "module": "CommonJS",
         "moduleResolution": "node",
         // "resolveJsonModule": true,
-        // "esModuleInterop": true,
+        "esModuleInterop": true,
 
         "typeRoots": ["./typings", "./node_modules/@types"]
     },
