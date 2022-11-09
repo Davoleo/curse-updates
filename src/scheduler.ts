@@ -1,5 +1,5 @@
 import { CachedProject } from "@prisma/client";
-import { MessageEmbed, MessageOptions, Snowflake, TextBasedChannel } from "discord.js";
+import {APIEmbed, Message, MessagePayload, Snowflake} from "discord.js";
 import { CurseHelper } from "./curseHelper";
 import CacheManager from "./data/CacheManager";
 import { DBHelper } from "./data/dataHandler";
@@ -40,17 +40,19 @@ async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 	return updatedProjects;
 }
 
-
-function sendUpdateAnnouncements(channelId: Snowflake, announcements: MessageEmbed[], message: string | null = null) {
+function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIEmbed[], message: string | null = null) {
 	botClient.channels.fetch(channelId)
-	.then((channel: TextBasedChannel) => {
-		const payload: MessageOptions = {
-			embeds: announcements
-		}
-		if (message !== null)
-			payload.content = message;
+		.then((channel) => {
+			if (channel?.isTextBased() || channel?.isThread()) {
+				const payload = MessagePayload.create(channel, {
+					content: message ?? undefined,
+					embeds: announcements
+				})
 
-		return channel.send(payload);
+				return channel.send(payload);
+			}
+
+			throw "Couldn't send update announcements in channel " + channel?.toString();
 	})
 	.then((message) => {
 		//TODO: log information
@@ -109,10 +111,10 @@ async function prepareSendAnnouncements(updates: Map<number, ModData>) {
 				//parseModProperties(preprocessedMessage, [])
 			}
 
-			const embeds: MessageEmbed[] = [];
+			const embeds: APIEmbed[] = [];
 			filteredUpdates.forEach(update => {
 				if (update !== null)
-					embeds.push(buildModEmbed(update));
+					embeds.push(buildModEmbed(update).data);
 			});
 
 			sendUpdateAnnouncements(updateConfig.channel, embeds);

@@ -45,7 +45,7 @@ async function queryModById(id: number): Promise<ModData> {
 
 function modExists(id: number): boolean {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    new Boolean(async (resolve: (arg0: boolean) => any) => {
+    Boolean(async (resolve: (arg0: boolean) => any) => {
         await CFAPI.get_mod(id)
         .then(() => resolve(true))
         .catch(() => resolve(false));

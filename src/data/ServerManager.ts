@@ -1,4 +1,4 @@
-import * as assert from "assert";
+import assert from "assert";
 import { Snowflake } from "discord.js";
 import { dbclient, DBHelper } from "./dataHandler";
 import UpdatesManager from "./UpdatesManager";

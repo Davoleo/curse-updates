@@ -15,7 +15,7 @@ export class Logger {
 		if (!existsSync("logs"))
 			mkdirSync("logs");
 		
-		this.filename = "logs/" + Logger.getCurrentDateTime().replace(/\/|:/g, '-') + "_bot.log";		
+		this.filename = "logs/" + Logger.getCurrentDateTime().replace(/[/:]/g, '-') + "_bot.log";
 		this.logStream = createWriteStream(this.filename, { autoClose: true });
 		console.log("Logger Initialized");
 		

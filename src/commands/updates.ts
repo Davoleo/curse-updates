@@ -21,7 +21,7 @@ import { CommandPermission } from "../util/discord";
 const CHANNEL_OPTION: SlashCommandChannelOption = new SlashCommandChannelOption()
     .setName('channel')
     .setDescription("The Channel updates should be sent into")
-    .addChannelTypes(ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText);
+    .addChannelTypes(ChannelType.GuildAnnouncement, ChannelType.AnnouncementThread, ChannelType.PrivateThread, ChannelType.PublicThread, ChannelType.GuildText);
 
 const UPDATES_CONFIG_ID_OPTION: SlashCommandIntegerOption = new SlashCommandIntegerOption()
     .setName('announcement_id')

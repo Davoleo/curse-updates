@@ -43,7 +43,7 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
     const modEmbed = new EmbedBuilder();
 
     if (modFile == undefined || mod == undefined) {
-        throw `ERROR: Querying the latest file of **${mod.name}** resulted in an \`undefined\` file!
+        throw `ERROR: Querying of mod **${mod?.name}** resulted in \`undefined\` data!
         Note: This error is most likely caused by trying to query an unsupported CF Project
         Note: If this error persists and is thrown in a scheduled update check please remove the project from the bot schedule.`
     }
@@ -74,11 +74,34 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
     modEmbed.setDescription(mod.summary + '\n━━━━━━━\n**Total Downloads**: ' + downloadString + "\n**Authors**: " + authorString);
     modEmbed.setColor(releaseColor);
     modEmbed.setThumbnail(mod.logo.url);
-    modEmbed.addField('New Version File', modFile.fileName, true);
-    modEmbed.addField('Size', fileSizeString, true);
-    modEmbed.addField('Type', FileReleaseType[modFile.releaseType]);
-    modEmbed.addField('Game Versions', '[' + modFile.gameVersions.join(', ') + ']');
-    modEmbed.addField('Links', '[Download](' + modFile.downloadUrl.replace(/ /g, '%20') + ')\t|\t[Wiki](' + mod.links.wikiUrl + ')\t|\t[Project](' + mod.links.websiteUrl + ')\t|\t[Source Code](' + mod.links.sourceUrl + ')');
+
+    const fields: APIEmbedField[] = [
+        {
+            name: 'New Version File',
+            value: modFile.fileName,
+            inline: true
+        },
+        {
+            name: 'Size',
+            value: fileSizeString,
+            inline: true
+        },
+        {
+            name: 'Type',
+            value: FileReleaseType[modFile.releaseType],
+        },
+        {
+            name: 'Game Versions',
+            value: `[${modFile.gameVersions.join(', ')}]`,
+        },
+        {
+            name: 'Links',
+            value: '[Download](' + modFile.downloadUrl.replace(/ /g, '%20') +
+                ')\t|\t[Wiki](' + mod.links.wikiUrl + ')\t|\t[Project](' + mod.links.websiteUrl +
+                ')\t|\t[Source Code](' + mod.links.sourceUrl + ')'
+        }
+    ]
+    modEmbed.setFields(fields);
     modEmbed.setTimestamp(modFile.fileDate);
 
     //logger.info('Latest file: ' + fileName);
@@ -121,7 +144,7 @@ export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<E
 
     //Set Embed Colors
     const embColor = embedColors[Math.ceil((Math.random() * 3))]
-    embeds.forEach(embed => embed.color = embColor)
+    embeds.forEach(embed => embed.setColor(embColor))
 
     return embeds;
 }
@@ -135,10 +158,30 @@ export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): P
     for (const config of updatesManager.config) {
         if (config === null)
             continue;
-        embed.addField("Announcement Channel", config.channel ? `<#${config.channel}>` : '`None`', false);
-        embed.addField("Template Message", config.message ?? '`None`', true);
-        embed.addField("Game Versions Filter", config.gameVerFilter ?? '`Empty`', true);
-        embed.addField("Projects Whitelist", config.projectsFilter ?? '`Disabled`', true);
+
+        const fields: APIEmbedField[] = [
+            {
+                name: 'Announcement Channel',
+                value: config.channel ? `<#${config.channel}>` : '`None`',
+                inline: false
+            },
+            {
+                name: 'Template Message',
+                value: config.message ?? '`None`',
+                inline: true
+            },
+            {
+                name: 'Game Versions Filter',
+                value: config.gameVerFilter ?? '`Empty`',
+                inline: true
+            },
+            {
+                name: 'Projects Whitelist',
+                value: config.projectsFilter ?? '`Disabled`',
+                inline: true
+            }
+        ]
+        embed.setFields(fields);
     }
 
 
