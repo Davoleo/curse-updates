@@ -1,11 +1,11 @@
-import { CommandInteraction } from "discord.js";
+import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import { buildModEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";
 
-async function latest(interaction: CommandInteraction) {
+async function latest(interaction: ChatInputCommandInteraction) {
     
     const modData = await CurseHelper.queryModById(interaction.options.getInteger('project_id', true));
 	const response = buildModEmbed(modData);

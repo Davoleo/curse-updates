@@ -1,10 +1,10 @@
-import { CommandInteraction } from "discord.js";
+import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
 import { buildHelpEmbed } from "../embedBuilder";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";
 
-function help(interaction: CommandInteraction) {
+function help(interaction: ChatInputCommandInteraction) {
     const command = interaction.options.getString('command', false);
     const embed = command ? buildHelpEmbed(command) : buildHelpEmbed();
     interaction.reply({embeds: [embed]});

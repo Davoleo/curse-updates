@@ -1,5 +1,14 @@
 import { CachedProject } from "@prisma/client";
-import {APIEmbed, Message, MessagePayload, Snowflake} from "discord.js";
+import {
+	AnyThreadChannel,
+	APIEmbed, BaseGuildTextChannel,
+	DMChannel, ForumChannel, GuildBasedChannel, GuildChannel, GuildTextBasedChannel,
+	Message,
+	MessagePayload,
+	Snowflake,
+	TextBasedChannel,
+	ThreadChannel
+} from "discord.js";
 import { CurseHelper } from "./curseHelper";
 import CacheManager from "./data/CacheManager";
 import { DBHelper } from "./data/dataHandler";
@@ -43,13 +52,15 @@ async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIEmbed[], message: string | null = null) {
 	botClient.channels.fetch(channelId)
 		.then((channel) => {
-			if (channel?.isTextBased() || channel?.isThread()) {
-				const payload = MessagePayload.create(channel, {
-					content: message ?? undefined,
-					embeds: announcements
-				})
+			if (channel instanceof GuildChannel) {
+				if (channel.isTextBased() || channel.isThread()) {
+					const payload = MessagePayload.create(channel, {
+						content: message ?? undefined,
+						embeds: announcements
+					})
 
-				return channel.send(payload);
+					return channel.send(payload);
+				}
 			}
 
 			throw "Couldn't send update announcements in channel " + channel?.toString();

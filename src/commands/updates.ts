@@ -1,6 +1,6 @@
 import { SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
 import { ChannelType } from "discord-api-types/v9";
-import { CommandInteraction } from "discord.js";
+import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import { DBHelper } from "../data/dataHandler";
 import ServerManager from "../data/ServerManager";
@@ -42,7 +42,7 @@ const PROJECTS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringO
     .setDescription("Project Ids whitelist in this format: `PROJ1|PROJ2|..` (Empty Option means all included)");
 
 
-async function newtemplate(interaction: CommandInteraction) {
+async function newtemplate(interaction: ChatInputCommandInteraction) {
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
     const newMessage = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name);
 
@@ -54,7 +54,7 @@ async function newtemplate(interaction: CommandInteraction) {
     interaction.reply(":white_check_mark: A new updates config has been created!")
 }
 
-async function setchannel(interaction: CommandInteraction) {
+async function setchannel(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
 
@@ -76,7 +76,7 @@ async function setchannel(interaction: CommandInteraction) {
         interaction.reply(':white_check_mark: Scheduled updates channel has been reset.')
 }
 
-async function removetemplate(interaction: CommandInteraction) {
+async function removetemplate(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
 
     //non-guild scopes are excluded before -> guildId is not null
@@ -95,7 +95,7 @@ async function removetemplate(interaction: CommandInteraction) {
 
 }
 
-async function setmessage(interaction: CommandInteraction) {
+async function setmessage(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
 
     //non-guild scopes are excluded before -> guildId is not null
@@ -118,7 +118,7 @@ async function setmessage(interaction: CommandInteraction) {
         interaction.reply(":white_check_mark: Updates-Attached Message template has been reset to \"\"!");
 }
 
-async function setfilters(interaction: CommandInteraction) {
+async function setfilters(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
     const gameVerString = interaction.options.getString(GAME_VERSIONS_FILTER_OPTION.name);
     const projectString = interaction.options.getString(PROJECTS_FILTER_OPTION.name);

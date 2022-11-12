@@ -17,6 +17,10 @@
         // "resolveJsonModule": true,
         "esModuleInterop": true,
 
+        //Suppresses discord.js bs errors in definitions despite strict null checks being enabled
+        //might remove later if this problem is fixed
+        "skipLibCheck": true,
+
         "typeRoots": ["./typings", "./node_modules/@types"]
     },
     "exclude": [

@@ -1,6 +1,6 @@
 import { Utils } from './util/discord';
 import { CurseHelper } from './curseHelper';
-import { Client, Guild } from 'discord.js';
+import {ChatInputCommandInteraction, Client, CommandInteraction, Guild} from 'discord.js';
 import Command from './model/Command';
 import { initCommands, loadCommandFiles } from './commandLoader';
 import Environment from './model/Environment';
@@ -39,8 +39,9 @@ botClient.once('ready', () => {
 });
 
 botClient.on('interactionCreate', (interaction) => {
-	if (interaction.isCommand()) {
+	if (interaction.isChatInputCommand()) {
 		const command = commandsMap.get(interaction.commandName);
+
 		const subcommand = interaction.options.getSubcommand(false) ?? "";
 		command!.execute(interaction, subcommand);
 	}

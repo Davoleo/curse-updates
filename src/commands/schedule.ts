@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import CacheManager from "../data/CacheManager";
 import { DBHelper } from "../data/dataHandler";
@@ -11,7 +11,7 @@ import { CommandPermission } from "../util/discord";
 
 const PROJECT_ID_KEY = 'project_id'
 
-async function add(interaction: CommandInteraction) {
+async function add(interaction: ChatInputCommandInteraction) {
 
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
     
@@ -38,7 +38,7 @@ async function add(interaction: CommandInteraction) {
     }
 }
 
-async function remove(interaction: CommandInteraction) {
+async function remove(interaction: ChatInputCommandInteraction) {
     
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
     const serverManager = await ServerManager.ofServer(interaction.guildId!);
