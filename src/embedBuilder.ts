@@ -6,11 +6,17 @@ import UpdatesManager from "./data/UpdatesManager";
 import { commandsMap } from "./main";
 import ModData, { RELEASE_COLORS } from "./model/ModData";
 
-export const embedColors = [
+const embedColors = [
 	0x404040,
 	0xFEBC11,
 	0xF26122,
 ];
+
+function setRandomEmbedColor(embed: EmbedBuilder) {
+    const index = Math.floor(Math.random() * 3);
+    embed.setColor(embedColors[index]);
+}
+
 
 export function buildHelpEmbed(commandName = ""): EmbedBuilder {
 
@@ -30,8 +36,7 @@ export function buildHelpEmbed(commandName = ""): EmbedBuilder {
         embed.setFields(fields);
     }
 
-    // Set a Random Embed Color
-    embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+    setRandomEmbedColor(embed);
     return embed;
 }
 
@@ -102,7 +107,7 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
         }
     ]
     modEmbed.setFields(fields);
-    modEmbed.setTimestamp(modFile.fileDate);
+    modEmbed.setTimestamp(new Date(modFile.fileDate));
 
     //logger.info('Latest file: ' + fileName);
 
@@ -143,8 +148,7 @@ export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<E
     }
 
     //Set Embed Colors
-    const embColor = embedColors[Math.ceil((Math.random() * 3))]
-    embeds.forEach(embed => embed.setColor(embColor))
+    embeds.forEach(embed => setRandomEmbedColor(embed))
 
     return embeds;
 }
@@ -185,6 +189,6 @@ export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): P
     }
 
 
-    embed.setColor(embedColors[Math.ceil((Math.random() * 3))]);
+    setRandomEmbedColor(embed);
     return embed;
 }
