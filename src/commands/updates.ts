@@ -1,6 +1,6 @@
 import { SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
 import { ChannelType } from "discord-api-types/v9";
-import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
+import { ChatInputCommandInteraction, CommandInteraction } from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import { DBHelper } from "../data/dataHandler";
 import ServerManager from "../data/ServerManager";

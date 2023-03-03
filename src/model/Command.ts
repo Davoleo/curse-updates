@@ -1,5 +1,9 @@
 import { CommandPermission, Utils } from "../util/discord";
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
+import {
+    SlashCommandBuilder,
+    SlashCommandSubcommandBuilder,
+    SlashCommandSubcommandsOnlyBuilder
+} from "@discordjs/builders";
 import { CommandScope } from "./CommandGroup";
 import { AutocompleteInteraction, CommandInteraction } from "discord.js";
 import { logger } from "../main";

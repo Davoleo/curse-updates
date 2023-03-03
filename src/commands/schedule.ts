@@ -1,10 +1,9 @@
-import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
+import { ChatInputCommandInteraction, CommandInteraction } from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import CacheManager from "../data/CacheManager";
 import { DBHelper } from "../data/dataHandler";
 import ServerManager from "../data/ServerManager";
 import { buildScheduleEmbed } from "../embedBuilder";
-import { logger } from "../main";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";
 import { CommandPermission } from "../util/discord";

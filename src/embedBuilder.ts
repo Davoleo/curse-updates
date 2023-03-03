@@ -1,4 +1,4 @@
-import { EmbedField, EmbedBuilder, APIEmbedField } from "discord.js";
+import { APIEmbedField, EmbedBuilder, EmbedField } from "discord.js";
 import { FileReleaseType } from "node-curseforge/dist/objects/enums";
 import CacheManager from "./data/CacheManager";
 import ServerManager from "./data/ServerManager";
@@ -96,7 +96,7 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
             value: FileReleaseType[modFile.releaseType],
         },
         {
-            name: 'Game Versions',
+            name: 'File Tags',
             value: `[${modFile.gameVersions.join(', ')}]`,
         },
         {
@@ -175,7 +175,7 @@ export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): P
                 inline: true
             },
             {
-                name: 'Game Versions Filter',
+                name: 'File Tags Filter',
                 value: config.gameVerFilter ?? '`Empty`',
                 inline: true
             },

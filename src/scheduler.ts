@@ -1,14 +1,5 @@
 import { CachedProject } from "@prisma/client";
-import {
-	AnyThreadChannel,
-	APIEmbed, BaseGuildTextChannel,
-	DMChannel, ForumChannel, GuildBasedChannel, GuildChannel, GuildTextBasedChannel,
-	Message,
-	MessagePayload,
-	Snowflake,
-	TextBasedChannel,
-	ThreadChannel
-} from "discord.js";
+import { APIEmbed, GuildChannel, MessagePayload, Snowflake } from "discord.js";
 import { CurseHelper } from "./curseHelper";
 import CacheManager from "./data/CacheManager";
 import { DBHelper } from "./data/dataHandler";

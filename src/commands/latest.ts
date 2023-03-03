@@ -1,4 +1,4 @@
-import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { CurseHelper } from "../curseHelper";
 import { buildModEmbed } from "../embedBuilder";
 import Command from "../model/Command";

@@ -1,4 +1,4 @@
-import {ChatInputCommandInteraction, CommandInteraction, Snowflake} from "discord.js";
+import { ChatInputCommandInteraction, Snowflake } from "discord.js";
 import { botClient } from "../main";
 import Command from "../model/Command";
 import { CommandScope } from "../model/CommandGroup";

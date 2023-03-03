@@ -94,6 +94,9 @@ export default class ServerManager {
             }
         }
 
+        //TODO FIX WRONG LOGIC HERE!
+        //at this point this.projects should contain all the projects that the server is currently monitoring
+        //trying to add them all will cause conflicts 90% of the time
         for (const proj of this.projects) {
             DBHelper.enqueueInTransaction(this.serverId, 
                 dbclient.assignedProject.create({
