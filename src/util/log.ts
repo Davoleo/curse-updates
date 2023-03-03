@@ -32,7 +32,7 @@ export class Logger {
 
 	private static getCurrentDateTime(): string {
 		const now = new Date();
-		return now.toLocaleDateString('en-GB') + '_' + now.toLocaleTimeString('en-GB');
+		return `${now.getFullYear()}-${now.getMonth()}-${now.getDay()}_${now.toLocaleTimeString('en-GB')}`;
 	}
 
 	private log(level: LogLevel, message: string, ...params: string[]): void {
