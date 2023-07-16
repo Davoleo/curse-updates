@@ -1,10 +1,10 @@
-import { APIEmbedField, EmbedBuilder, EmbedField } from "discord.js";
-import { FileReleaseType } from "node-curseforge/dist/objects/enums";
-import CacheManager from "./data/CacheManager";
-import ServerManager from "./data/ServerManager";
-import UpdatesManager from "./data/UpdatesManager";
-import { commandsMap } from "./main";
-import ModData, { RELEASE_COLORS } from "./model/ModData";
+import {APIEmbedField, EmbedBuilder, EmbedField} from "discord.js";
+import {FileReleaseType} from "node-curseforge/dist/objects/enums";
+import CacheManager from "../data/CacheManager";
+import ServerManager from "../data/ServerManager";
+import UpdatesManager from "../data/UpdatesManager";
+import {commandsMap} from "../main";
+import ModData, {RELEASE_COLORS} from "../model/ModData";
 
 const embedColors = [
 	0x404040,

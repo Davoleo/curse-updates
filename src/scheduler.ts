@@ -1,14 +1,14 @@
-import { CachedProject } from "@prisma/client";
-import { APIEmbed, GuildChannel, MessagePayload, Snowflake } from "discord.js";
-import { CurseHelper } from "./curseHelper";
+import {CachedProject} from "@prisma/client";
+import {APIEmbed, GuildChannel, MessagePayload, Snowflake} from "discord.js";
+import {CurseHelper} from "./curseHelper";
 import CacheManager from "./data/CacheManager";
-import { DBHelper } from "./data/dataHandler";
+import {DBHelper} from "./data/dataHandler";
 import ServerManager from "./data/ServerManager";
-import { buildModEmbed } from "./embedBuilder";
-import { botClient, logger } from "./main";
-import Environment from "./model/Environment";
+import {buildModEmbed} from "./discord/embedBuilder";
+import {botClient, logger} from "./main";
+import Environment from "./util/Environment";
 import ModData from "./model/ModData";
-import { Utils } from "./util/discord";
+import {Utils} from "./util/discord";
 
 export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 

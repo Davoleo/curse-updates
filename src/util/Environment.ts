@@ -1,7 +1,6 @@
-
-import { Snowflake } from "discord.js";
-import { config } from "dotenv";
-import { utilFunctions } from "../util/functions";
+import {Snowflake} from "discord.js";
+import {config} from "dotenv";
+import {utilFunctions} from "./functions";
 
 /**
  * Singleton Typed Wrapper class for .env fields

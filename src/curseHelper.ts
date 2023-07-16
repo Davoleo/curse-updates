@@ -1,10 +1,10 @@
-import Curseforge, { Game, Mod, ModFile } from 'node-curseforge';
-import Environment from './model/Environment';
+import Curseforge, {Mod, ModFile} from 'node-curseforge';
+import Environment from './util/Environment';
 import ModData from './model/ModData';
 
 const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 
-const gameVersions: Map<Game, Set<string>> = new Map();
+const gameVersions: Map<number, Set<string>> = new Map();
 
 const modAndModFileKeys: string[] = [
     ...Object.keys(Mod.prototype),
@@ -14,13 +14,13 @@ const modAndModFileKeys: string[] = [
 async function init(): Promise<void> {
     const games = await CFAPI.get_games(0, 50);
     games.forEach(game => {
-        gameVersions.set(game, new Set());
+        gameVersions.set(game.id, new Set());
     });
 
     for (const pair of gameVersions) {
         const game = pair[0];
         //Manually Skip 'Terraria' and 'StarCraft II' until node-curseforge is fixed
-        if (game.id === 431 || game.id === 65)
+        if (game === 431 || game === 65)
             continue;
         const versions = await CFAPI.get_game_versions(game);
         //console.debug(pair[0].name);

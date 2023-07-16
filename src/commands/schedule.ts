@@ -1,12 +1,9 @@
-import { ChatInputCommandInteraction, CommandInteraction } from "discord.js";
-import { CurseHelper } from "../curseHelper";
-import CacheManager from "../data/CacheManager";
-import { DBHelper } from "../data/dataHandler";
-import ServerManager from "../data/ServerManager";
-import { buildScheduleEmbed } from "../embedBuilder";
+import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
+import {DBHelper} from "../data/dataHandler";
+import {buildScheduleEmbed} from "../discord/embedBuilder";
 import Command from "../model/Command";
-import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../util/discord";
+import {CommandScope} from "../model/CommandGroup";
+import {CommandPermission} from "../util/discord";
 
 const PROJECT_ID_KEY = 'project_id'
 
@@ -15,8 +12,8 @@ async function add(interaction: ChatInputCommandInteraction) {
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
     
     try {
-        const data = await CurseHelper.queryModById(projectID);
         const serverId = interaction.guildId!;
+
 
         const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.create(serverId, interaction.guild!.name);
         await serverManager.querySchedule();
@@ -34,7 +31,7 @@ async function add(interaction: ChatInputCommandInteraction) {
             interaction.reply({content: `:x: ${error.name} Error: ${error.message}`, ephemeral: true});
         else
             interaction.reply({content: ":x: UNKNOWN ERROR!", ephemeral: true});
-    }
+    }u
 }
 
 async function remove(interaction: ChatInputCommandInteraction) {

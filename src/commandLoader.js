@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import { logger } from './main';
-import { Routes } from 'discord-api-types/v9'
-import { REST } from '@discordjs/rest';
-import Environment from './model/Environment';
+import {logger} from './main';
+import {Routes} from 'discord-api-types/v9'
+import {REST} from '@discordjs/rest';
+import Environment from './util/Environment';
 
 async function loadCommandFiles() {
 
