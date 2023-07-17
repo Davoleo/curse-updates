@@ -1,12 +1,13 @@
-import { CommandPermission, Utils } from "../util/discord";
+import {CommandPermission, Utils} from "../util/discord";
 import {
     SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandsOnlyBuilder
 } from "@discordjs/builders";
-import { CommandScope } from "./CommandGroup";
-import { AutocompleteInteraction, CommandInteraction } from "discord.js";
-import { logger } from "../main";
+import {CommandScope} from "./CommandGroup";
+import {AutocompleteInteraction, CommandInteraction} from "discord.js";
+import {logger} from "../main";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 
 type CommandHandler = (interaction: CommandInteraction) => void;
 type AutocompleteHandler = (interaction: AutocompleteInteraction) => void;
@@ -33,13 +34,13 @@ export default class Command extends SlashCommandBuilder {
     execute(interaction: CommandInteraction, subcommand: string): void {
         //Check if the user has permission to run the command
         if (!Utils.hasPermission(interaction.user.id, interaction.memberPermissions, this.permissionLevel)) {
-            interaction.reply(":x: You don't have enough permissions to run this command.");
+            void interaction.reply(":x: You don't have enough permissions to run this command.");
             return;
         }
 
         //Server-only commands can't be runnable outside their scope
         if (this.scope === CommandScope.SERVER && !interaction.inGuild()) {
-            interaction.reply(":x: This command can only be executed inside servers!")
+            void interaction.reply(":x: This command can only be executed inside servers!")
             return;
         }
 
@@ -48,9 +49,14 @@ export default class Command extends SlashCommandBuilder {
                 this._actions.get(subcommand)!(interaction);
         }
         catch(error) {
-            if (error instanceof Error) {
-                interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
-                interaction.followUp(error.message);
+
+            if (error instanceof PrismaClientKnownRequestError) {
+                void interaction.reply({ content: ":x: Generic Data Error", ephemeral: true })
+                logger.error(`Prisma Error (${error.code}): ${error.message}`)
+            }
+            else if (error instanceof Error) {
+                void interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
+                void interaction.followUp(error.message);
             
                 logger.warn("Running command: " + this.name + " " + subcommand + "has failed!!");
                 logger.error(error.name + ': ' + error.message);

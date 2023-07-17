@@ -1,9 +1,11 @@
 import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
-import {DBHelper} from "../data/dataHandler";
 import {buildScheduleEmbed} from "../discord/embedBuilder";
 import Command from "../model/Command";
 import {CommandScope} from "../model/CommandGroup";
 import {CommandPermission} from "../util/discord";
+import GuildService from "../services/GuildService";
+import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 
 const PROJECT_ID_KEY = 'project_id'
 
@@ -13,86 +15,58 @@ async function add(interaction: ChatInputCommandInteraction) {
     
     try {
         const serverId = interaction.guildId!;
-
-
-        const serverManager = await ServerManager.ofServer(serverId) ?? ServerManager.create(serverId, interaction.guild!.name);
-        await serverManager.querySchedule();
-        serverManager.addProject(projectID);
-
-        //Transaction
-        serverManager.save();
-        CacheManager.addProject(serverId, data.mod.id, data.mod.slug, data.latestFile.fileName);
-        DBHelper.runTransaction(serverId);
-
-        interaction.reply(":white_check_mark: " + data.mod.name + " has been successfully added to the schedule");
+        const slug = await GuildService.addProject(serverId, projectID)
+        void interaction.reply(":white_check_mark: " + slug + " has been successfully added to the schedule");
     }
     catch(error) {
-        if (error instanceof Error)
-            interaction.reply({content: `:x: ${error.name} Error: ${error.message}`, ephemeral: true});
-        else
-            interaction.reply({content: ":x: UNKNOWN ERROR!", ephemeral: true});
-    }u
+        if (error instanceof ErrorNotFound) {
+            void interaction.reply({content: `:x: Error: ${error.message} ID=${projectID}`, ephemeral: true});
+        }
+        else if (error instanceof Error) {
+            void interaction.reply({content: `:x: ${error.name} Error: ${error.message}`, ephemeral: true});
+        }
+        else {
+            void interaction.reply({content: `:x: ${error.name}!`, ephemeral: true});
+            throw error;
+        }
+    }
 }
 
 async function remove(interaction: ChatInputCommandInteraction) {
     
     const projectID = interaction.options.getInteger(PROJECT_ID_KEY, true);
-    const serverManager = await ServerManager.ofServer(interaction.guildId!);
-
-    if (serverManager === null) 
-    {
-        interaction.reply(":x: Can't remove projects from a server with empty schedule!");
-        return;
-    }
 
     try {
         //Remove project from the schedule
-        serverManager.removeProject(projectID);
-        //Save to DB and Run a check to see if the project still needs to be in the cache
-        
-        serverManager.save()
-        CacheManager.cleanupProject(serverManager.serverId, projectID);
-        DBHelper.runTransaction(serverManager.serverId);
-
-        interaction.reply(":recycle: Project `(ID: " + projectID + ")` removed successfully!");
+        await GuildService.removeProject(interaction.guildId!, projectID);
+        await interaction.reply(":recycle: Project `(ID: " + projectID + ")` removed successfully!");
     }
     catch(error) {
-        interaction.reply(":x: Couldn't find a project with `ID = " + projectID + "` in the bot schedule");
+        if (error instanceof PrismaClientKnownRequestError) {
+            if (error.code === 'P2018' || error.code === 'P2025') {
+                void interaction.reply(":x: Couldn't find a project with `ID = " + projectID + "` in the bot schedule")
+            }
+        }
+        else throw error;
     }
 }
 
 async function show(interaction: CommandInteraction) {
-    const serverManager = await ServerManager.ofServer(interaction.guildId!);
-
-    if (serverManager === null) {
-        interaction.reply("This server is not registered in the Database");
-        return;
-    }
-
-    const embeds = await buildScheduleEmbed(serverManager);
-    interaction.reply({embeds: embeds});
+    const embeds = await buildScheduleEmbed(interaction.guildId!);
+    void interaction.reply({embeds: embeds});
 }
 
 async function clear(interaction: CommandInteraction) {
-    const manager = await ServerManager.ofServer(interaction.guildId!);
-
-    if (manager === null) {
-        interaction.reply(":x: Can't clear schedule of a server that already has empty schedule.");
-        return;
+    try {
+        await GuildService.clearProjects(interaction.guildId!);
+        void interaction.reply(':warning: Schedule was cleared successfully!');
     }
-
-    await manager.querySchedule();
-
-    manager.clearProjects();
-    manager.save();
-
-    for (const proj of manager.projects) {
-        CacheManager.cleanupProject(manager.serverId, proj);
+    catch (e) {
+        if (e instanceof Error) {
+            void interaction.reply(":x: Can't clear Schedule: " + e.message)
+        }
+        else throw e;
     }
-
-    DBHelper.runTransaction(manager.serverId);
-
-    interaction.reply(':warning: Schedule was cleared successfully!');
 }
 
 export const command = new Command(

@@ -9,6 +9,7 @@ import {initScheduler} from './scheduler';
 import {Logger} from './util/log';
 import {DBHelper} from './data/dataHandler';
 import assert from 'assert';
+import GuildService from "./services/GuildService";
 
 export const botClient = new Client({intents: 'Guilds'});
 
@@ -52,6 +53,13 @@ botClient.on('interactionCreate', (interaction) => {
 		const command = commandsMap.get(interaction.commandName);
 		command!.handleAutocomplete(interaction);
 	}
+});
+
+botClient.on('guildCreate', (guild: Guild) => {
+	void GuildService.initServer({
+		id: guild.id,
+		name: guild.name
+	});
 });
 
 botClient.on('guildDelete', (guild: Guild) => {

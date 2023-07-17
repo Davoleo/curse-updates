@@ -33,15 +33,14 @@ export default class GuildService {
         ).announcementConfigs;
     }
 
+    /**
+     * initializes new entry in the Guilds table;
+     * if already initialized the guild name is updated
+     * @param server serverId and name from Discord
+     */
     static async initServer(server: {id: Snowflake, name: string}) {
-        dbclient.serverConfig.upsert({
-            where: {
-                id: server.id
-            },
-            update: {
-                serverName: server.name
-            },
-            create: {
+        dbclient.serverConfig.create({
+            data: {
                 id: server.id,
                 serverName: server.name
             }
@@ -49,6 +48,16 @@ export default class GuildService {
     }
 
     // ---- Project Schedule ----
+    static async getAllProjects(serverId: Snowflake) {
+        return await dbclient.serverConfig.findUniqueOrThrow({
+            where: { id: serverId },
+            select: {
+                serverName: true,
+                projects: true
+            }
+        });
+    }
+
     static async addProject(serverId: Snowflake, projectId: number) {
 
         const serverConfig = await dbclient.serverConfig.findUniqueOrThrow({
@@ -68,7 +77,7 @@ export default class GuildService {
         if (serverConfig.projects.indexOf({ id: projectId }) !== -1)
             throw Error("Project already Scheduled!");
 
-        await CacheService.addProject(serverId, projectId)
+        return await CacheService.addProject(serverId, projectId)
     }
 
     static async removeProject(serverId: Snowflake, projectId: number) {
@@ -96,6 +105,10 @@ export default class GuildService {
                 projects: { select: { id: true } }
             }
         });
+
+        if (!projNumbers || projNumbers.projects.length === 0) {
+            throw Error("Schedule is already empty!")
+        }
 
         await dbclient.serverConfig.update({
             where: { id: serverId },

@@ -1,10 +1,8 @@
-import {APIEmbedField, EmbedBuilder, EmbedField} from "discord.js";
+import {APIEmbedField, EmbedBuilder, EmbedField, Snowflake} from "discord.js";
 import {FileReleaseType} from "node-curseforge/dist/objects/enums";
-import CacheManager from "../data/CacheManager";
-import ServerManager from "../data/ServerManager";
-import UpdatesManager from "../data/UpdatesManager";
 import {commandsMap} from "../main";
 import ModData, {RELEASE_COLORS} from "../model/ModData";
+import GuildService from "../services/GuildService";
 
 const embedColors = [
 	0x404040,
@@ -114,23 +112,21 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
     return modEmbed;
 }
 
-export async function buildScheduleEmbed(serverConfig: ServerManager): Promise<EmbedBuilder[]> {
+export async function buildScheduleEmbed(serverId: Snowflake): Promise<EmbedBuilder[]> {
     const embeds = [new EmbedBuilder()];
-
-    await serverConfig.querySchedule();
+    const serverConfig = await GuildService.getAllProjects(serverId);
 
     const mainEmbedPairs: EmbedField[] = [];
-    for (const id of serverConfig.projects) {
-        const project = await CacheManager.getCachedProject(id);
+    for (const project of serverConfig.projects) {
         mainEmbedPairs.push({
-            name: project?.slug ?? 'null',
-            value: 'id: ' + (project?.id ?? 'null') + '\nlatest cached version: ' + (project?.version ?? 'null'),
+            name: project.slug,
+            value: 'id: ' + (project.id) + '\nlatest cached version: ' + (project.filename),
             inline: false
         });
     }
 
     if (mainEmbedPairs.length > 0) {
-        embeds[0].setTitle(serverConfig.serverName + '\'s Registered Projects');
+        embeds[0].setTitle(serverConfig + '\'s Registered Projects');
         embeds[0].addFields(mainEmbedPairs);
     }
     else {

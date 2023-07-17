@@ -2,12 +2,12 @@ import {SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandString
 import {ChannelType} from "discord-api-types/v9";
 import {ChatInputCommandInteraction, CommandInteraction, ModalSubmitInteraction} from "discord.js";
 import {DBHelper} from "../data/dataHandler";
-import UpdatesManager from "../data/UpdatesManager";
 import {buildUpdateConfigsEmbed} from "../discord/embedBuilder";
 import Command from "../model/Command";
 import {CommandScope} from "../model/CommandGroup";
 import {CommandPermission} from "../util/discord";
 import {ConfigModal, modalById} from "../discord/modalBuilder";
+import UpdatesService from "../services/UpdatesService";
 
 //const ACCEPTED_CHANNEL_TYPES = [
 //    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText
@@ -42,14 +42,12 @@ const PROJECTS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringO
 
 
 async function newtemplate(interaction: ChatInputCommandInteraction) {
-    const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
+    const channel = interaction.options.getChannel(CHANNEL_OPTION.name)?.id;
+    const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
-    const settings = await UpdatesManager.ofServer(interaction.guildId!);
-    settings.save();
-    DBHelper.runTransaction(settings.serverId);
+    await UpdatesService.addReportTemplate(interaction.guildId!, channel, message);
 
-
-    interaction.reply(":white_check_mark: A new updates config has been created!")
+    void interaction.reply(":white_check_mark: A new updates config has been created!")
 }
 
 async function setchannel(interaction: ChatInputCommandInteraction) {

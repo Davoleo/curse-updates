@@ -18,11 +18,11 @@ export default class CacheManager {
         });
     }
 
-    static async addProject(guildId: Snowflake, id: number): Promise<void> {
+    static async addProject(guildId: Snowflake, id: number): Promise<string> {
 
-        const exists = await dbclient.cachedProject.findUnique({ where: { id: id } }) !== null;
-        if (exists) {
-            return
+        const cachedProject = await dbclient.cachedProject.findUnique({ where: { id: id } });
+        if (cachedProject !== null) {
+            return cachedProject.slug;
         }
 
         const project = await CurseHelper.queryModById(id);
@@ -40,6 +40,8 @@ export default class CacheManager {
                 }
             }
         })
+
+        return project.mod.slug;
     }
 
     static editProjectVersion(transactionId: string, projectId: number, newVersion: { id: number, filename: string }): void {
