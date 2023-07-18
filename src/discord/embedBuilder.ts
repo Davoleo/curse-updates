@@ -1,3 +1,4 @@
+import {AnnouncementsConfig} from "@prisma/client";
 import {APIEmbedField, EmbedBuilder, EmbedField, Snowflake} from "discord.js";
 import {FileReleaseType} from "node-curseforge/dist/objects/enums";
 import {commandsMap} from "../main";
@@ -150,12 +151,12 @@ export async function buildScheduleEmbed(serverId: Snowflake): Promise<EmbedBuil
 }
 
 
-export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): Promise<EmbedBuilder> {
-    const embed = new EmbedBuilder();
+export async function buildUpdateConfigsEmbed(updatesConfigs: AnnouncementsConfig[]): Promise<EmbedBuilder> {
 
+    const embed = new EmbedBuilder();
     embed.setTitle("Server's Announcements Configurations")
 
-    for (const config of updatesManager.config) {
+    for (const config of updatesConfigs) {
         if (config === null)
             continue;
 
@@ -172,7 +173,7 @@ export async function buildUpdateConfigsEmbed(updatesManager: UpdatesManager): P
             },
             {
                 name: 'File Tags Filter',
-                value: config.gameVerFilter ?? '`Empty`',
+                value: config.tagsFilter ?? '`Empty`',
                 inline: true
             },
             {

@@ -1,13 +1,13 @@
 import {SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStringOption} from "@discordjs/builders";
 import {ChannelType} from "discord-api-types/v9";
-import {ChatInputCommandInteraction, CommandInteraction, ModalSubmitInteraction} from "discord.js";
-import {DBHelper} from "../data/dataHandler";
+import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
 import {buildUpdateConfigsEmbed} from "../discord/embedBuilder";
 import Command from "../model/Command";
 import {CommandScope} from "../model/CommandGroup";
 import {CommandPermission} from "../util/discord";
-import {ConfigModal, modalById} from "../discord/modalBuilder";
+import {FilterModal} from "../discord/modals";
 import UpdatesService from "../services/UpdatesService";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 
 //const ACCEPTED_CHANNEL_TYPES = [
 //    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText
@@ -32,110 +32,93 @@ const TEMPLATE_MESSAGE_OPTION: SlashCommandStringOption = new SlashCommandString
     .setName('template_message')
     .setDescription("The text Message sent together with new updates embeds (or snowflake id of the message)");
 
-const GAME_VERSIONS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
-    .setName('file_tags')
-    .setDescription("Game File Tags whitelist in this format: `GAME1:TAG1|GAME2:TAG2|..` (Empty Option means all included)");
-    
-const PROJECTS_FILTER_OPTION: SlashCommandStringOption = new SlashCommandStringOption()
-    .setName('projects_whitelist')
-    .setDescription("Project Ids whitelist in this format: `PROJ1|PROJ2|..` (Empty Option means all included)");
-
 
 async function newtemplate(interaction: ChatInputCommandInteraction) {
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name)?.id;
     const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
     await UpdatesService.addReportTemplate(interaction.guildId!, channel, message);
+    await setfilters(interaction)
 
-    void interaction.reply(":white_check_mark: A new updates config has been created!")
+    void interaction.reply(":white_check_mark: A new announcements config has been created!")
 }
 
 async function setchannel(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
 
-    //non-guild scopes are excluded before -> guildId is not null
-    const settings = await UpdatesManager.ofServer(interaction.guildId!);
-
-    if (!settings.isTemplateValid(configId)) {
-        interaction.reply(":x: That Announcement Template doesn't exist!");
-        return;
+    try {
+        await UpdatesService.editReportChannel(configId, channel?.id);
+    }
+    catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            if (e.code === 'P2018' || e.code === 'P2025') {
+                void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
+            }
+        }
+        else throw e;
     }
 
-    settings.editReportChannel(configId, channel?.id)
-    settings.save();
-    DBHelper.runTransaction(settings.serverId);
-
     if (channel !== null)
-        interaction.reply(':white_check_mark: Scheduled projects updates will start to appear in <#' + channel.id + '> once a new project update is published!');
+        void interaction.reply(':white_check_mark: Scheduled projects updates will start to appear in <#' + channel.id + '> once a new project update is published!');
     else
-        interaction.reply(':white_check_mark: Scheduled updates channel has been reset.')
+        void interaction.reply(':white_check_mark: Scheduled updates channel has been reset.')
 }
 
 async function removetemplate(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
 
-    //non-guild scopes are excluded before -> guildId is not null
-    const settings = await UpdatesManager.ofServer(interaction.guildId!);
-
-    if (!settings.isTemplateValid(configId)) {
-        interaction.reply(":x: That Announcement Template doesn't exist!");
-        return;
+    try {
+        await UpdatesService.removeReportTemplate(configId);
+    }
+    catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            if (e.code === 'P2018' || e.code === 'P2025') {
+                void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
+            }
+        }
+        else throw e;
     }
 
-    settings.removeReportTemplate(configId);
-    settings.save();
-    DBHelper.runTransaction(settings.serverId);
-
-    interaction.reply(":white_check_mark: Announcements Template N°" + configId + " has been removed successfully.")
+    void interaction.reply(":white_check_mark: Announcements Template N°" + configId + " has been removed successfully.")
 
 }
 
 async function setmessage(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
+    const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
-    //non-guild scopes are excluded before -> guildId is not null
-    const settings = await UpdatesManager.ofServer(interaction.guildId!);
-
-    if (!settings.isTemplateValid(configId)) {
-        interaction.reply(":x: That Announcement Template doesn't exist!");
-        return;
+    try {
+        UpdatesService.editReportMessage(configId, message)
+    }
+    catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            if (e.code === 'P2018' || e.code === 'P2025') {
+                void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
+            }
+        }
+        else throw e;
     }
 
     const newMessage = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name);
-    settings.editReportMessage(configId, newMessage ?? undefined);
-
-    settings.save();
-    DBHelper.runTransaction(settings.serverId);
 
     if (newMessage !== null) 
-        interaction.reply(":white_check_mark: Updates-Attached Message template has been succesully edited");
+        void interaction.reply(":white_check_mark: Updates-Attached Message template has been succesully edited");
     else
-        interaction.reply(":white_check_mark: Updates-Attached Message template has been reset to \"\"!");
+        void interaction.reply(":white_check_mark: Updates-Attached Message template has been reset to \"\"!");
 }
 
-function showfiltermodal(interaction: ChatInputCommandInteraction) {
+async function setfilters(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
 
-    if (!settings.isTemplateValid(configId)) {
-        interaction.reply(":x: That Announcement Template doesn't exist!");
-        return;
-    }
-
-    const modal = (modalById('filtersModal') as ConfigModal).compose();
-    interaction.showModal(modal);
+    const modal = await new FilterModal(configId, interaction.user.id).compose();
+    await interaction.showModal(modal);
 }
-
-async function setfilters(interaction: ModalSubmitInteraction) {
-    
-}
-
-
 
 async function showconfigs(interaction: CommandInteraction) {
-    const settings = await UpdatesManager.ofServer(interaction.guildId!);
+    const settings = await UpdatesService.getAllServerUpdateConfigs(interaction.guildId!);
     const reply = await buildUpdateConfigsEmbed(settings);
-    interaction.reply({embeds: [reply]});
+    void interaction.reply({embeds: [reply]});
 }
 
 export const command = new Command(
@@ -153,9 +136,8 @@ export const command = new Command(
 .setAutocompleteHandler(async (interaction) => {
     console.log("Siamo già qua che è very good");
     if (interaction.options.get(UPDATES_CONFIG_ID_OPTION.name) != null) {
-        const manager = await UpdatesManager.ofServer(interaction.guildId!)
-        const indexes = Object.keys(manager.config);
-        await interaction.respond(indexes.map(index => ({name: index, value: index})));
+        const configIds = await UpdatesService.getAllConfigIds(interaction.guildId!)
+        await interaction.respond(configIds.map(index => {return { name: index.id + "", value: index.id}}));
     }
 })
 .addSubcommand(subcommand => subcommand
@@ -188,6 +170,4 @@ export const command = new Command(
 .addSubcommand(subcommand => subcommand
     .setName(setfilters.name)
     .setDescription("Controls which projects will be announced depending on certain conditions")
-    .addStringOption(GAME_VERSIONS_FILTER_OPTION)
-    .addStringOption(PROJECTS_FILTER_OPTION)
 )

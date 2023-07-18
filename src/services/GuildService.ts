@@ -58,6 +58,22 @@ export default class GuildService {
         });
     }
 
+    static async hasProject(serverId: Snowflake, projectId: number) {
+        const project = await dbclient.serverConfig.findUnique({
+            where: {
+                id: serverId
+            },
+            select: {
+                projects: {
+                    where: { id: projectId },
+                    select: { id: true },
+                }
+            }
+        });
+
+        return project !== null;
+    }
+
     static async addProject(serverId: Snowflake, projectId: number) {
 
         const serverConfig = await dbclient.serverConfig.findUniqueOrThrow({
