@@ -27,8 +27,8 @@ model AnnouncementsConfig {
 model CachedProject {
     id               Int            @id
     slug             String
-    fileId           Int            @unique
-    filename         String
+    fileId           Int?
+    filename         String?
     subscribedGuilds ServerConfig[] @relation("AssignedProject")
 }
 

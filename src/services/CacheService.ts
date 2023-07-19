@@ -31,8 +31,8 @@ export default class CacheManager {
             data: {
                 id: id,
                 slug: project.mod.slug,
-                fileId: project.latestFile.id,
-                filename: project.latestFile.fileName,
+                fileId: project.latestFile?.id,
+                filename: project.latestFile?.fileName,
                 subscribedGuilds: {
                     connect: {
                         id: guildId
@@ -44,7 +44,7 @@ export default class CacheManager {
         return project.mod.slug;
     }
 
-    static editProjectVersion(transactionId: string, projectId: number, newVersion: { id: number, filename: string }): void {
+    static editProjectVersion(transactionId: string, projectId: number, newVersion: { id: number | undefined, filename: string | undefined }): void {
         DBHelper.enqueueInTransaction(transactionId, 
             dbclient.cachedProject.update({
                 where: {
