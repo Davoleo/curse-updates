@@ -66,14 +66,26 @@ export class FilterModal implements Modal {
     async handleSubmission(interaction: ModalSubmitInteraction) {
 
         const tagsString = interaction.fields.getField(FilterModal.TAGS_FILTER_INPUT, ComponentType.TextInput).value
+        const projectString = interaction.fields.getField(FilterModal.PROJECTS_FILTER_INPUT, ComponentType.TextInput).value.split('|')
 
         if (tagsString.length > 0) {
             const tags = tagsString?.split('|').map(stag => GameTag.fromString(stag));
-            for (const tag of tags) {
-                const gameTags = CurseHelper.gameVersions.get(tag.game)
 
-                if (!gameTags || !gameTags.has(tag.tag)) {
-                    await interaction.reply(":x: Tags Filter format invalid: Can't find game or version in: `" + tag + '`')
+            for (const tag of tags) {
+                try {
+                    tag.validate();
+                }
+                catch (e) {
+                    if (e instanceof Error) {
+                        await interaction.reply(":x: Tags Filter format invalid: " + e.message)
+                        await interaction.followUp("Broken Filters Input\n" +
+                            "Tags Filter: " + tagsString + '`\n' +
+                            "Projects Filter: " + projectString.join('|') + '`')
+                        return;
+                    }
+                    else {
+                        throw e;
+                    }
                 }
             }
 
@@ -83,14 +95,16 @@ export class FilterModal implements Modal {
         const serverConfig = await GuildService.getAllProjects(interaction.guildId!);
         const scheduledProjects = new Set<number>(serverConfig.projects.map(proj => proj.id));
 
-        const projectString = interaction.fields.getField(FilterModal.PROJECTS_FILTER_INPUT, ComponentType.TextInput).value.split('|')
         const projects: number[] = new Array(projectString.length)
 
         for (let i = 0; i < projects.length; i++) {
             const projId = Number(projectString[i]);
 
             if (Number.isNaN(projId)) {
-                await interaction.reply(":x: One of the project Ids in the whitelist filter is malformed, please fix and try again.");
+                await interaction.reply(":x: Project N°`" + projId + "` in the whitelist filter is malformed, please fix and try again.");
+                await interaction.followUp("Broken Filters Input\n" +
+                    "Tags Filter: " + tagsString + '`\n' +
+                    "Projects Filter: " + projectString + '`')
                 return;
             }
 
