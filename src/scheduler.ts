@@ -1,14 +1,15 @@
 import {CachedProject} from "@prisma/client";
 import {APIEmbed, GuildChannel, MessagePayload, Snowflake} from "discord.js";
 import {CurseHelper} from "./curseHelper";
-import CacheManager from "./data/CacheManager";
 import {DBHelper} from "./data/dataHandler";
-import ServerManager from "./data/ServerManager";
 import {buildModEmbed} from "./discord/embedBuilder";
 import {botClient, logger} from "./main";
 import Environment from "./util/Environment";
 import ModData from "./model/ModData";
 import {Utils} from "./util/discord";
+import CacheService from "./services/CacheService";
+import GuildService from "./services/GuildService";
+import GameTag from "./model/GameTag";
 
 export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 
@@ -16,20 +17,26 @@ export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 
 async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 
-	const projects: CachedProject[] = await CacheManager.getAllProjects();
+	const projects: CachedProject[] = await CacheService.getAllProjects()
+	const projectIds = projects.map(proj => proj.id)
+	const curseData = await CurseHelper.queryMods(projectIds)
 
-	const updatedProjects: Map<number, ModData> = new Map();
-
-	let anyUpdated = false;
+	let anyUpdated = false
 
 	for(const project of projects) {
-		//logger.info('Checking project: ' + project.id);
-		const data = await CurseHelper.queryModById(project.id);
+		const data = curseData.get(project.id)
 
-		if (project.version !== data.latestFile.fileName) {
-			CacheManager.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, data.latestFile.fileName);
-			updatedProjects.set(project.id, data);
-			anyUpdated = true;
+		if (data) {
+			const latest = data.latestFile;
+
+			if (project.fileId != latest?.id) {
+				CacheService.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, { id: latest?.id, filename: latest?.fileName })
+				anyUpdated = true
+			}
+
+			if (!latest || project.fileId === latest.id) {
+				curseData.delete(project.id)
+			}
 		}
 	}
 
@@ -37,7 +44,7 @@ async function queryCacheUpdates(): Promise<Map<number, ModData>> {
 	if (anyUpdated)
 		DBHelper.runTransaction(SCHEDULER_TRANSACTION_ID);
 
-	return updatedProjects;
+	return curseData;
 }
 
 function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIEmbed[], message: string | null = null) {
@@ -74,37 +81,44 @@ function parseModProperties(text: string, modInfo: ModData[]) {
 
 async function prepareSendAnnouncements(updates: Map<number, ModData>) {
 	
-	const guilds = await ServerManager.all();
+	const guilds = await GuildService.getAllServerConfigs();
 
 	for (const guild of guilds) {
 
-		const announcements = await guild.getUpdateSettings();
-
-		for (const updateConfig of announcements.config) {
+		for (const updateConfig of guild.announcementConfigs) {
 			if (updateConfig === null || updateConfig.channel === null)
 				continue;
 
-			const filteredUpdates = Array.from(updates, (update) => {
+			const filteredUpdates = Array.from(updates.values(), (update) => {
 				let remove = false;
 				
 				//If projects filter is enabled and none of the entries includes the current update project 
 				//we set remove to true for this project
 				if (updateConfig.projectsFilter !== null) {
-					if (!updateConfig.projectsFilter.includes(update[0].toString()))
+					if (!updateConfig.projectsFilter.includes(update.mod.id.toString()))
 						remove = true;
 				}
 
 				//If gameVers filter is enabled and none of the current update gameVersions are in the filter
 				//we set remove to true for this project
-				if (updateConfig.gameVerFilter !== null) {
-					const anyMatches = update[1].latestFile.gameVersions.some(gameVer => {
-						return updateConfig.gameVerFilter!.includes(gameVer);
+				if (updateConfig.tagsFilter !== null && update.latestFile) {
+					const tags = updateConfig.tagsFilter.split('|').map(stag => GameTag.fromString(stag))
+
+
+					const anyMatches = update.latestFile.gameVersions.some(version => {
+						for (const tag of tags) {
+							if (CurseHelper.GameSlugs.get(tag.game) === update.mod.gameId) {
+								return tag.tag === version
+							}
+						}
+						return false;
 					});
+
+					//remove if it was already flagged OR if tags filter doesn't produce any match
 					remove ||= !anyMatches;
 				}
 
-				//If the project was flagged to be removed we return null instead of it's update
-				return remove ? null : update[1];
+				return remove ? null : update;
 			});
 
 			const preprocessedMessage = updateConfig.message;
