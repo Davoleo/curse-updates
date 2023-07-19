@@ -2,7 +2,7 @@ import { Mod, ModFile } from "node-curseforge";
 
 export default interface ModData {
     mod: Mod;
-    latestFile: ModFile;
+    latestFile: ModFile | undefined;
 }
 
 /**
