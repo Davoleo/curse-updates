@@ -9,7 +9,7 @@ async function latest(interaction: ChatInputCommandInteraction) {
     
     const modData = await CurseHelper.queryModById(interaction.options.getInteger('project_id', true));
 	const response = buildModEmbed(modData);
-    interaction.reply({embeds: [response]});
+    void interaction.reply({embeds: [response]});
 }
 
 export const command: Command = new Command(

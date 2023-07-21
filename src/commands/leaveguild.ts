@@ -1,14 +1,14 @@
-import { ChatInputCommandInteraction, Snowflake } from "discord.js";
-import { botClient } from "../main";
+import {ChatInputCommandInteraction, Snowflake} from "discord.js";
+import {botClient} from "../main";
 import Command from "../model/Command";
-import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../util/discord";
+import {CommandScope} from "../model/CommandGroup";
+import {CommandPermission} from "../util/discord";
 
 async function leaveguild(interaction: ChatInputCommandInteraction) {
     const id: Snowflake = interaction.options.getString('id', true)
     const guild = await botClient.guilds.fetch(id);
-    guild.leave();
-    interaction.reply(`Guild "${guild.name}" has been left`);
+    await guild.leave();
+    void interaction.reply(`Guild "${guild.name}" has been left`);
 }
 
 export const command = new Command(

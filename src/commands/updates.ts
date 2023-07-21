@@ -89,7 +89,7 @@ async function setmessage(interaction: ChatInputCommandInteraction) {
     const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
     try {
-        UpdatesService.editReportMessage(configId, message)
+        await UpdatesService.editReportMessage(configId, message)
     }
     catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {

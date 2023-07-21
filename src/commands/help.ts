@@ -7,7 +7,7 @@ import {CommandPermission} from "../util/discord";
 function help(interaction: ChatInputCommandInteraction) {
     const command = interaction.options.getString('command', false);
     const embed = command ? buildHelpEmbed(command) : buildHelpEmbed();
-    interaction.reply({embeds: [embed]});
+    void interaction.reply({embeds: [embed]});
 }
 
 export const command = new Command(
