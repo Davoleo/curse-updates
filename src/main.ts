@@ -1,6 +1,6 @@
 import {Utils} from './util/discord';
 import {CurseHelper} from './curseHelper';
-import {Client, Guild, Snowflake} from 'discord.js';
+import {Client, Guild} from 'discord.js';
 import Command from './model/Command';
 import {initCommands, loadCommandFiles} from './commandLoader';
 import Environment from './util/Environment';
@@ -9,13 +9,10 @@ import {Logger} from './util/log';
 import {DBHelper} from './data/dataHandler';
 import assert from 'assert';
 import GuildService from "./services/GuildService";
-import {Modal} from "./discord/modals";
 
 export const botClient = new Client({intents: 'Guilds'});
 
 export const logger: Logger = new Logger();
-
-export const activeModals = new Map<Snowflake, Modal>();
 
 DBHelper.init();
 
@@ -39,6 +36,7 @@ CurseHelper.init().catch(err => {
 botClient.once('ready', () => {
 	assert(botClient.user !== null);
 	logger.info(`Logged in as ${botClient.user.tag}!`);
+
 	Utils.updateBotStatus(botClient.user, Environment.get().DevMode);
 });
 
@@ -66,7 +64,12 @@ botClient.on('guildCreate', (guild: Guild) => {
 
 botClient.on('guildDelete', (guild: Guild) => {
 	//Remove data for servers the bot has been kicked/banned from
-	GuildService.removeServer(guild.id);
+	try {
+		GuildService.removeServer(guild.id);
+	}
+	catch (e) {
+		logger.warn("guildDelete(" + guild.name + "): " + e.message)
+	}
 });
 
 botClient.on("error", (err) => {
@@ -80,4 +83,4 @@ botClient.on("error", (err) => {
 
 initScheduler();
 
-botClient.login(Environment.get().DiscordToken);
+void botClient.login(Environment.get().DiscordToken);

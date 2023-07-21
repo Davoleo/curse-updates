@@ -3,12 +3,9 @@ import {
     ComponentType,
     ModalBuilder,
     ModalSubmitInteraction,
-    Snowflake,
     TextInputBuilder,
     TextInputStyle
 } from "discord.js";
-import {CurseHelper} from "../curseHelper";
-import {activeModals} from "../main";
 import UpdatesService from "../services/UpdatesService";
 import GameTag from "../model/GameTag";
 import GuildService from "../services/GuildService";
@@ -28,9 +25,7 @@ export class FilterModal implements Modal {
 
     public readonly id = 'filtersModal';
 
-    constructor(public configId: number, author: Snowflake) {
-        activeModals.set(author, this)
-    }
+    constructor(public configId: number) {}
 
     async compose() {
         const modal = new ModalBuilder()

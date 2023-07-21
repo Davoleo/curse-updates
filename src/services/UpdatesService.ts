@@ -26,7 +26,7 @@ export default class UpdatesService {
     }
 
     static async addReportTemplate(serverId: Snowflake, channel: string | undefined, message: string | undefined) {
-        await this.updateConfigs.create({data: {
+        return await this.updateConfigs.create({data: {
             serverId: serverId,
             channel: channel,
             message: message

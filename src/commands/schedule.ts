@@ -6,6 +6,7 @@ import {CommandPermission} from "../util/discord";
 import GuildService from "../services/GuildService";
 import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
+import {logger} from "../main";
 
 const PROJECT_ID_KEY = 'project_id'
 
@@ -45,6 +46,7 @@ async function remove(interaction: ChatInputCommandInteraction) {
         if (error instanceof PrismaClientKnownRequestError) {
             if (error.code === 'P2018' || error.code === 'P2025') {
                 void interaction.reply(":x: Couldn't find a project with `ID = " + projectID + "` in the bot schedule")
+                logger.error('schedule remove: ' + error.message)
             }
         }
         else throw error;

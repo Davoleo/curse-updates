@@ -1,6 +1,7 @@
 import {Snowflake} from "discord.js";
 import {dbclient, DBHelper} from "../data/dataHandler";
 import CacheService from "./CacheService";
+import UninitializedGuildError from "../model/UninitializedGuildError";
 
 export default class GuildService {
 
@@ -49,18 +50,23 @@ export default class GuildService {
 
     // ---- Project Schedule ----
     static async getAllProjects(serverId: Snowflake) {
-        return await dbclient.serverConfig.findUniqueOrThrow({
+        const projects = await dbclient.serverConfig.findUnique({
             where: { id: serverId },
             select: {
                 serverName: true,
                 projects: true
             }
         });
+
+        if (!projects)
+            throw new UninitializedGuildError(serverId);
+
+        return projects;
     }
 
     static async addProject(serverId: Snowflake, projectId: number) {
 
-        const serverConfig = await dbclient.serverConfig.findUniqueOrThrow({
+        const serverConfig = await dbclient.serverConfig.findUnique({
             where: {id: serverId},
             select: {
                 projects: {
@@ -70,6 +76,9 @@ export default class GuildService {
                 }
             }
         });
+
+        if (!serverConfig)
+            throw new UninitializedGuildError(serverId);
 
         if (serverConfig.projects.length >= 30)
             throw Error("Too many Assigned projects! Remove something first.");
@@ -106,7 +115,10 @@ export default class GuildService {
             }
         });
 
-        if (!projNumbers || projNumbers.projects.length === 0) {
+        if (!projNumbers)
+            throw new UninitializedGuildError(serverId);
+
+        if (projNumbers.projects.length === 0) {
             throw Error("Schedule is already empty!")
         }
 

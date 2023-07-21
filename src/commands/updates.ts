@@ -8,6 +8,7 @@ import {CommandPermission} from "../util/discord";
 import {FilterModal} from "../discord/modals";
 import UpdatesService from "../services/UpdatesService";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
+import {logger} from "../main";
 
 //const ACCEPTED_CHANNEL_TYPES = [
 //    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText
@@ -37,8 +38,8 @@ async function newtemplate(interaction: ChatInputCommandInteraction) {
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name)?.id;
     const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
-    await UpdatesService.addReportTemplate(interaction.guildId!, channel, message);
-    await setfilters(interaction)
+    const config = await UpdatesService.addReportTemplate(interaction.guildId!, channel, message);
+    await setfilters(interaction, config.id)
 
     void interaction.reply(":white_check_mark: A new announcements config has been created!")
 }
@@ -108,11 +109,24 @@ async function setmessage(interaction: ChatInputCommandInteraction) {
         void interaction.reply(":white_check_mark: Updates-Attached Message template has been reset to \"\"!");
 }
 
-async function setfilters(interaction: ChatInputCommandInteraction) {
-    const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
+async function setfilters(interaction: ChatInputCommandInteraction, externalConfigId: number | undefined = undefined) {
+    const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name) ?? externalConfigId!;
 
-    const modal = await new FilterModal(configId, interaction.user.id).compose();
+    const modalWrapper = new FilterModal(configId);
+
+    const modal = await modalWrapper.compose();
     await interaction.showModal(modal);
+    const submitted = await interaction.awaitModalSubmit({
+        time: 60000,
+        filter: i => i.user.id === interaction.user.id
+    }).catch(err => {
+        logger.error(err)
+        return null
+    });
+
+    if (submitted)
+        await modalWrapper.handleSubmission(submitted);
+
 }
 
 async function showconfigs(interaction: CommandInteraction) {

@@ -87,5 +87,4 @@ export const CurseHelper = {
     init,
     queryModById,
     queryMods,
-    modExists,
 }
