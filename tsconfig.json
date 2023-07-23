@@ -4,7 +4,7 @@
         "outDir": "./build",
         "sourceMap": true,
         "allowJs": true,
-        "target": "ES6",
+        "target": "ES2020",
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "allowUnreachableCode": false,
@@ -19,7 +19,7 @@
 
         //Suppresses discord.js bs errors in definitions despite strict null checks being enabled
         //might remove later if this problem is fixed
-        "skipLibCheck": true,
+        //"skipLibCheck": true,
 
         "typeRoots": ["./typings", "./node_modules/@types"]
     },

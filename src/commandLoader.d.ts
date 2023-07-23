@@ -1,4 +1,4 @@
-import Command from "../src/model/Command";
+import Command from "../src/model/Command.js";
 
 export function loadCommandFiles(): Promise<Command[]>;
 
