@@ -1,7 +1,7 @@
 import {CommandInteraction, Message} from "discord.js";
-import Command from "../model/Command";
-import {CommandScope} from "../model/CommandGroup";
-import {CommandPermission} from "../util/discord";
+import Command from "../model/Command.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
 
 function ping(interaction: CommandInteraction) {
     interaction.reply({content: "Pinging...", fetchReply: true}).then((reply: Message) => {

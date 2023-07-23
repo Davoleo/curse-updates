@@ -1,7 +1,7 @@
 import {CachedProject} from "@prisma/client";
-import {dbclient, DBHelper} from "../data/dataHandler";
+import {dbclient, DBHelper} from "../data/dataHandler.js";
 import {Snowflake} from "discord.js";
-import {CurseHelper} from "../curseHelper";
+import {CurseHelper} from "../curseHelper.js";
 
 export default class CacheManager {
 

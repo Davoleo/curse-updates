@@ -1,6 +1,6 @@
 import {Snowflake} from 'discord-api-types/globals';
 import {ActivityType, Client, ClientUser, PermissionFlagsBits, PermissionsBitField} from 'discord.js';
-import Environment from './Environment';
+import Environment from './Environment.js';
 
 ///The different levels of permission that may be needed to execute a certain command
 export enum CommandPermission {

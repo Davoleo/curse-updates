@@ -1,6 +1,6 @@
-import Command from "../model/Command";
-import { CommandScope } from "../model/CommandGroup";
-import { CommandPermission } from "../util/discord";
+import Command from "../model/Command.js";
+import { CommandScope } from "../model/CommandGroup.js";
+import { CommandPermission } from "../util/discord.js";
 
 /*
 function test(args: string[], messageRef: Message) {

@@ -1,6 +1,6 @@
 import {Snowflake} from "discord.js";
-import {dbclient} from "../data/dataHandler";
-import GameTag from "../model/GameTag";
+import {dbclient} from "../data/dataHandler.js";
+import GameTag from "../model/GameTag.js";
 
 export default class UpdatesService {
 

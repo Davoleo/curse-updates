@@ -1,9 +1,9 @@
 import {AnnouncementsConfig} from "@prisma/client";
 import {APIEmbedField, EmbedBuilder, EmbedField, Snowflake} from "discord.js";
-import {FileReleaseType} from "node-curseforge/dist/objects/enums";
-import {commandsMap} from "../main";
-import ModData, {RELEASE_COLORS} from "../model/ModData";
-import GuildService from "../services/GuildService";
+import {FileReleaseType} from "node-curseforge/dist/objects/enums.js";
+import {commandsMap} from "../main.js";
+import ModData, {RELEASE_COLORS} from "../model/ModData.js";
+import GuildService from "../services/GuildService.js";
 
 const embedColors = [
 	0x404040,

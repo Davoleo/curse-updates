@@ -1,7 +1,7 @@
 import {Snowflake} from "discord.js";
-import {dbclient, DBHelper} from "../data/dataHandler";
-import CacheService from "./CacheService";
-import UninitializedGuildError from "../model/UninitializedGuildError";
+import {dbclient, DBHelper} from "../data/dataHandler.js";
+import CacheService from "./CacheService.js";
+import UninitializedGuildError from "../model/UninitializedGuildError.js";
 
 export default class GuildService {
 

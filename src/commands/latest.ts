@@ -1,9 +1,9 @@
 import {ChatInputCommandInteraction} from "discord.js";
-import {CurseHelper} from "../curseHelper";
-import {buildModEmbed} from "../discord/embedBuilder";
-import Command from "../model/Command";
-import {CommandScope} from "../model/CommandGroup";
-import {CommandPermission} from "../util/discord";
+import {CurseHelper} from "../curseHelper.js";
+import {buildModEmbed} from "../discord/embedBuilder.js";
+import Command from "../model/Command.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
 
 async function latest(interaction: ChatInputCommandInteraction) {
     

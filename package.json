@@ -23,6 +23,7 @@
     "mod",
     "modpack"
   ],
+  "type": "module",
   "author": "Davoleo",
   "license": "ISC",
   "bugs": {

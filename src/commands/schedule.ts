@@ -1,12 +1,12 @@
 import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
-import {buildScheduleEmbed} from "../discord/embedBuilder";
-import Command from "../model/Command";
-import {CommandScope} from "../model/CommandGroup";
-import {CommandPermission} from "../util/discord";
-import GuildService from "../services/GuildService";
-import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
-import {logger} from "../main";
+import {buildScheduleEmbed} from "../discord/embedBuilder.js";
+import Command from "../model/Command.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
+import GuildService from "../services/GuildService.js";
+import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions.js";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library.js";
+import {logger} from "../main.js";
 
 const PROJECT_ID_KEY = 'project_id'
 

@@ -1,14 +1,14 @@
-import {Utils} from './util/discord';
-import {CurseHelper} from './curseHelper';
+import {Utils} from './util/discord.js';
+import {CurseHelper} from './curseHelper.js';
 import {Client, Guild} from 'discord.js';
-import Command from './model/Command';
-import {initCommands, loadCommandFiles} from './commandLoader';
-import Environment from './util/Environment';
-import {initScheduler} from './scheduler';
-import {Logger} from './util/log';
-import {DBHelper} from './data/dataHandler';
-import assert from 'assert';
-import GuildService from "./services/GuildService";
+import Command from './model/Command.js';
+import Environment from './util/Environment.js';
+import {initScheduler} from './scheduler.js';
+import {Logger} from './util/log.js';
+import {DBHelper} from './data/dataHandler.js';
+import GuildService from "./services/GuildService.js";
+import { loadCommandFiles, initCommands } from './commandLoader.js'
+import { strict as assert } from 'assert';
 
 export const botClient = new Client({intents: 'Guilds'});
 
@@ -34,7 +34,7 @@ CurseHelper.init().catch(err => {
 });
 
 botClient.once('ready', () => {
-	assert(botClient.user !== null);
+	assert(botClient.user)
 	logger.info(`Logged in as ${botClient.user.tag}!`);
 
 	Utils.updateBotStatus(botClient.user, Environment.get().DevMode);

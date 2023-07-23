@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import {logger} from './main';
+import {logger} from './main.js';
 import {Routes} from 'discord-api-types/v9'
 import {REST} from '@discordjs/rest';
-import Environment from './util/Environment';
+import Environment from './util/Environment.js';
 
-async function loadCommandFiles() {
+export async function loadCommandFiles() {
 
 	let commands = [];
 	
@@ -20,7 +20,7 @@ async function loadCommandFiles() {
 	return commands;
 }
 
-function initCommands(commands) {
+export function initCommands(commands) {
 	
 	const env = Environment.get()
 
@@ -38,6 +38,3 @@ function initCommands(commands) {
 		.catch(console.warn)
 	}
 }
-
-exports.loadCommandFiles = loadCommandFiles;
-exports.initCommands = initCommands;

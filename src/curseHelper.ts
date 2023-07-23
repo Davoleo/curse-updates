@@ -1,6 +1,6 @@
-import Curseforge, {Mod, ModFile} from 'node-curseforge';
-import Environment from './util/Environment';
-import ModData from './model/ModData';
+import {Curseforge, Mod, ModFile} from 'node-curseforge';
+import Environment from './util/Environment.js';
+import ModData from './model/ModData.js';
 
 const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 

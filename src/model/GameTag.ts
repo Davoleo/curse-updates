@@ -1,4 +1,4 @@
-import { CurseHelper } from "../curseHelper";
+import { CurseHelper } from "../curseHelper.js";
 
 export default class GameTag {
     constructor(public game: string, public tag: string) {}

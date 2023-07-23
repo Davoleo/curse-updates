@@ -1,8 +1,8 @@
 import {ChatInputCommandInteraction} from "discord.js";
-import {buildHelpEmbed} from "../discord/embedBuilder";
-import Command from "../model/Command";
-import {CommandScope} from "../model/CommandGroup";
-import {CommandPermission} from "../util/discord";
+import {buildHelpEmbed} from "../discord/embedBuilder.js";
+import Command from "../model/Command.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
 
 function help(interaction: ChatInputCommandInteraction) {
     const command = interaction.options.getString('command', false);

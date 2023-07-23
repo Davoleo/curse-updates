@@ -1,5 +1,5 @@
 import { PrismaClient, PrismaPromise } from "@prisma/client";
-import { logger } from "../main";
+import { logger } from "../main.js";
 
 const activeTransactions: Map<string, PrismaPromise<unknown>[]> = new Map();
 

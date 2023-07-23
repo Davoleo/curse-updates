@@ -1,14 +1,14 @@
 import {SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandStringOption} from "@discordjs/builders";
 import {ChannelType} from "discord-api-types/v9";
 import {ChatInputCommandInteraction, CommandInteraction} from "discord.js";
-import {buildUpdateConfigsEmbed} from "../discord/embedBuilder";
-import Command from "../model/Command";
-import {CommandScope} from "../model/CommandGroup";
-import {CommandPermission} from "../util/discord";
-import {FilterModal} from "../discord/modals";
-import UpdatesService from "../services/UpdatesService";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
-import {logger} from "../main";
+import {buildUpdateConfigsEmbed} from "../discord/embedBuilder.js";
+import Command from "../model/Command.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
+import {FilterModal} from "../discord/modals.js";
+import UpdatesService from "../services/UpdatesService.js";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library.js";
+import {logger} from "../main.js";
 
 //const ACCEPTED_CHANNEL_TYPES = [
 //    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText

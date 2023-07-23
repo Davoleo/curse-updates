@@ -6,9 +6,9 @@ import {
     TextInputBuilder,
     TextInputStyle
 } from "discord.js";
-import UpdatesService from "../services/UpdatesService";
-import GameTag from "../model/GameTag";
-import GuildService from "../services/GuildService";
+import UpdatesService from "../services/UpdatesService.js";
+import GameTag from "../model/GameTag.js";
+import GuildService from "../services/GuildService.js";
 
 export interface Modal {
     readonly id: string

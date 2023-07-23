@@ -1,15 +1,17 @@
-import {CommandPermission, Utils} from "../util/discord";
+import {CommandPermission, Utils} from "../util/discord.js";
 import {
     SlashCommandBuilder,
     SlashCommandSubcommandBuilder,
     SlashCommandSubcommandsOnlyBuilder
 } from "@discordjs/builders";
-import {CommandScope} from "./CommandGroup";
+import {CommandScope} from "./CommandGroup.js";
 import {AutocompleteInteraction, CommandInteraction} from "discord.js";
-import {logger} from "../main";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
+import {logger} from "../main.js";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library.js";
+import UninitializedGuildError from "./UninitializedGuildError.js";
+import GuildService from "../services/GuildService.js";
 
-type CommandHandler = (interaction: CommandInteraction) => void;
+type CommandHandler = (interaction: CommandInteraction) => Promise<void> | void;
 type AutocompleteHandler = (interaction: AutocompleteInteraction) => void;
 
 type NameAndDescription = {name: string, description: string}
@@ -31,7 +33,7 @@ export default class Command extends SlashCommandBuilder {
         this.scope = scope;
     }
 
-    execute(interaction: CommandInteraction, subcommand: string): void {
+    async execute(interaction: CommandInteraction, subcommand: string) {
         //Check if the user has permission to run the command
         if (!Utils.hasPermission(interaction.user.id, interaction.memberPermissions, this.permissionLevel)) {
             void interaction.reply(":x: You don't have enough permissions to run this command.");
@@ -45,14 +47,23 @@ export default class Command extends SlashCommandBuilder {
         }
 
         try {
-            if (this._actions.has(subcommand))
-                this._actions.get(subcommand)!(interaction);
+            logger.info("calling: ", interaction.commandName, subcommand)
+
+            if (this._actions.has(subcommand)) {
+                const action = this._actions.get(subcommand)!
+                await action(interaction)
+            }
         }
         catch(error) {
 
             if (error instanceof PrismaClientKnownRequestError) {
                 void interaction.reply({ content: ":x: Generic Data Error", ephemeral: true })
                 logger.error(`Prisma Error (${error.code}): ${error.message}`)
+            }
+            else if (error instanceof UninitializedGuildError) {
+                logger.warn("Uninitialized guild " + interaction.guild?.name + ", now initializing...")
+                await GuildService.initServer({ id: interaction.guildId!, name: interaction.guild!.name })
+                void interaction.reply(":x: Server config was not yet populated, **this is a one-time only error, please try again.**")
             }
             else if (error instanceof Error) {
                 void interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
