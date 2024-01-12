@@ -6,7 +6,7 @@ import UninitializedGuildError from "../model/UninitializedGuildError.js";
 export default class GuildService {
 
     static async getAllServerConfigs() {
-        return await dbclient.serverConfig.findMany({
+        return dbclient.serverConfig.findMany({
             include: {
                 announcementConfigs: true
             }
@@ -40,7 +40,7 @@ export default class GuildService {
      * @param server serverId and name from Discord
      */
     static async initServer(server: {id: Snowflake, name: string}) {
-        dbclient.serverConfig.create({
+        return dbclient.serverConfig.create({
             data: {
                 id: server.id,
                 serverName: server.name

@@ -127,7 +127,7 @@ export async function buildScheduleEmbed(serverId: Snowflake): Promise<EmbedBuil
     }
 
     if (mainEmbedPairs.length > 0) {
-        embeds[0].setTitle(serverConfig + '\'s Registered Projects');
+        embeds[0].setTitle(serverConfig.serverName + '\'s Registered Projects');
         embeds[0].addFields(mainEmbedPairs);
     }
     else {

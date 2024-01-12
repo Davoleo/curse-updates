@@ -30,7 +30,7 @@ export class FilterModal implements Modal {
     async compose() {
         const modal = new ModalBuilder()
             .setCustomId(this.id)
-            .setTitle(`Announcements Filters (Config n°${this.configId})`)
+            .setTitle(`Filters (Config n°${this.configId})`)
 
         await UpdatesService.getFilters(this.configId)
 
