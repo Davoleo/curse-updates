@@ -63,10 +63,10 @@ export default class Command extends SlashCommandBuilder {
             else if (error instanceof UninitializedGuildError) {
                 logger.warn("Uninitialized guild " + interaction.guild?.name + ", now initializing...")
                 await GuildService.initServer({ id: interaction.guildId!, name: interaction.guild!.name })
-                void interaction.reply(":x: Server config was not yet populated, **this is a one-time only error, please try again.**")
+                void interaction.reply({content: ":x: Server config was not yet populated, **this is a one-time only error, please try again.**", ephemeral: true})
             }
             else if (error instanceof Error) {
-                void interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
+                await interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
                 void interaction.followUp(error.message);
             
                 logger.warn("Running command: " + this.name + " " + subcommand + "has failed!!");

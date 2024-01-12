@@ -114,19 +114,21 @@ async function setfilters(interaction: ChatInputCommandInteraction, externalConf
 
     const modalWrapper = new FilterModal(configId);
 
-    const modal = await modalWrapper.compose();
-    await interaction.showModal(modal);
-    const submitted = await interaction.awaitModalSubmit({
-        time: 60000,
-        filter: i => i.user.id === interaction.user.id
-    }).catch(err => {
-        logger.error(err)
-        return null
-    });
+    try {
+        const modal = await modalWrapper.compose();
+        await interaction.showModal(modal);
+        const submitted = await interaction.awaitModalSubmit({
+            time: 120000,
+            filter: i => i.user.id === interaction.user.id
+        });
 
-    if (submitted)
-        await modalWrapper.handleSubmission(submitted);
+        if (submitted)
+            await modalWrapper.handleSubmission(submitted);
+    }
+    catch (e) {
+        logger.error(e.message);
 
+    }
 }
 
 async function showconfigs(interaction: CommandInteraction) {

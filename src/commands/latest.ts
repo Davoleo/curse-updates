@@ -4,12 +4,23 @@ import {buildModEmbed} from "../discord/embedBuilder.js";
 import Command from "../model/Command.js";
 import {CommandScope} from "../model/CommandGroup.js";
 import {CommandPermission} from "../util/discord.js";
+import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions.js";
 
 async function latest(interaction: ChatInputCommandInteraction) {
-    
-    const modData = await CurseHelper.queryModById(interaction.options.getInteger('project_id', true));
-	const response = buildModEmbed(modData);
-    void interaction.reply({embeds: [response]});
+
+    const id = interaction.options.getInteger('project_id', true)
+
+    try {
+        const modData = await CurseHelper.queryModById(id);
+        const response = buildModEmbed(modData);
+        void interaction.reply({embeds: [response]});
+    }
+    catch (error) {
+        if (error instanceof ErrorNotFound)
+            void interaction.reply(":x: Project with id: `" + id + "` doesn't exist!")
+        else 
+            throw error
+    }
 }
 
 export const command: Command = new Command(
