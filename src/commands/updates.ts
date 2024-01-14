@@ -41,7 +41,7 @@ async function newtemplate(interaction: ChatInputCommandInteraction) {
     const config = await UpdatesService.addReportTemplate(interaction.guildId!, channel, message);
     await setfilters(interaction, config.id)
 
-    void interaction.reply(":white_check_mark: A new announcements config has been created!")
+    void interaction.followUp(":white_check_mark: A new announcements config has been created!")
 }
 
 async function setchannel(interaction: ChatInputCommandInteraction) {
@@ -127,7 +127,6 @@ async function setfilters(interaction: ChatInputCommandInteraction, externalConf
     }
     catch (e) {
         logger.error(e.message);
-
     }
 }
 

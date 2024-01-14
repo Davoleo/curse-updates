@@ -45,6 +45,7 @@ export class FilterModal implements Modal {
             .setStyle(TextInputStyle.Short)
             .setLabel("Game Version Tags (Empty means all included)")
             .setPlaceholder("GAME1:TAG1|GAME2:TAG2|...")
+            .setRequired(false)
         const fileTagsInputRow = new ActionRowBuilder<TextInputBuilder>().addComponents(fileTagsFilterInput);
 
         const projectsFilterInput = new TextInputBuilder()
@@ -52,6 +53,7 @@ export class FilterModal implements Modal {
             .setStyle(TextInputStyle.Short)
             .setLabel("Project IDs (Empty Means all included)")
             .setPlaceholder("PROJ1|PROJ2|...")
+            .setRequired(false)
         const projectsInputRow = new ActionRowBuilder<TextInputBuilder>().addComponents(projectsFilterInput);
 
         modal.addComponents(fileTagsInputRow, projectsInputRow)
@@ -74,8 +76,8 @@ export class FilterModal implements Modal {
                     if (e instanceof Error) {
                         await interaction.reply(":x: Tags Filter format invalid: " + e.message)
                         await interaction.followUp("Broken Filters Input\n" +
-                            "Tags Filter: " + tagsString + '`\n' +
-                            "Projects Filter: " + projectString.join('|') + '`')
+                            "Tags Filter: `" + tagsString + '`\n' +
+                            "Projects Filter: `" + projectString.join('|') + '`')
                         return;
                     }
                     else {
@@ -93,13 +95,13 @@ export class FilterModal implements Modal {
         const projects: number[] = new Array(projectString.length)
 
         for (let i = 0; i < projects.length; i++) {
-            const projId = Number(projectString[i]);
+            const projId = Number(projectString[i].trim());
 
             if (Number.isNaN(projId)) {
                 await interaction.reply(":x: Project N°`" + projId + "` in the whitelist filter is malformed, please fix and try again.");
                 await interaction.followUp("Broken Filters Input\n" +
-                    "Tags Filter: " + tagsString + '`\n' +
-                    "Projects Filter: " + projectString + '`')
+                    "Tags Filter: `" + tagsString + '`\n' +
+                    "Projects Filter: `" + projectString + '`')
                 return;
             }
 
