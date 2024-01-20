@@ -29,6 +29,7 @@ export default class Command extends SlashCommandBuilder {
         this.setName(name);
         this.setDescription(description);
         this.setDefaultPermission(permission !== CommandPermission.OWNER);
+        this.setDMPermission(scope == CommandScope.EVERYWHERE);
         this.permissionLevel = permission;
         this.scope = scope;
     }

@@ -182,7 +182,7 @@ export async function buildUpdateConfigsEmbed(updatesConfigs: AnnouncementsConfi
                 inline: true
             }
         ]
-        embed.setFields(fields);
+        embed.addFields(fields);
     }
 
 
