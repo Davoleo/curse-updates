@@ -1,4 +1,4 @@
-import { createWriteStream, existsSync, mkdirSync, WriteStream } from 'fs';
+import {createWriteStream, existsSync, mkdirSync, WriteStream} from 'fs';
 
 enum LogLevel {
 	ERROR,
@@ -8,7 +8,7 @@ enum LogLevel {
 
 export class Logger {
 
-	private filename: string;
+	private readonly filename: string;
 	private logStream: WriteStream;
 
 	constructor() {
@@ -32,7 +32,7 @@ export class Logger {
 
 	private static getCurrentDateTime(): string {
 		const now = new Date();
-		return `${now.getFullYear()}-${now.getMonth()}-${now.getDay()}_${now.toLocaleTimeString('en-GB')}`;
+		return `${now.toLocaleDateString()}_${now.toLocaleTimeString('en-GB')}`;
 	}
 
 	private log(level: LogLevel, message: string, ...params: string[]): void {

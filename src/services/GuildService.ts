@@ -8,6 +8,11 @@ export default class GuildService {
     static async getAllServerConfigs() {
         return dbclient.serverConfig.findMany({
             include: {
+                projects: {
+                    select: {
+                        id: true
+                    }
+                },
                 announcementConfigs: true
             }
         });

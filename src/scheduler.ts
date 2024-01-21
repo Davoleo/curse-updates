@@ -15,36 +15,42 @@ export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 
 // -------------------------- Scheduled Check --------------------------------------
 
-async function queryCacheUpdates(): Promise<Map<number, ModData>> {
+async function queryCacheUpdates(): Promise<ModData[]> {
 
 	const projects: CachedProject[] = await CacheService.getAllProjects()
-	const projectIds = projects.map(proj => proj.id)
+	const projectIds = projects.map(proj => proj.id).sort();
 	const curseData = await CurseHelper.queryMods(projectIds)
 
-	let anyUpdated = false
 
-	for(const project of projects) {
-		const data = curseData.get(project.id)
+	const updates: ModData[] = [];
 
-		if (data) {
-			const latest = data.latestFile;
+	for(const {mod, latestFile} of curseData) {
 
-			if (project.fileId != latest?.id) {
-				CacheService.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, { id: latest?.id, filename: latest?.fileName })
-				anyUpdated = true
+		if (mod) {
+			const project = projects.filter(proj => proj.id === mod.id).pop();
+
+			if (!project) {
+				logger.error("Received update for a project that is not in the Cache..?? projId: " + mod.id);
+				continue;
 			}
 
-			if (!latest || project.fileId === latest.id) {
-				curseData.delete(project.id)
+			//if the updated project doesn't have files or the file id is the same as the cached one -> Remove from schedule
+			if (!latestFile || project.fileId === latestFile.id) {
+				continue;
+			}
+
+			if (project.fileId != latestFile.id) {
+				CacheService.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, { id: latestFile?.id, filename: latestFile?.fileName })
+				updates.push()
 			}
 		}
 	}
 
 	//Run cached project updates
-	if (anyUpdated)
-		DBHelper.runTransaction(SCHEDULER_TRANSACTION_ID);
+	if (updates.length > 0)
+		await DBHelper.runTransaction(SCHEDULER_TRANSACTION_ID);
 
-	return curseData;
+	return updates;
 }
 
 function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIEmbed[], message: string | null = null) {
@@ -79,24 +85,34 @@ function parseModProperties(text: string, modInfo: ModData[]) {
 
 }
 
-async function prepareSendAnnouncements(updates: Map<number, ModData>) {
+async function prepareSendAnnouncements(updates: ModData[]) {
 	
 	const guilds = await GuildService.getAllServerConfigs();
 
 	for (const guild of guilds) {
 
+		const guildUpdates =
+			guild.projects.map((proj) => updates
+				.filter(update => update.mod.id == proj.id)
+				.pop()
+			);
+
 		for (const updateConfig of guild.announcementConfigs) {
 			if (updateConfig === null || updateConfig.channel === null)
 				continue;
 
-			const filteredUpdates = Array.from(updates.values(), (update) => {
-				let remove = false;
-				
-				//If projects filter is enabled and none of the entries includes the current update project 
+			const filteredUpdates = guildUpdates.filter((update) => {
+
+				//If the update for some reason doesn't contain any info -> skip it
+				if (!update)
+					return false;
+
+				let keep = true;
+
+				//If projects filter is enabled and none of the entries includes the current update project
 				//we set remove to true for this project
 				if (updateConfig.projectsFilter !== null) {
-					if (!updateConfig.projectsFilter.includes(update.mod.id.toString()))
-						remove = true;
+					keep &&= updateConfig.projectsFilter.includes(update.mod.id.toString())
 				}
 
 				//If gameVers filter is enabled and none of the current update gameVersions are in the filter
@@ -114,12 +130,12 @@ async function prepareSendAnnouncements(updates: Map<number, ModData>) {
 						return false;
 					});
 
-					//remove if it was already flagged OR if tags filter doesn't produce any match
-					remove ||= !anyMatches;
+					//keep if it wasn't discarded previously and at least one of the tags in the config is matched
+					keep &&= anyMatches;
 				}
 
-				return remove ? null : update;
-			});
+				return keep;
+			})
 
 			const preprocessedMessage = updateConfig.message;
 			if (preprocessedMessage !== null) {
@@ -127,11 +143,7 @@ async function prepareSendAnnouncements(updates: Map<number, ModData>) {
 				//parseModProperties(preprocessedMessage, [])
 			}
 
-			const embeds: APIEmbed[] = [];
-			filteredUpdates.forEach(update => {
-				if (update !== null)
-					embeds.push(buildModEmbed(update).data);
-			});
+			const embeds = filteredUpdates.map(update => buildModEmbed(update!).data);
 
 			sendUpdateAnnouncements(updateConfig.channel, embeds);
 		}
@@ -141,9 +153,10 @@ async function prepareSendAnnouncements(updates: Map<number, ModData>) {
 
 export function initScheduler() {
 	setInterval(() => {
+		logger.info("Scheduler now checking for updates...")
 		queryCacheUpdates()
 		.then(updates => {
-			if (updates.size > 0) {
+			if (updates.length > 0) {
 				prepareSendAnnouncements(updates);
 			}
 		})

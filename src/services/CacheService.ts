@@ -5,12 +5,12 @@ import {CurseHelper} from "../curseHelper.js";
 
 export default class CacheManager {
 
-    static async getAllProjects(): Promise<CachedProject[]> {
-        return await dbclient.cachedProject.findMany();
+    static getAllProjects(): Promise<CachedProject[]> {
+        return dbclient.cachedProject.findMany();
     }
 
-    static async getCachedProject(idOrSlug: number | string): Promise<CachedProject | null> {
-        return await dbclient.cachedProject.findUnique({
+    static getCachedProject(idOrSlug: number | string): Promise<CachedProject | null> {
+        return dbclient.cachedProject.findUnique({
             where: {
                 id: typeof idOrSlug === 'number' ? idOrSlug : undefined,
                 slug: typeof idOrSlug === 'string' ? idOrSlug : undefined,

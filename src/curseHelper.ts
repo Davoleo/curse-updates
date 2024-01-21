@@ -49,20 +49,12 @@ async function queryModById(id: number): Promise<ModData> {
     }
 }
 
-async function queryMods(ids: number[]): Promise<Map<number, ModData>> {
-    const mods = await CFAPI.get_mods(0, ...ids);
-
-    return new Map(
-        mods.map(mod => {
-            return [
-                mod.id,
-                {
-                    mod: mod,
-                    latestFile: mod.latestFiles.at(-1)!
-                }
-            ]
-        }
-    ));
+async function queryMods(ids: number[]): Promise<ModData[]> {
+    const mods = await CFAPI.get_mods(...ids);
+    return mods.map(value => ({
+        mod: value,
+        latestFile: value.latestFiles.at(-1)!
+    }));
 }
 
 function modExists(id: number): boolean {
