@@ -3,7 +3,8 @@ import {createWriteStream, existsSync, mkdirSync, WriteStream} from 'fs';
 enum LogLevel {
 	ERROR,
 	WARN,
-	INFO
+	INFO,
+	DEBUG
 }
 
 export class Logger {
@@ -40,16 +41,23 @@ export class Logger {
 		switch(level) {
 			case LogLevel.ERROR:
 				console.error(prefixedMessage, ...params);
-			break;
+				break;
 			case LogLevel.WARN:
 				console.warn(prefixedMessage, ...params);
-			break;
+				break;
 			case LogLevel.INFO:
-				console.log(prefixedMessage, ...params);
-			break;
+				console.info(prefixedMessage, ...params);
+				break;
+			case LogLevel.DEBUG:
+				console.debug(prefixedMessage, ...params);
+				break;
 		}
 
 		this.appendLogLine(prefixedMessage, ...params);
+	}
+
+	public debug(message: string, ...params: string[]): void {
+		this.log(LogLevel.DEBUG, message, ...params);
 	}
 
 	public info(message: string, ...params: string[]): void {

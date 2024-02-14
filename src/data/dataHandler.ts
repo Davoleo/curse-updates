@@ -26,9 +26,9 @@ export const dbclient = new PrismaClient({
 
 function init() {
     dbclient.$on('query', (event) => {
-        logger.info('Query: ' + event.query);
-        logger.info('Params: ' + event.params);
-        logger.info('Duration: ' + event.duration + 'ms');
+        logger.debug('Query: ' + event.query);
+        logger.debug('Params: ' + event.params);
+        logger.debug('Duration: ' + event.duration + 'ms');
     });
 
     dbclient.$on('info', (event) => {
