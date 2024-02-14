@@ -24,9 +24,12 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 
 	const updates: ModData[] = [];
 
-	for(const {mod, latestFile} of curseData) {
+	for(const updateData of curseData) {
+
+		const mod = updateData.mod;
 
 		if (mod) {
+			logger.info("Project '" + mod.name + "': Checking for updates...");
 			const project = projects.filter(proj => proj.id === mod.id).pop();
 
 			if (!project) {
@@ -34,14 +37,17 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 				continue;
 			}
 
+			const latestFile = updateData.latestFile;
+
 			//if the updated project doesn't have files or the file id is the same as the cached one -> Remove from schedule
 			if (!latestFile || project.fileId === latestFile.id) {
 				continue;
 			}
 
 			if (project.fileId != latestFile.id) {
+				logger.info("Project '" + project.filename + "': found update '" + latestFile.fileName + "'");
 				CacheService.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, { id: latestFile?.id, filename: latestFile?.fileName })
-				updates.push()
+				updates.push(updateData);
 			}
 		}
 	}
@@ -138,14 +144,14 @@ async function prepareSendAnnouncements(updates: ModData[]) {
 			})
 
 			const preprocessedMessage = updateConfig.message;
-			if (preprocessedMessage !== null) {
-				//TODO Implement
-				//parseModProperties(preprocessedMessage, [])
-			}
+			//TODO Implement
+			// if (preprocessedMessage !== null) {
+			// 	//parseModProperties(preprocessedMessage, [])
+			// }
 
 			const embeds = filteredUpdates.map(update => buildModEmbed(update!).data);
 
-			sendUpdateAnnouncements(updateConfig.channel, embeds);
+			sendUpdateAnnouncements(updateConfig.channel, embeds, preprocessedMessage);
 		}
 	}
 }
