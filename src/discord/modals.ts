@@ -9,6 +9,7 @@ import {
 import UpdatesService from "../services/UpdatesService.js";
 import GameTag from "../model/GameTag.js";
 import GuildService from "../services/GuildService.js";
+import {logger} from "../main.js";
 
 export interface Modal {
     readonly id: string
@@ -63,7 +64,9 @@ export class FilterModal implements Modal {
     async handleSubmission(interaction: ModalSubmitInteraction) {
 
         const tagsString = interaction.fields.getField(FilterModal.TAGS_FILTER_INPUT, ComponentType.TextInput).value
-        const projectString = interaction.fields.getField(FilterModal.PROJECTS_FILTER_INPUT, ComponentType.TextInput).value.split('|')
+        const projectsString = interaction.fields.getField(FilterModal.PROJECTS_FILTER_INPUT, ComponentType.TextInput).value;
+        logger.debug("setfilters (tags): " + tagsString);
+        logger.debug("setfilters (projects): " + projectsString);
 
         if (tagsString.length > 0) {
             const tags = tagsString?.split('|').map(stag => GameTag.fromString(stag));
@@ -77,7 +80,7 @@ export class FilterModal implements Modal {
                         await interaction.reply(":x: Tags Filter format invalid: " + e.message)
                         await interaction.followUp("Broken Filters Input\n" +
                             "Tags Filter: `" + tagsString + '`\n' +
-                            "Projects Filter: `" + projectString.join('|') + '`')
+                            "Projects Filter: `" + projectsString + '`')
                         return;
                     }
                     else {
@@ -92,30 +95,47 @@ export class FilterModal implements Modal {
         const serverConfig = await GuildService.getAllProjects(interaction.guildId!);
         const scheduledProjects = new Set<number>(serverConfig.projects.map(proj => proj.id));
 
-        const projects: number[] = new Array(projectString.length)
+        if (projectsString.length > 0) {
+            const projectsStringArray = projectsString.split('|');
 
-        for (let i = 0; i < projects.length; i++) {
-            const projId = Number(projectString[i].trim());
+            const projects: number[] = new Array(projectsStringArray.length)
 
-            if (Number.isNaN(projId)) {
-                await interaction.reply(":x: Project N°`" + projId + "` in the whitelist filter is malformed, please fix and try again.");
-                await interaction.followUp("Broken Filters Input\n" +
-                    "Tags Filter: `" + tagsString + '`\n' +
-                    "Projects Filter: `" + projectString + '`')
-                return;
+            for (let i = 0; i < projects.length; i++) {
+                const stringId =  projectsStringArray[i].trim();
+
+                if (stringId.length == 0) //if current project is empty string skip it
+                    continue;
+
+                const projId = Number(stringId);
+
+                if (Number.isNaN(projId)) {
+                    await interaction.reply(":x: Project N°`" + projId + "` in the whitelist filter is malformed, please fix and try again.");
+                    await interaction.followUp("Broken Filters Input\n" +
+                        "Tags Filter: `" + tagsString + '`\n' +
+                        "Projects Filter: `" + projectsString + '`')
+                    return;
+                }
+
+                if (!scheduledProjects.has(projId)) {
+                    const warningMessage = ":warning: Project N°`" + projId + "` in the whitelist filter is not part of " + serverConfig.serverName + "'s scheduled projects, either add it or remove it from the whitelist."
+
+                    if (interaction.replied) {
+                        await interaction.followUp(warningMessage);
+                    }
+                    else {
+                        await interaction.reply(warningMessage);
+                    }
+                }
+
+                projects.push(projId)
             }
 
-            if (!scheduledProjects.has(projId)) {
-                await interaction.reply(":warning: Project N°`" + projId + "` in the whitelist filter is not part of " + serverConfig.serverName + "'s scheduled projects, either add it or remove it from the whitelist.")
-            }
-
-            projects.push(projId)
+            await UpdatesService.setProjectsFilter(this.configId, projects);
         }
 
-        await UpdatesService.setProjectsFilter(this.configId, projects);
 
         void interaction.reply(":white_check_mark: Announcement Filters edited successfully!\n" +
             "Tags Filter: " + (tagsString.length !== 0 ? 'set' : 'reset') + " to `" + tagsString + '`\n' +
-            "Projects Filter: " + (projectString.length !== 0 ? 'set' : 'reset') + " to `" + projectString + '`');
+            "Projects Filter: " + (projectsString.length !== 0 ? 'set' : 'reset') + " to `" + projectsString + '`');
     }
 }
