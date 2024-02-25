@@ -184,5 +184,6 @@ export const command = new Command(
 )
 .addSubcommand(subcommand => subcommand
     .setName(setfilters.name)
+    .addIntegerOption(UPDATES_CONFIG_ID_OPTION.setRequired(true))
     .setDescription("Controls which projects will be announced depending on certain conditions")
 )
