@@ -33,7 +33,7 @@ export class FilterModal implements Modal {
             .setCustomId(this.id)
             .setTitle(`Filters (Config n°${this.configId})`)
 
-        await UpdatesService.getFilters(this.configId)
+        const filters = await UpdatesService.getFilterStrings(this.configId)
 
         // const messageInput = new TextInputBuilder()
         //     .setCustomId('messsageInput')
@@ -47,6 +47,7 @@ export class FilterModal implements Modal {
             .setLabel("Game Version Tags (Empty means all included)")
             .setPlaceholder("GAME1:TAG1|GAME2:TAG2|...")
             .setRequired(false)
+            .setValue(filters.tags ?? '')
         const fileTagsInputRow = new ActionRowBuilder<TextInputBuilder>().addComponents(fileTagsFilterInput);
 
         const projectsFilterInput = new TextInputBuilder()
@@ -55,6 +56,7 @@ export class FilterModal implements Modal {
             .setLabel("Project IDs (Empty Means all included)")
             .setPlaceholder("PROJ1|PROJ2|...")
             .setRequired(false)
+            .setValue(filters.projects ?? '')
         const projectsInputRow = new ActionRowBuilder<TextInputBuilder>().addComponents(projectsFilterInput);
 
         modal.addComponents(fileTagsInputRow, projectsInputRow)

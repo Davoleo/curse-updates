@@ -66,6 +66,14 @@ export default class UpdatesService {
     }
 
     static async getFilters(id: number): Promise<{ tags: GameTag[], projects: number[] }> {
+        const unparsedFilters = await this.getFilterStrings(id);
+
+        const tags = unparsedFilters.tags ? unparsedFilters.tags.split('|').map(stag => GameTag.fromString(stag)) : [];
+        const projects = unparsedFilters.projects ? unparsedFilters.projects.split('|').map(sProject => Number(sProject)) : [];
+        return { tags: tags, projects: projects }
+    }
+
+    static async getFilterStrings(id: number): Promise<{tags: string|null, projects: string|null}> {
         const filters = (
             await this.updateConfigs.findUniqueOrThrow({
                 where: { id: id },
@@ -76,9 +84,7 @@ export default class UpdatesService {
             })
         );
 
-        const tags = filters.tagsFilter ? filters.tagsFilter.split('|').map(stag => GameTag.fromString(stag)) : [];
-        const projects = filters.projectsFilter ? filters.projectsFilter.split('|').map(sProject => Number(sProject)) : [];
-        return { tags: tags, projects: projects }
+        return { tags: filters.tagsFilter, projects: filters.projectsFilter }
     }
 
     static async setProjectsFilter(id: number, projectIds: number[]) {
