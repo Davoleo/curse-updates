@@ -1,13 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const { PrismaClient } = require('@prisma/client');
-const { readFileSync } = require('fs');
+const { readFileSync, existsSync } = require('fs');
 
 const prisma = new PrismaClient();
 
+const cachedProjectsPath = 'exports/cached_projects_export.json';
+const serverConfigPath = 'exports/server_config_export.json'
+
 function main() {
 
-    let projectsExport = JSON.parse(readFileSync('exports/cached_projects_export.json'));
-    let serversExport = JSON.parse(readFileSync('exports/server_config_export.json'));
+    if (!existsSync(cachedProjectsPath) || !existsSync(serverConfigPath)) {
+        console.error("LokiJS exported DB files do not exist => aborting seeding...");
+        return;
+    }
+
+    let projectsExport = JSON.parse(readFileSync(cachedProjectsPath));
+    let serversExport = JSON.parse(readFileSync(serverConfigPath));
 
     seedPrisma(projectsExport, serversExport)
     .then(() => console.log("Seeding Complete"))

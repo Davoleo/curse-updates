@@ -2,14 +2,13 @@
   Warnings:
 
   - You are about to drop the `AssignedProject` table. If the table is not empty, all the data it contains will be lost.
-  - The primary key for the `AnnouncementsConfig` table will be changed. If it partially fails, the table could be left without primary key constraint.
   - You are about to drop the column `version` on the `CachedProject` table. All the data in the column will be lost.
-  - Added the required column `fileId` to the `CachedProject` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `filename` to the `CachedProject` table without a default value. This is not possible if the table is not empty.
+  - The primary key for the `AnnouncementsConfig` table will be changed. If it partially fails, the table could be left without primary key constraint.
 
 */
 -- DropTable
 PRAGMA foreign_keys=off;
+-- noinspection SqlResolve
 DROP TABLE "AssignedProject";
 PRAGMA foreign_keys=on;
 
@@ -23,6 +22,15 @@ CREATE TABLE "_AssignedProject" (
 
 -- RedefineTables
 PRAGMA foreign_keys=OFF;
+CREATE TABLE "new_CachedProject" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "slug" TEXT NOT NULL,
+    "fileId" INTEGER,
+    "filename" TEXT
+);
+INSERT INTO "new_CachedProject" ("id", "slug") SELECT "id", "slug" FROM "CachedProject";
+DROP TABLE "CachedProject";
+ALTER TABLE "new_CachedProject" RENAME TO "CachedProject";
 CREATE TABLE "new_AnnouncementsConfig" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "serverId" TEXT NOT NULL,
@@ -35,16 +43,6 @@ CREATE TABLE "new_AnnouncementsConfig" (
 INSERT INTO "new_AnnouncementsConfig" ("channel", "id", "message", "serverId") SELECT "channel", "id", "message", "serverId" FROM "AnnouncementsConfig";
 DROP TABLE "AnnouncementsConfig";
 ALTER TABLE "new_AnnouncementsConfig" RENAME TO "AnnouncementsConfig";
-CREATE TABLE "new_CachedProject" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "slug" TEXT NOT NULL,
-    "fileId" INTEGER NOT NULL,
-    "filename" TEXT NOT NULL
-);
-INSERT INTO "new_CachedProject" ("id", "slug") SELECT "id", "slug" FROM "CachedProject";
-DROP TABLE "CachedProject";
-ALTER TABLE "new_CachedProject" RENAME TO "CachedProject";
-CREATE UNIQUE INDEX "CachedProject_fileId_key" ON "CachedProject"("fileId");
 PRAGMA foreign_key_check;
 PRAGMA foreign_keys=ON;
 

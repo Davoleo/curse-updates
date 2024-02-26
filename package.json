@@ -9,7 +9,7 @@
     "build": "tsc"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.cjs"
   },
   "repository": {
     "type": "git",
