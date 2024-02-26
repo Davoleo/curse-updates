@@ -6,31 +6,33 @@ export default class UpdatesService {
 
     private static updateConfigs = dbclient.announcementsConfig;
 
-    static async getAllServerUpdateConfigs(serverId: Snowflake) {
-        return await this.updateConfigs.findMany({
+    static getAllServerUpdateConfigs(serverId: Snowflake) {
+        return this.updateConfigs.findMany({
             where: {
                 serverId: serverId
             }
-        })
+        });
     }
 
-    static async getAllConfigIds(serverId: Snowflake) {
-        return await this.updateConfigs.findMany({
+    static getAllConfigIds(serverId: Snowflake) {
+        return this.updateConfigs.findMany({
             where: {
                 serverId: serverId
             },
             select: {
                 id: true
             }
-        })
+        });
     }
 
-    static async addReportTemplate(serverId: Snowflake, channel: string | undefined, message: string | undefined) {
-        return await this.updateConfigs.create({data: {
-            serverId: serverId,
-            channel: channel,
-            message: message
-        }});
+    static addReportTemplate(serverId: Snowflake, channel: string | undefined, message: string | undefined) {
+        return this.updateConfigs.create({
+            data: {
+                serverId: serverId,
+                channel: channel,
+                message: message
+            }
+        });
     }
 
     static async removeReportTemplate(id: number) {
