@@ -25,10 +25,20 @@ export default class UpdatesService {
         });
     }
 
-    static addReportTemplate(serverId: Snowflake, channel: string | undefined, message: string | undefined) {
+    static async addReportTemplate(serverId: Snowflake, serverName: string, channel: string | undefined, message: string | undefined)  {
         return this.updateConfigs.create({
             data: {
-                serverId: serverId,
+                server: {
+                    connectOrCreate: {
+                        where: {
+                            id: serverId
+                        },
+                        create: {
+                            id: serverId,
+                            serverName: serverName
+                        }
+                    }
+                },
                 channel: channel,
                 message: message
             }

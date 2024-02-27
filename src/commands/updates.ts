@@ -38,7 +38,7 @@ async function newtemplate(interaction: ChatInputCommandInteraction) {
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name)?.id;
     const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
-    const config = await UpdatesService.addReportTemplate(interaction.guildId!, channel, message);
+    const config = await UpdatesService.addReportTemplate(interaction.guildId!, interaction.guild!.name, channel, message);
     await setfilters(interaction, config.id)
 
     void interaction.followUp(":white_check_mark: A new announcements config has been created!")

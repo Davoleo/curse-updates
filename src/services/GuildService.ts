@@ -49,6 +49,9 @@ export default class GuildService {
             data: {
                 id: server.id,
                 serverName: server.name
+            },
+            include: {
+                projects: true,
             }
         })
     }
@@ -69,9 +72,9 @@ export default class GuildService {
         return projects;
     }
 
-    static async addProject(serverId: Snowflake, projectId: number) {
+    static async addProject(serverId: Snowflake, serverName: string, projectId: number) {
 
-        const serverConfig = await dbclient.serverConfig.findUnique({
+        let serverConfig = await dbclient.serverConfig.findUnique({
             where: {id: serverId},
             select: {
                 projects: {
@@ -83,7 +86,7 @@ export default class GuildService {
         });
 
         if (!serverConfig)
-            throw new UninitializedGuildError(serverId);
+            serverConfig = await this.initServer({id: serverId, name: serverName})
 
         if (serverConfig.projects.length >= 30)
             throw Error("Too many Assigned projects! Remove something first.");

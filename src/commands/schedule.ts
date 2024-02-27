@@ -16,7 +16,7 @@ async function add(interaction: ChatInputCommandInteraction) {
     
     try {
         const serverId = interaction.guildId!;
-        const slug = await GuildService.addProject(serverId, projectID)
+        const slug = await GuildService.addProject(serverId, interaction.guild!.name, projectID)
         void interaction.reply(":white_check_mark: " + slug + " has been successfully added to the schedule");
     }
     catch(error) {
