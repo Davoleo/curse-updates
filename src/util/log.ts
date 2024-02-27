@@ -7,6 +7,15 @@ enum LogLevel {
 	DEBUG
 }
 
+const format = new Intl.DateTimeFormat('en-GB', {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+	second: '2-digit',
+});
+
 export class Logger {
 
 	private readonly filename: string;
@@ -33,7 +42,8 @@ export class Logger {
 
 	private static getCurrentDateTime(): string {
 		const now = new Date();
-		return `${now.toLocaleDateString()}_${now.toLocaleTimeString('en-GB')}`;
+		const parts =  format.formatToParts(now);
+		return `${parts[4].value}-${parts[2].value}-${parts[0].value}_${parts[6].value}-${parts[8].value}-${parts[10].value}`;
 	}
 
 	private log(level: LogLevel, message: string, ...params: string[]): void {
