@@ -50,6 +50,10 @@ async function queryModById(id: number): Promise<ModData> {
 }
 
 async function queryMods(ids: number[]): Promise<ModData[]> {
+    //CF returns Bad Request [400] if you request empty set of mods
+    if (ids.length === 0)
+        return [];
+
     const mods = await CFAPI.get_mods(...ids);
     return mods.map(value => ({
         mod: value,
