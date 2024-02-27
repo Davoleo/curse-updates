@@ -8,10 +8,13 @@ function allDefined<T>(array: Array<T | undefined | null>): array is Array<T> {
 
 function filterDefined<T>(array: Array<T | undefined | null>): Array<T> {
     const filtered: T[] = [];
-    array.forEach(obj => {
-        if (obj !== undefined && obj !== null) 
+
+    for (const obj of array) {
+        if (obj) {
             filtered.push(obj);
-    });
+        }
+    }
+
     return filtered;
 }
 

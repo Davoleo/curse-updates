@@ -29,12 +29,10 @@ export function initCommands(commands) {
 	const jsonCommands =  commands.map((command) => command.toJSON());
 
 	if (env.DevMode) {
-		rest.put(Routes.applicationGuildCommands(env.BotId, env.TestingServers[0]), {body: jsonCommands})
-		.then(() => logger.info("Succesfully registered Slash Commands to Testing Server 1"))
-		.catch(console.warn)
-
-		rest.put(Routes.applicationGuildCommands(env.BotId, env.TestingServers[1]), {body: jsonCommands})
-		.then(() => logger.info("Succesfully registered Slash Commands to Testing Server 2"))
-		.catch(console.warn)
+		for (let i = 0; i<env.TestingServers.length; i++) {
+			rest.put(Routes.applicationGuildCommands(env.BotId, env.TestingServers[i]), {body: jsonCommands})
+				.then(() => logger.info("Succesfully registered Slash Commands to Testing Server " + i))
+				.catch(console.warn)
+		}
 	}
 }

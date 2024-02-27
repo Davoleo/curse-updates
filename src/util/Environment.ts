@@ -29,8 +29,6 @@ export default class Environment {
         this.DevMode = process.env.DEV_MODE?.toUpperCase() === "TRUE"
         if (process.env.TESTING_SERVER1 || process.env.TESTING_SERVER2)
             this.TestingServers = utilFunctions.filterDefined([process.env.TESTING_SERVER1, process.env.TESTING_SERVER2])
-        else
-            this.DevMode = false;
         this.CurseForgeAPIKey = process.env.CURSEFORGE_API_KEY!;
     }
 
