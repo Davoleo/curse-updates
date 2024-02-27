@@ -48,6 +48,7 @@ TESTING_SERVER2=<second ID of the discord server you want the bot to work on>
 CURSEFORGE_API_KEY=<Curseforge API Key>
 ```
 - Open a terminal in the main directory of the bot and run `npm install` to install dependencies
-- then compile typescript source files with `npm run build`
+- Initialize the database with `npx prisma migrate deploy`
+- Then compile typescript source files with `npm run build`
 - Then you can actually start the bot with `npm run bot`
 - Invite the bot to your server and enjoy :)
