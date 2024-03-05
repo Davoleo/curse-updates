@@ -79,6 +79,9 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
     modEmbed.setColor(releaseColor);
     modEmbed.setThumbnail(mod.logo.url);
 
+    const wikiLink = mod.links.wikiUrl?.length > 0 ? '|\t[Wiki](' + mod.links.wikiUrl + ')\t' : '';
+    const sourceLink = mod.links.sourceUrl?.length > 0 ? '|\t[Source Code](' + mod.links.sourceUrl + ')' : '';
+
     const fields: APIEmbedField[] = [
         {
             name: 'New Version File',
@@ -101,8 +104,8 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
         {
             name: 'Links',
             value: '[Download](' + encodeURI(modFile.downloadUrl) +
-                ')\t|\t[Wiki](' + mod.links.wikiUrl + ')\t|\t[Project](' + mod.links.websiteUrl +
-                ')\t|\t[Source Code](' + mod.links.sourceUrl + ')'
+                ')\t' + wikiLink + '|\t[Project](' + mod.links.websiteUrl +
+                ')\t' + sourceLink,
         }
     ]
     modEmbed.setFields(fields);
