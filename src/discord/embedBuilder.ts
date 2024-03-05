@@ -100,7 +100,7 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
         },
         {
             name: 'Links',
-            value: '[Download](' + modFile.downloadUrl.replace(/ /g, '%20') +
+            value: '[Download](' + encodeURI(modFile.downloadUrl) +
                 ')\t|\t[Wiki](' + mod.links.wikiUrl + ')\t|\t[Project](' + mod.links.websiteUrl +
                 ')\t|\t[Source Code](' + mod.links.sourceUrl + ')'
         }
