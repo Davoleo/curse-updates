@@ -7,8 +7,8 @@ import {initScheduler} from './scheduler.js';
 import {Logger} from './util/log.js';
 import {DBHelper} from './data/dataHandler.js';
 import GuildService from "./services/GuildService.js";
-import { loadCommandFiles, initCommands } from './commandLoader.js'
-import { strict as assert } from 'assert';
+import {initCommands, loadCommandFiles} from './commandLoader.js'
+import {strict as assert} from 'assert';
 
 export const botClient = new Client({intents: 'Guilds'});
 
@@ -76,10 +76,19 @@ botClient.on("error", (err) => {
 	logger.error("Error while comunicating with bot client: " + err.message);
 });
 
-//process.on('unhandledRejection', (reason, promise) => {
-//	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
-	//throw reason;
-//})
+process.on('unhandledRejection', (reason, promise) => {
+	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
+	throw reason;
+})
+
+process.on('uncaughtException', (error, origin) => {
+	logger.error("GENERIC ERROR - " + error.name + ": " + error.message);
+	if (error.stack) {
+		logger.error(error.stack);
+	}
+
+	throw origin;
+})
 
 initScheduler();
 
