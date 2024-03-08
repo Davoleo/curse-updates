@@ -1,6 +1,6 @@
 import {Utils} from './util/discord.js';
 import {CurseHelper} from './curseHelper.js';
-import {Client, Guild} from 'discord.js';
+import {Client, Events, Guild} from 'discord.js';
 import Command from './model/Command.js';
 import Environment from './util/Environment.js';
 import {initScheduler} from './scheduler.js';
@@ -33,14 +33,14 @@ CurseHelper.init().catch(err => {
 	console.error(err);
 });
 
-botClient.once('ready', () => {
+botClient.once(Events.ClientReady, () => {
 	assert(botClient.user)
 	logger.info(`Logged in as ${botClient.user.tag}!`);
 
 	Utils.updateBotStatus(botClient.user, Environment.get().DevMode);
 });
 
-botClient.on('interactionCreate', (interaction) => {
+botClient.on(Events.InteractionCreate, (interaction) => {
 	if (interaction.isChatInputCommand()) {
 		const command = commandsMap.get(interaction.commandName);
 
@@ -55,14 +55,14 @@ botClient.on('interactionCreate', (interaction) => {
 	}
 });
 
-botClient.on('guildCreate', (guild: Guild) => {
+botClient.on(Events.GuildCreate, (guild: Guild) => {
 	void GuildService.initServer({
 		id: guild.id,
 		name: guild.name
 	});
 });
 
-botClient.on('guildDelete', (guild: Guild) => {
+botClient.on(Events.GuildDelete, (guild: Guild) => {
 	//Remove data for servers the bot has been kicked/banned from
 	try {
 		GuildService.removeServer(guild.id);
@@ -72,14 +72,23 @@ botClient.on('guildDelete', (guild: Guild) => {
 	}
 });
 
-botClient.on("error", (err) => {
-	logger.error("Error while comunicating with bot client: " + err.message);
+botClient.on(Events.Error, (err) => {
+	logger.error("ERROR: " + err.name);
+	logger.error("message: " + err.message);
+	logger.error(err.stack ?? 'NO STACK')
 });
 
+botClient.on(Events.ShardError, err => {
+	logger.error("SHARD ERROR: " + err.name);
+	logger.error("message: " + err.message);
+	logger.error(err.stack ?? 'NO STACK')
+});
+
+/*- Node.js events -*/
 process.on('unhandledRejection', (reason, promise) => {
 	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
 	throw reason;
-})
+});
 
 process.on('uncaughtException', (error, origin) => {
 	logger.error("GENERIC ERROR - " + error.name + ": " + error.message);
@@ -88,7 +97,10 @@ process.on('uncaughtException', (error, origin) => {
 	}
 
 	throw origin;
-})
+});
+
+process.on('warning', logger.warn);
+/*-------------------*/
 
 initScheduler();
 
