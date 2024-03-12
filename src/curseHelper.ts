@@ -70,20 +70,11 @@ async function queryMods(ids: number[]): Promise<ModData[]> {
         return [];
 
     const mods = await CFAPI.get_mods(...ids);
-    const data: ModData[]  = mods.map(value => ({
+    return mods.map(value => ({
         mod: value,
         latestFile: value.latestFiles.at(-1)!,
         latestChangelog: undefined,
     }));
-
-    const changelogs = await Promise.all(
-        data.map((data) => data.latestFile?.get_changelog())
-    );
-    for (let i = 0; i < data.length; i++) {
-        data[i].latestChangelog = changelogs[i];
-    }
-
-    return data;
 }
 
 function modExists(id: number): boolean {

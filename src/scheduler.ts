@@ -47,6 +47,7 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 			if (project.fileId != latestFile.id) {
 				logger.info("Project '" + project.filename + "': found update '" + latestFile.fileName + "'");
 				CacheService.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, { id: latestFile?.id, filename: latestFile?.fileName })
+				updateData.latestChangelog = await latestFile.get_changelog();
 				updates.push(updateData);
 			}
 		}
