@@ -66,6 +66,16 @@ export default class Command extends SlashCommandBuilder {
                 await GuildService.initServer({ id: interaction.guildId!, name: interaction.guild!.name })
                 void interaction.reply({content: ":x: Server config was not yet populated, **this is a one-time only error, please try again.**", ephemeral: true})
             }
+            else if (error.code === 400) {
+                logger.error("Request Error (" + error.code + "): " + error.name);
+                logger.error(error.message);
+                void interaction.reply(":x: **CurseForge Bad Request Error!**");
+            }
+            else if (error.code === 503 || error.code === 500) {
+                logger.error("CurseForge Server Error (" + error.code + "): " + error.name);
+                logger.error(error.message);
+                void interaction.reply(":x: CurseForge Error!")
+            }
             else if (error instanceof Error) {
                 await interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
                 void interaction.followUp(error.message);

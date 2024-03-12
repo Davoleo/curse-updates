@@ -4,7 +4,7 @@ import {buildModEmbed} from "../discord/embedBuilder.js";
 import Command from "../model/Command.js";
 import {CommandScope} from "../model/CommandGroup.js";
 import {CommandPermission} from "../util/discord.js";
-import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions.js";
+import {logger} from "../main.js";
 
 async function latest(interaction: ChatInputCommandInteraction) {
 
@@ -16,8 +16,10 @@ async function latest(interaction: ChatInputCommandInteraction) {
         void interaction.reply({embeds: [response]});
     }
     catch (error) {
-        if (error instanceof ErrorNotFound)
+        if (error.code === 404) {
             void interaction.reply(":x: Project with id: `" + id + "` doesn't exist!")
+            logger.warn("latest: Project with id " + id + " not found!", error)
+        }
         else 
             throw error
     }
