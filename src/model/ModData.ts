@@ -1,8 +1,9 @@
-import { Mod, ModFile } from "node-curseforge";
+import {Mod, ModFile} from "node-curseforge";
 
 export default interface ModData {
     mod: Mod;
     latestFile: ModFile | undefined;
+    latestChangelog: string | undefined;
 }
 
 /**

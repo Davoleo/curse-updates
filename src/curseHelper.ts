@@ -1,6 +1,7 @@
 import {Curseforge, Mod, ModFile} from 'node-curseforge';
 import Environment from './util/Environment.js';
 import ModData from './model/ModData.js';
+import {logger} from "./main.js";
 
 const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 
@@ -42,10 +43,24 @@ async function init(): Promise<void> {
 async function queryModById(id: number): Promise<ModData> {
     const mod = await CFAPI.get_mod(id);
     const latestFile = mod.latestFiles.at(-1);
+
+    let changelog: string | undefined = undefined;
+    try {
+        changelog = await latestFile?.get_changelog();
+    }
+    catch (err) {
+        logger.warn("Changelog Request Error: ", err);
+    }
+
+    //empty changelog string = no changelog
+    if (changelog?.length === 0) {
+        changelog = undefined;
+    }
     
     return {
         mod: mod,
-        latestFile: latestFile
+        latestFile: latestFile,
+        latestChangelog: changelog,
     }
 }
 
@@ -55,10 +70,20 @@ async function queryMods(ids: number[]): Promise<ModData[]> {
         return [];
 
     const mods = await CFAPI.get_mods(...ids);
-    return mods.map(value => ({
+    const data: ModData[]  = mods.map(value => ({
         mod: value,
-        latestFile: value.latestFiles.at(-1)!
+        latestFile: value.latestFiles.at(-1)!,
+        latestChangelog: undefined,
     }));
+
+    const changelogs = await Promise.all(
+        data.map((data) => data.latestFile?.get_changelog())
+    );
+    for (let i = 0; i < data.length; i++) {
+        data[i].latestChangelog = changelogs[i];
+    }
+
+    return data;
 }
 
 function modExists(id: number): boolean {

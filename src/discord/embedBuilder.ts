@@ -4,6 +4,7 @@ import {FileReleaseType} from "node-curseforge/dist/objects/enums.js";
 import {commandsMap} from "../main.js";
 import ModData, {RELEASE_COLORS} from "../model/ModData.js";
 import GuildService from "../services/GuildService.js";
+import {utilFunctions} from "../util/functions.js";
 
 const embedColors = [
 	0x404040,
@@ -75,7 +76,15 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
     const downloadString = new Intl.NumberFormat('en-US').format(mod.downloadCount);
 
     modEmbed.setTitle('New ' + mod.name + ' ' + FileReleaseType[modFile.releaseType] + '!').setURL(mod.links.websiteUrl);
-    modEmbed.setDescription(mod.summary + '\n━━━━━━━\n**Total Downloads**: ' + downloadString + "\n**Authors**: " + authorString);
+
+
+    let embedDesc = projectData.latestChangelog ? utilFunctions.turndownHTML(projectData.latestChangelog) : mod.summary;
+    //ellipsis if changelog or summary length is greater than 3900
+    if (embedDesc.length > 3900) {
+        embedDesc = embedDesc.slice(0, 3900) + '...';
+    }
+
+    modEmbed.setDescription(embedDesc + '\n━━━━━━━\n**Total Downloads**: ' + downloadString + "\n**Authors**: " + authorString);
     modEmbed.setColor(releaseColor);
     modEmbed.setThumbnail(mod.logo.url);
 
