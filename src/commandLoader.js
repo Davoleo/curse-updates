@@ -1,34 +1,38 @@
 import * as fs from 'fs';
-import { logger } from './main';
+import {logger} from './main.js';
+import {Routes} from 'discord-api-types/v9'
+import {REST} from '@discordjs/rest';
+import Environment from './util/Environment.js';
 
-async function loadCommands() {
-	const commands = [];
+export async function loadCommandFiles() {
 
-	fs.readdir('./build/commands/util', (error, files) => {
-		if (error)
-			logger.error("commandLoaderError: " + error);
-		files = files.filter(file => !file.endsWith('map'));
-		logger.info("Loading " + files.length + " util commands");
-		files.forEach(async file => {
-			const command = await import("./commands/util/" + file);
-			// logger.info(command.comm);
-			commands.push(command.comm);
-		});
-	});
+	let commands = [];
 	
-	fs.readdir('./build/commands/schedule', (error, files) => {
-		if (error)
-			logger.error("commandLoaderError: " + error);
-		files = files.filter(file => !file.endsWith('map'));
-		logger.info("Loading " + files.length + " scheduling commands");
-		files.forEach(async file => {
-			const command = await import('./commands/schedule/' + file);
-			// logger.info(command.comm);
-			commands.push(command.comm);
-		});
-	});
+	let files = fs.readdirSync('./build/commands');
+	files = files.filter(file => file.endsWith('.js'));
+	logger.info("Loading " + files.length + " commands");
+	for (const file of files) {
+		const script = await import('./commands/' + file);
+		//logger.info(script);
+		commands.push(script.command);
+	}
 
 	return commands;
 }
 
-exports.loadCommands = loadCommands;
+export function initCommands(commands) {
+	
+	const env = Environment.get()
+
+	const rest = new REST({version: '9'}).setToken(env.DiscordToken);
+
+	const jsonCommands =  commands.map((command) => command.toJSON());
+
+	if (env.DevMode) {
+		for (let i = 0; i<env.TestingServers.length; i++) {
+			rest.put(Routes.applicationGuildCommands(env.BotId, env.TestingServers[i]), {body: jsonCommands})
+				.then(() => logger.info("Succesfully registered Slash Commands to Testing Server " + i))
+				.catch(console.warn)
+		}
+	}
+}

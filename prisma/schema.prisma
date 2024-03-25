@@ -1,0 +1,46 @@
+datasource db {
+    provider = "sqlite"
+    url = "file:../data.db"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model ServerConfig {
+    id                  String                  @id
+    serverName          String
+    announcementConfigs AnnouncementsConfig[]
+    projects            CachedProject[]         @relation("AssignedProject")
+}
+
+model AnnouncementsConfig {
+    id              Int          @id @default(autoincrement())
+    serverId        String
+    server          ServerConfig @relation(fields: [serverId], references: [id])
+    channel         String?
+    message         String?
+    tagsFilter      String?
+    projectsFilter  String?
+}
+
+model CachedProject {
+    id               Int            @id
+    slug             String
+    fileId           Int?
+    filename         String?
+    subscribedGuilds ServerConfig[] @relation("AssignedProject")
+}
+
+    //     serverId: Snowflake;
+    // serverName: string;
+    // prefix: string;
+    // releasesChannel: Snowflake;
+    // messageTemplate: string;
+    // projectIds: Array<number>;
+
+
+    //     id: number;
+    // slug: string;
+    // version: string;
+    // subbedGuilds: Snowflake[];

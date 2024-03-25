@@ -1,3 +1,5 @@
-import Command from "../src/model/Command";
+import Command from "../src/model/Command.js";
 
-export function loadCommands(): Promise<Command[]>;
+export function loadCommandFiles(): Promise<Command[]>;
+
+export function initCommands(commands: Command[]): void;
