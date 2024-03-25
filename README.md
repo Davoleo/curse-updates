@@ -28,7 +28,7 @@ If you want to self-host this discord bot you can do so by following these steps
 - Download/Clone the project sources from GitHub _(the green button)_
 - Create a new file named `.env` in the root of the bot directory
 - Fill `.env` with this template replacing the dummy data with your configuration options:
-```
+```dotenv
 # Discord
 DISCORD_TOKEN=<Discord Application Token>
 OWNER_ID=<Owner Permission Level User Id>
