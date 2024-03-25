@@ -35,4 +35,17 @@ export function initCommands(commands) {
 				.catch(console.warn)
 		}
 	}
+	else {
+
+		rest.put(Routes.applicationCommands(env.BotId), {body: jsonCommands})
+			.then(() => {
+				logger.info("Succesfully registered GLOBAL Slash Commands");
+				//Cleanup guild commands
+				return Promise.all(env.TestingServers.map(server => {
+					return rest.put(Routes.applicationGuildCommands(env.BotId, server))
+				}));
+			})
+			.then(() => logger.info("Successfully cleaned up Guild Commands"))
+			.catch(console.warn)
+	}
 }
