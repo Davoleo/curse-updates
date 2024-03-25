@@ -11,9 +11,9 @@ export default interface ModData {
  */
 export const RELEASE_COLORS = [
     0x404040,   //UNKNOWN
-    0x14B866,   //RELEASE
-    0x0E9BD8,   //BETA
-    0xD3CAE8    //ALPHA
+    0x259C3F,   //RELEASE
+    0xA278C7,   //BETA
+    0xF9BB3C    //ALPHA
 ];
 
 // export type ReleaseType = {

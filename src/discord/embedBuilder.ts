@@ -80,8 +80,8 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
 
     let embedDesc = projectData.latestChangelog ? utilFunctions.turndownHTML(projectData.latestChangelog) : mod.summary;
     //ellipsis if changelog or summary length is greater than 3900
-    if (embedDesc.length > 3900) {
-        embedDesc = embedDesc.slice(0, 3900) + '...';
+    if (embedDesc.length > 3700) {
+        embedDesc = embedDesc.slice(0, 3700) + '...';
     }
 
     modEmbed.setDescription(embedDesc + '\n━━━━━━━\n**Total Downloads**: ' + downloadString + "\n**Authors**: " + authorString);
