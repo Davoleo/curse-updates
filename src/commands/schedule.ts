@@ -95,8 +95,9 @@ export const command = new Command(
     .setName(remove.name)
     .setDescription("Removes a Curseforge project from the scheduled check that runs once every 15 minutes")
     .addIntegerOption(option => option
-        .setName(remove.name)
+        .setName(PROJECT_ID_KEY)
         .setDescription("The Id of the CurseForge Project to remove from the schedule")
+        .setRequired(true)
     )
 )
 .addSubcommand(subcommand => subcommand
