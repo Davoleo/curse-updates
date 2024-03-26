@@ -179,7 +179,7 @@ export function initScheduler() {
 		})
 		.catch(error => logger.error("There was an error when querying cached projects: ", error));
 	
-	}, 1000 * 60);
+	}, 1000 * 15 * 60);
 	// 15 Minutes
 	
 	

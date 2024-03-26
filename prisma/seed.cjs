@@ -37,7 +37,8 @@ async function seedPrisma(projectsExport, serversExport) {
             create: {
                 id: oldCondig.id,
                 slug: oldCondig.slug,
-                version: oldCondig.version
+                fileId: null,
+                filename: null,
             }
         })
     }
@@ -51,30 +52,20 @@ async function seedPrisma(projectsExport, serversExport) {
             create: {
                 id: oldConfig.serverId,
                 serverName: oldConfig.serverName,
+                projects: {
+                    connect: oldConfig.projectIds.map(id => {
+                        console.log(id);
+                        return {"id": id}
+                    }),
+                },
                 announcementConfigs: {
                     create: {
-                        id: 0,
+                        id: undefined,
                         channel: oldConfig.releasesChannel === '-1' ? undefined : oldConfig.releasesChannel
                     } 
                 }
             }
         });
-
-        for (const pid of oldConfig.projectIds) {
-            await prisma.assignedProject.upsert({
-                where: {
-                    projectId_serverId: {
-                        projectId: pid,
-                        serverId: oldConfig.serverId
-                    }
-                },
-                update: {},
-                create: {
-                    projectId: pid,
-                    serverId: oldConfig.serverId
-                }
-            })
-        }
     }
 }
 
