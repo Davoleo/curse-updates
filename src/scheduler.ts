@@ -104,6 +104,11 @@ async function prepareSendAnnouncements(updates: ModData[]) {
 				.pop()
 			);
 
+		if (guildUpdates.length === 0) {
+			//no project updates for this guild
+			continue;
+		}
+
 		for (const updateConfig of guild.announcementConfigs) {
 			if (updateConfig === null || updateConfig.channel === null)
 				continue;
@@ -142,7 +147,12 @@ async function prepareSendAnnouncements(updates: ModData[]) {
 				}
 
 				return keep;
-			})
+			});
+
+			if (filteredUpdates.length === 0) {
+				//no project updates for this config after filtering work
+				continue;
+			}
 
 			const preprocessedMessage = updateConfig.message;
 			//TODO Implement
