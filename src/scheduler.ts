@@ -1,5 +1,5 @@
 import {CachedProject} from "@prisma/client";
-import {APIEmbed, GuildChannel, MessagePayload, Snowflake} from "discord.js";
+import {APIEmbed, DiscordAPIError, GuildChannel, Snowflake} from "discord.js";
 import {CurseHelper} from "./curseHelper.js";
 import {DBHelper} from "./data/dataHandler.js";
 import {buildModEmbed} from "./discord/embedBuilder.js";
@@ -60,29 +60,29 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 	return updates;
 }
 
-function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIEmbed[], message: string | null = null) {
-	botClient.channels.fetch(channelId)
-		.then((channel) => {
-			if (channel instanceof GuildChannel) {
-				if (channel.isTextBased() || channel.isThread()) {
-					const payload = MessagePayload.create(channel, {
-						content: message ?? undefined,
-						embeds: announcements
-					})
+async function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIEmbed[], message: string | null = null) {
 
-					return channel.send(payload);
+	try {
+		const channel = await botClient.channels.fetch(channelId);
+
+		if (channel instanceof GuildChannel) {
+			if (channel.isTextBased() || channel.isThread()) {
+				for (const embed of announcements) {
+					await channel.send({
+						content: message ?? undefined,
+						embeds: [embed]
+					});
 				}
 			}
-
-			throw "Couldn't send update announcements in channel " + channel?.toString();
-	})
-	.then((message) => {
-		//TODO: log information
-	})
-	.catch((err: Error) => {
-		logger.error("[scheduler.ts] " + err.name + ": " + err.message);
-		Utils.sendDMtoBotOwner(botClient, `[scheduler.ts] ${err.name}: ${err.message}\n\n${err?.stack}`);
-	})
+		}
+	}
+	catch (err) {
+		logger.error(`[scheduler.ts] ${err.name}: ${err.message} \n\n ${err?.stack}`);
+		Utils.sendDMtoBotOwner(botClient, `[scheduler.ts] ${err.name}: ${err.message}`);
+		if (err instanceof DiscordAPIError) {
+			logger.error(`[scheduler.ts] [DiscordDetails] channel:${channelId} \n\nbody:\n${err.requestBody}`)
+		}
+	}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -162,7 +162,7 @@ async function prepareSendAnnouncements(updates: ModData[]) {
 
 			const embeds = filteredUpdates.map(update => buildModEmbed(update!).data);
 
-			sendUpdateAnnouncements(updateConfig.channel, embeds, preprocessedMessage);
+			return await sendUpdateAnnouncements(updateConfig.channel, embeds, preprocessedMessage);
 		}
 	}
 }
@@ -174,8 +174,9 @@ export function initScheduler() {
 		queryCacheUpdates()
 		.then(updates => {
 			if (updates.length > 0) {
-				prepareSendAnnouncements(updates);
+				return prepareSendAnnouncements(updates);
 			}
+			return Promise.resolve();
 		})
 		.catch(error => logger.error("There was an error when querying cached projects: ", error));
 	

@@ -1,5 +1,12 @@
 import {Snowflake} from 'discord-api-types/globals';
-import {ActivityType, Client, ClientUser, PermissionFlagsBits, PermissionsBitField} from 'discord.js';
+import {
+	ActivityType,
+	Client,
+	ClientUser,
+	MessageCreateOptions,
+	PermissionFlagsBits,
+	PermissionsBitField
+} from 'discord.js';
 import Environment from './Environment.js';
 
 ///The different levels of permission that may be needed to execute a certain command
@@ -14,9 +21,9 @@ const env = Environment.get();
 export class Utils {
 
 
-	static sendDMtoBotOwner(client: Client, message: string): void {
+	static sendDMtoBotOwner(client: Client, message: string | MessageCreateOptions): void {
 		client.users.fetch(env.OwnerId).then(owner => {
-			owner.send(message);
+			void owner.send(message);
 		});
 	}
 
