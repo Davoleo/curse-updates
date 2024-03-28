@@ -15,13 +15,15 @@ model ServerConfig {
 }
 
 model AnnouncementsConfig {
-    id              Int          @id @default(autoincrement())
+    id              Int
     serverId        String
     server          ServerConfig @relation(fields: [serverId], references: [id])
     channel         String?
     message         String?
     tagsFilter      String?
     projectsFilter  String?
+
+    @@id([id, serverId])
 }
 
 model CachedProject {

@@ -7,7 +7,6 @@ import {CommandScope} from "../model/CommandGroup.js";
 import {CommandPermission} from "../util/discord.js";
 import {FilterModal} from "../discord/modals.js";
 import UpdatesService from "../services/UpdatesService.js";
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library.js";
 import {logger} from "../main.js";
 
 //const ACCEPTED_CHANNEL_TYPES = [
@@ -49,13 +48,12 @@ async function setchannel(interaction: ChatInputCommandInteraction) {
     const channel = interaction.options.getChannel(CHANNEL_OPTION.name);
 
     try {
-        await UpdatesService.editReportChannel(configId, channel?.id);
+        await UpdatesService.editReportChannel(interaction.guildId!, configId, channel?.id);
     }
     catch (e) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            if (e.code === 'P2018' || e.code === 'P2025') {
-                void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
-            }
+        if (e.code === 'P2018' || e.code === 'P2025') {
+            void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
+            return;
         }
         else throw e;
     }
@@ -70,13 +68,12 @@ async function removetemplate(interaction: ChatInputCommandInteraction) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name, true);
 
     try {
-        await UpdatesService.removeReportTemplate(configId);
+        await UpdatesService.removeReportTemplate(interaction.guildId!, configId);
     }
     catch (e) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            if (e.code === 'P2018' || e.code === 'P2025') {
-                void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
-            }
+        if (e.code === 'P2018' || e.code === 'P2025') {
+            void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
+            return;
         }
         else throw e;
     }
@@ -90,13 +87,12 @@ async function setmessage(interaction: ChatInputCommandInteraction) {
     const message = interaction.options.getString(TEMPLATE_MESSAGE_OPTION.name) ?? undefined;
 
     try {
-        await UpdatesService.editReportMessage(configId, message)
+        await UpdatesService.editReportMessage(interaction.guildId!, configId, message)
     }
     catch (e) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            if (e.code === 'P2018' || e.code === 'P2025') {
-                void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
-            }
+        if (e.code === 'P2018' || e.code === 'P2025') {
+            void interaction.reply(`:x: Announcement config \`${configId}\` doesn't exist!`);
+            return;
         }
         else throw e;
     }
@@ -112,7 +108,7 @@ async function setmessage(interaction: ChatInputCommandInteraction) {
 async function setfilters(interaction: ChatInputCommandInteraction, externalConfigId: number | undefined = undefined) {
     const configId = interaction.options.getInteger(UPDATES_CONFIG_ID_OPTION.name) ?? externalConfigId!;
 
-    const modalWrapper = new FilterModal(configId);
+    const modalWrapper = new FilterModal(interaction.guildId!, configId);
 
     try {
         const modal = await modalWrapper.compose();
@@ -149,9 +145,8 @@ export const command = new Command(
 .setAction(setmessage, setmessage.name)
 .setAction(setfilters, setfilters.name)
 .setAutocompleteHandler(async (interaction) => {
-    console.log("Siamo già qua che è very good");
     if (interaction.options.get(UPDATES_CONFIG_ID_OPTION.name) != null) {
-        const configIds = await UpdatesService.getAllConfigIds(interaction.guildId!)
+        const configIds = await UpdatesService.getAllConfigIds(interaction.guildId!);
         await interaction.respond(configIds.map(index => {return { name: index.id + "", value: index.id}}));
     }
 })
