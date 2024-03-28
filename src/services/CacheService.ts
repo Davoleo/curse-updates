@@ -22,6 +22,18 @@ export default class CacheManager {
 
         const cachedProject = await dbclient.cachedProject.findUnique({ where: { id: id } });
         if (cachedProject !== null) {
+            await dbclient.cachedProject.update({
+                where: {
+                    id: id,
+                },
+                data: {
+                    subscribedGuilds: {
+                        connect: {
+                            id: guildId
+                        },
+                    }
+                }
+            })
             return cachedProject.slug;
         }
 
