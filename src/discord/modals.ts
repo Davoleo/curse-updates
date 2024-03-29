@@ -3,6 +3,7 @@ import {
     ComponentType,
     ModalBuilder,
     ModalSubmitInteraction,
+    Snowflake,
     TextInputBuilder,
     TextInputStyle
 } from "discord.js";
@@ -26,14 +27,14 @@ export class FilterModal implements Modal {
 
     public readonly id = 'filtersModal';
 
-    constructor(public configId: number) {}
+    constructor(public serverId: Snowflake, public configId: number) {}
 
     async compose() {
         const modal = new ModalBuilder()
             .setCustomId(this.id)
             .setTitle(`Filters (Config n°${this.configId})`)
 
-        const filters = await UpdatesService.getFilterStrings(this.configId)
+        const filters = await UpdatesService.getFilterStrings(this.serverId, this.configId)
 
         // const messageInput = new TextInputBuilder()
         //     .setCustomId('messsageInput')
@@ -91,7 +92,7 @@ export class FilterModal implements Modal {
                 }
             }
 
-            await UpdatesService.setTagsFilter(this.configId, tags);
+            await UpdatesService.setTagsFilter(this.serverId, this.configId, tags);
         }
 
         const serverConfig = await GuildService.getAllProjects(interaction.guildId!);
@@ -132,7 +133,7 @@ export class FilterModal implements Modal {
                 projects.push(projId)
             }
 
-            await UpdatesService.setProjectsFilter(this.configId, projects);
+            await UpdatesService.setProjectsFilter(this.serverId, this.configId, projects);
         }
 
 
