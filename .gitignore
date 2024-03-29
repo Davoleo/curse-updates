@@ -18,6 +18,8 @@ curseforge-updates.psd
 
 # New SQLite DB File and its db-journal
 data.db
+# DB Backup
+data_bak.db
 data.db-journal
 # old LokiJS DB
 data.old.db
