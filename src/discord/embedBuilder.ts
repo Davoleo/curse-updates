@@ -75,8 +75,7 @@ export function buildModEmbed(projectData: ModData): EmbedBuilder {
 
     const downloadString = new Intl.NumberFormat('en-US').format(mod.downloadCount);
 
-    modEmbed.setTitle('New ' + mod.name + ' ' + FileReleaseType[modFile.releaseType] + '!').setURL(mod.links.websiteUrl);
-
+    modEmbed.setTitle('New ' + mod.name + ' ' + FileReleaseType[modFile.releaseType] + '!').setURL(mod.links.websiteUrl + '/files/' + modFile.id);
 
     let embedDesc = projectData.latestChangelog ? utilFunctions.turndownHTML(projectData.latestChangelog) : mod.summary;
     //ellipsis if changelog or summary length is greater than 3900
