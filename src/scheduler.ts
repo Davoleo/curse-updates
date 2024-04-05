@@ -29,7 +29,7 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 		const mod = updateData.mod;
 
 		if (mod) {
-			logger.info("Project '" + mod.name + "': Checking for updates...");
+			logger.debug("Project '" + mod.name + "': Checking for updates...");
 			const project = projects.filter(proj => proj.id === mod.id).pop();
 
 			if (!project) {
