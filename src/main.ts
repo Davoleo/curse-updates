@@ -91,12 +91,13 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 process.on('uncaughtException', (error, origin) => {
+	Utils.sendDMtoBotOwner(botClient, "GENERIC ERROR - " + error.name + ": " + error.message)
 	logger.error("GENERIC ERROR - " + error.name + ": " + error.message);
 	if (error.stack) {
 		logger.error(error.stack);
 	}
 
-	throw origin;
+	logger.error(origin);
 });
 
 process.on('warning', logger.warn);
