@@ -10,7 +10,7 @@ export default class Environment {
     private static INSTANCE: Environment;
 
     DiscordToken: string;
-    OwnerId: Snowflake;
+    OwnerId: Snowflake | undefined;
     BotId: Snowflake;
 
     DevMode: boolean;
@@ -24,7 +24,7 @@ export default class Environment {
 
 
         this.DiscordToken = process.env.DISCORD_TOKEN!;
-        this.OwnerId = process.env.OWNER_ID!;
+        this.OwnerId = process.env.OWNER_ID;
         this.BotId = process.env.BOT_ID!;
         this.DevMode = process.env.DEV_MODE?.toUpperCase() === "TRUE"
         if (process.env.TESTING_SERVER1 || process.env.TESTING_SERVER2)

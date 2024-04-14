@@ -22,6 +22,10 @@ export class Utils {
 
 
 	static sendDMtoBotOwner(client: Client, message: string | MessageCreateOptions): void {
+		//if no bot owner is provided -> disable DM notifications
+		if (!env.OwnerId)
+			return;
+
 		client.users.fetch(env.OwnerId).then(owner => {
 			void owner.send(message);
 		});
@@ -32,14 +36,14 @@ export class Utils {
 		//Guild is not available we only check for owner level permission
 		if (discordPermissions === null) {
 			if (permissionLevel == CommandPermission.OWNER)
-				return authorId === env.OwnerId;
+				return env.OwnerId ? (authorId === env.OwnerId) : false;
 			else
 				return true;
 		}
 
 		switch (permissionLevel) {
 			case CommandPermission.OWNER:
-				return authorId === env.OwnerId;
+				return env.OwnerId ? (authorId === env.OwnerId) : false;
 			case CommandPermission.ADMINISTRATOR:
 				return discordPermissions.has(PermissionFlagsBits.ManageGuild, true) || discordPermissions.has(PermissionFlagsBits.ManageRoles, true);
 			case CommandPermission.MODERATOR:
