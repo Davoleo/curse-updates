@@ -12,7 +12,7 @@ import {strict as assert} from 'assert';
 
 export const botClient = new Client({intents: 'Guilds'});
 
-export const logger: Logger = new Logger();
+export const logger: Logger = new Logger(Environment.get().LogLevel);
 
 DBHelper.init();
 

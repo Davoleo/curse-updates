@@ -40,6 +40,7 @@ BOT_ID=<Discord Application ID>
 DEV_MODE=TRUE
 TESTING_SERVER1=<first ID of the discord server you want the bot to work on>
 TESTING_SERVER2=<second ID of the discord server you want the bot to work on>
+# LOG_LEVEL=DEBUG # Minimum log level severity (remove first # to uncomment) [default value: DEBUG] {possible values: ERROR, WARN, INFO, DEBUG} 
 
 # CurseForge
 CURSEFORGE_API_KEY=<Curseforge API Key>

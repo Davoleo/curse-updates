@@ -1,11 +1,13 @@
 import {createWriteStream, existsSync, mkdirSync, WriteStream} from 'fs';
 
-enum LogLevel {
+export enum LogLevel {
 	ERROR,
 	WARN,
 	INFO,
-	DEBUG
+	DEBUG,
 }
+
+export type LogLevelNames = keyof typeof LogLevel;
 
 const format = new Intl.DateTimeFormat('en-GB', {
 	day: '2-digit',
@@ -20,15 +22,16 @@ export class Logger {
 
 	private readonly filename: string;
 	private logStream: WriteStream;
+	private _level: LogLevel;
 
-	constructor() {
+	constructor(lowestLevel: LogLevel) {
 		if (!existsSync("logs"))
 			mkdirSync("logs");
 		
 		this.filename = "logs/" + Logger.getCurrentDateTime().replace(/[/:]/g, '-') + "_bot.log";
 		this.logStream = createWriteStream(this.filename, { autoClose: true });
+		this._level = lowestLevel;
 		console.log("Logger Initialized");
-		
 	}
 
 	private appendLogLine(line: string, ...extras: unknown[]): void {
@@ -44,6 +47,26 @@ export class Logger {
 		const now = new Date();
 		const parts =  format.formatToParts(now);
 		return `${parts[4].value}-${parts[2].value}-${parts[0].value}_${parts[6].value}-${parts[8].value}-${parts[10].value}`;
+	}
+
+	public static logLevelByName(levelName: LogLevelNames | undefined): LogLevel | null {
+		if (levelName === undefined)
+			return null;
+
+		switch (levelName) {
+			case "ERROR":
+				return LogLevel.ERROR;
+			case "WARN":
+				return LogLevel.WARN;
+			case "INFO":
+				return LogLevel.INFO;
+			case "DEBUG":
+				return LogLevel.DEBUG;
+			default:
+				console.warn("LogLevel in .env file is invalid! Please choose one of the following values: ERROR, WARN, INFO, DEBUG")
+				console.warn("using default level DEBUG for this run")
+				return null;
+		}
 	}
 
 	private log(level: LogLevel, message: string, ...params: string[]): void {
@@ -63,7 +86,18 @@ export class Logger {
 				break;
 		}
 
-		this.appendLogLine(prefixedMessage, ...params);
+		if (level <= this._level) {
+			this.appendLogLine(prefixedMessage, ...params);
+		}
+	}
+
+
+	set level(value: LogLevel) {
+		this._level = value;
+	}
+
+	get level(): LogLevel {
+		return this._level;
 	}
 
 	public debug(message: string, ...params: string[]): void {

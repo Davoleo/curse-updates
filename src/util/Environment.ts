@@ -1,6 +1,7 @@
 import {Snowflake} from "discord.js";
 import {config} from "dotenv";
 import {utilFunctions} from "./functions.js";
+import {Logger, LogLevel, LogLevelNames} from "./log.js";
 
 /**
  * Singleton Typed Wrapper class for .env fields
@@ -15,21 +16,25 @@ export default class Environment {
 
     DevMode: boolean;
     TestingServers: Snowflake[];
+    LogLevel: LogLevel;
 
     CurseForgeAPIKey: string;
 
     private constructor() {
-        if (!utilFunctions.allDefined([process.env.DISCORD_TOKEN, process.env.OWNER_ID, process.env.BOT_ID, process.env.CURSEFORGE_API_KEY]))
+        const env = process.env;
+
+        if (!utilFunctions.allDefined([env.DISCORD_TOKEN, env.OWNER_ID, env.BOT_ID, env.CURSEFORGE_API_KEY]))
             throw Error("One or more required Environment Constants are not defined, please review your .env file!")
 
 
-        this.DiscordToken = process.env.DISCORD_TOKEN!;
-        this.OwnerId = process.env.OWNER_ID;
-        this.BotId = process.env.BOT_ID!;
-        this.DevMode = process.env.DEV_MODE?.toUpperCase() === "TRUE"
-        if (process.env.TESTING_SERVER1 || process.env.TESTING_SERVER2)
-            this.TestingServers = utilFunctions.filterDefined([process.env.TESTING_SERVER1, process.env.TESTING_SERVER2])
-        this.CurseForgeAPIKey = process.env.CURSEFORGE_API_KEY!;
+        this.DiscordToken = env.DISCORD_TOKEN!;
+        this.OwnerId = env.OWNER_ID;
+        this.BotId = env.BOT_ID!;
+        this.DevMode = env.DEV_MODE?.toUpperCase() === "TRUE"
+        if (env.TESTING_SERVER1 || env.TESTING_SERVER2)
+            this.TestingServers = utilFunctions.filterDefined([env.TESTING_SERVER1, env.TESTING_SERVER2])
+        this.LogLevel = Logger.logLevelByName(env.LOG_LEVEL as LogLevelNames | undefined) ?? LogLevel.DEBUG;
+        this.CurseForgeAPIKey = env.CURSEFORGE_API_KEY!;
     }
 
     /**
