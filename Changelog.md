@@ -1,3 +1,25 @@
+# Curse-Updates Changelog
+
+### 1.0.1
+- Allow Slash commands to be registered globally [in all guilds the bot is part of]
+- Fixed seeding script
+- Adjusted `scheduler.ts` interval 15min → 60min
+- Fix `schedule remove` command argument (project id)
+  - Argument is now mandatory
+  - Fixed parameter name
+- Updated CurseForge release embed colors to match new website
+- Decreased release embed description (changelog) character limit to 3700 (will continue to monitor this value and if needed decrease it even more)
+- Fix `scheduler.ts` issue where it would try sending updates when there weren't any
+- Fixed typo in bot status activity
+- Fixed database issue when adding a CF project that was already cached
+- Change release embed title URL to contain a link to the new release instead of the project (project link still exists at the bottom of the embed)
+- change "Checking for updates..." log line severity `INFO` → `DEBUG`
+- Exceptions that get out of hand and reach top level handler are now caught (but more logging calls are done as well as sending a DM to the bot owner to notify the exception happened).
+- `BOT_OWNER` environment variable is now optional, omitting it will disable:
+  - DM notifications from the bot when errors occur
+  - Bot Owner permission level commands
+- new optional environment variable `LOG_LEVEL` to specify the minimum severity log level to write to the log file (console will still output all log levels) 
+
 ### 1.0.0
 - Complete Rewrite from scratch to be more optimized.
 - Now uses _new_ official Curseforge API
