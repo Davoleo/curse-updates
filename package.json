@@ -1,6 +1,6 @@
 {
   "name": "curse-updates",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Discord Bot that posts update notifications every time a new project update is released on curseforge.com",
   "main": "src/main.js",
   "scripts": {

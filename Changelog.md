@@ -1,5 +1,10 @@
 # Curse-Updates Changelog
 
+### 1.0.2
+- Improve cache cleanup operations
+- Fixed database data cleanup when the bot is removed from a server
+- updated Prisma dependencies
+
 ### 1.0.1
 - Allow Slash commands to be registered globally [in all guilds the bot is part of]
 - Fixed seeding script
