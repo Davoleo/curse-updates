@@ -9,6 +9,7 @@ import {DBHelper} from './data/dataHandler.js';
 import GuildService from "./services/GuildService.js";
 import {initCommands, loadCommandFiles} from './commandLoader.js'
 import {strict as assert} from 'assert';
+import UpdatesService from "./services/UpdatesService.js";
 
 export const botClient = new Client({intents: 'Guilds'});
 
@@ -62,13 +63,21 @@ botClient.on(Events.GuildCreate, (guild: Guild) => {
 	});
 });
 
-botClient.on(Events.GuildDelete, (guild: Guild) => {
-	//Remove data for servers the bot has been kicked/banned from
+botClient.on(Events.GuildDelete, async (guild: Guild) => {
 	try {
-		GuildService.removeServer(guild.id);
+		//Remove all update configs
+		await UpdatesService.clearReportTemplates(guild.id);
+
+		//Clear projects from the server config [+ clean-up cache]
+		await GuildService.clearProjects(guild.id, true)
+
+		//Remove server from DB
+		await GuildService.removeServer(guild.id);
+		logger.info(`guildDelete(${guild.name}) successful!`)
 	}
-	catch (e) {
-		logger.warn("guildDelete(" + guild.name + "): " + e.message)
+	catch (err) {
+		logger.error(`guildDelete(${guild.name}) error: ${err}`);
+		Utils.sendDMtoBotOwner(botClient, `guildDelete(${guild.name}) error: ${err}`)
 	}
 });
 

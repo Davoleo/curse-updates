@@ -18,8 +18,8 @@ export default class GuildService {
         });
     }
 
-    static removeServer(id: Snowflake): void {
-        dbclient.serverConfig.delete({
+    static async removeServer(id: Snowflake) {
+        return dbclient.serverConfig.delete({
             where: {
                 id: id
             }
@@ -115,7 +115,7 @@ export default class GuildService {
         await CacheService.cleanupProject(projectId, null)
     }
 
-    static async clearProjects(serverId: Snowflake) {
+    static async clearProjects(serverId: Snowflake, cleanUpCache = true) {
         const projNumbers = await dbclient.serverConfig.findUnique({
             where: { id: serverId },
             select: {
@@ -140,7 +140,7 @@ export default class GuildService {
             }
         })
 
-        if (projNumbers) {
+        if (cleanUpCache && projNumbers.projects.length > 0) {
             for (const idObj of projNumbers.projects) {
                 await CacheService.cleanupProject(idObj.id, serverId);
             }

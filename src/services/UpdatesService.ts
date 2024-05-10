@@ -54,12 +54,20 @@ export default class UpdatesService {
     }
 
     static async removeReportTemplate(serverId: Snowflake, configId: number) {
-        await this.updateConfigs.delete({
+        return this.updateConfigs.delete({
             where: {
                 id_serverId: {
                     serverId: serverId,
                     id: configId,
                 }
+            }
+        });
+    }
+
+    static async clearReportTemplates(serverId: Snowflake) {
+        return this.updateConfigs.deleteMany({
+            where: {
+                serverId: serverId,
             }
         });
     }
