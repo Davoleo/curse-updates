@@ -1,22 +1,29 @@
-import { CommandInteraction } from "discord.js";
+import {CommandInteraction} from "discord.js";
 import Command from "../model/Command.js";
-import { CommandScope } from "../model/CommandGroup.js";
-import { CommandPermission } from "../util/discord.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
+import CacheManager from "../services/CacheService.js";
 
 function updatestuff(interaction: CommandInteraction) {
 
-    // const commandData = [];
-    // commands.forEach(command => {
-    //     const obj = {
-    //         name: command.name,
-    //         description: command.description,
-    //     };
-    //     commandData.push(obj);
-    // });
+    CacheManager.getAllProjects().then(projects => {
 
-    //slashCommands = await botClient.guilds.cache.get('500396398324350989')
-    
-    interaction.reply('dogsong intensifies');
+        if (projects.length === 0) {
+            interaction.reply('dogsong intensifies');
+            return [];
+        }
+
+        const transactionId = "$CLEANUP_COMMAND$"
+
+        const promises = [];
+        for (const project of projects) {
+            promises.push(CacheManager.cleanupProject(project.id, transactionId));
+        }
+        return Promise.all(promises);
+    }).then(
+        cleanUpFlags => cleanUpFlags.map(flag => flag ? 1 : 0)
+            .reduce((a, b) => a + b, 0))
+        .then(value => interaction.reply(`Cache cleanup found ${value} useless projects!`));
 }
 
 export const command = new Command(

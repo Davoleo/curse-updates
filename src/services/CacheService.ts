@@ -71,20 +71,33 @@ export default class CacheManager {
     }
 
 
-    static async cleanupProject(id: number, transactionId: string | null) {
-        const matches = await dbclient.serverConfig.count({
+    static async cleanupProject(id: number, transactionId: string | null): Promise<boolean> {
+
+        const matches = await dbclient.cachedProject.findUnique({
             where: {
-                projects: {
-                    some: {
-                        id: id
+                id: id
+            },
+            select: {
+                _count: {
+                    select: {
+                        subscribedGuilds: true
                     }
                 }
-            },
-        });
+            }
+        })
 
-        if (matches === 0) {
-            await this.removeProject(id, transactionId);
+        //project does not exist => abort cleanup
+        if (matches === null) {
+            return false;
         }
+
+        //subscribed guilds are 0 => remove this project from cache
+        if (matches._count.subscribedGuilds === 0) {
+            await this.removeProject(id, transactionId);
+            return true;
+        }
+
+        return false;
     }
 
     static async removeProject(id: number, transactionId: string | null) {

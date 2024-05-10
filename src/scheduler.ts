@@ -11,6 +11,7 @@ import CacheService from "./services/CacheService.js";
 import GuildService from "./services/GuildService.js";
 import GameTag from "./model/GameTag.js";
 
+export const SCHEDULER_CLEANUP_TRANSACTION = '$SCHEDULER_CLEANUP_TRANSACTION$';
 export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 
 // -------------------------- Scheduled Check --------------------------------------
@@ -21,6 +22,13 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 	const projectIds = projects.map(proj => proj.id).sort();
 	const curseData = await CurseHelper.queryMods(projectIds)
 
+	let anyCleanedUp = false;
+	for (const project of projects) {
+		const cleaned = await CacheService.cleanupProject(project.id, SCHEDULER_CLEANUP_TRANSACTION);
+		anyCleanedUp ||= cleaned;
+	}
+	if (anyCleanedUp)
+		await DBHelper.runTransaction(SCHEDULER_CLEANUP_TRANSACTION);
 
 	const updates: ModData[] = [];
 
