@@ -127,7 +127,7 @@ export default class GuildService {
             throw new UninitializedGuildError(serverId);
 
         if (projNumbers.projects.length === 0) {
-            throw Error("Schedule is already empty!")
+            return;
         }
 
         await dbclient.serverConfig.update({
