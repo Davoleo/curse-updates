@@ -14,7 +14,7 @@ import BotConfig from "./util/BotConfig.js";
 
 export const botClient = new Client({intents: 'Guilds'});
 
-export const logger: Logger = new Logger(Environment.get().LogLevel);
+const reloadCommands = process.argv[2] === 'reload';
 
 BotConfig.preLoad();
 DBHelper.init();
@@ -23,7 +23,9 @@ export const commandsMap: Map<string, Command> = new Map();
 //Load Commands from js files
 loadCommandFiles().then(commands => {
 	//Init Slash Commands
-	initCommands(commands);
+	if (reloadCommands) {
+		initCommands(commands);
+	}
 
 	//Add loaded commands to a global Map
 	for (const command of commands) {

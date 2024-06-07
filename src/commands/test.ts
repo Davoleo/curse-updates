@@ -1,6 +1,6 @@
 import Command from "../model/Command.js";
-import { CommandScope } from "../model/CommandGroup.js";
-import { CommandPermission } from "../util/discord.js";
+import {CommandScope} from "../model/CommandGroup.js";
+import {CommandPermission} from "../util/discord.js";
 
 /*
 function test(args: string[], messageRef: Message) {
@@ -16,7 +16,7 @@ function test(args: string[], messageRef: Message) {
 
 export const command = new Command(
     'test', 
-    'Tests some functions - Internal Command only runnable by the bot author',
+    'Tests some functions - Internal Command',
     CommandScope.EVERYWHERE,
     CommandPermission.OWNER
 );
