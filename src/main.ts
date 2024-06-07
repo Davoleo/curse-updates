@@ -10,11 +10,13 @@ import GuildService from "./services/GuildService.js";
 import {initCommands, loadCommandFiles} from './commandLoader.js'
 import {strict as assert} from 'assert';
 import UpdatesService from "./services/UpdatesService.js";
+import BotConfig from "./util/BotConfig.js";
 
 export const botClient = new Client({intents: 'Guilds'});
 
 export const logger: Logger = new Logger(Environment.get().LogLevel);
 
+BotConfig.preLoad();
 DBHelper.init();
 
 export const commandsMap: Map<string, Command> = new Map();

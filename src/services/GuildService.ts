@@ -2,6 +2,7 @@ import {Snowflake} from "discord.js";
 import {dbclient, DBHelper} from "../data/dataHandler.js";
 import CacheService from "./CacheService.js";
 import UninitializedGuildError from "../model/UninitializedGuildError.js";
+import BotConfig from "../util/BotConfig.js";
 
 export default class GuildService {
 
@@ -88,7 +89,8 @@ export default class GuildService {
         if (!serverConfig)
             serverConfig = await this.initServer({id: serverId, name: serverName})
 
-        if (serverConfig.projects.length >= 30)
+        const botConfig = BotConfig.get()
+        if (botConfig.ServerProjectsLimit !== -1 && serverConfig.projects.length > botConfig.ServerProjectsLimit)
             throw Error("Too many Assigned projects! Remove something first.");
 
         if (serverConfig.projects.indexOf({ id: projectId }) !== -1)
