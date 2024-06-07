@@ -90,7 +90,7 @@ export default class GuildService {
             serverConfig = await this.initServer({id: serverId, name: serverName})
 
         const botConfig = BotConfig.get()
-        if (botConfig.ServerProjectsLimit !== -1 && serverConfig.projects.length > botConfig.ServerProjectsLimit)
+        if (botConfig.ServerProjectsLimit !== -1 && serverConfig.projects.length >= botConfig.ServerProjectsLimit)
             throw Error("Too many Assigned projects! Remove something first.");
 
         if (serverConfig.projects.indexOf({ id: projectId }) !== -1)

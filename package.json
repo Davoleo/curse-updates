@@ -1,6 +1,6 @@
 {
   "name": "curse-updates",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A Discord Bot that posts update notifications every time a new project update is released on curseforge.com",
   "main": "src/main.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .ts",
     "build": "tsc",
     "studio": "prisma studio",
-    "bot+reload": "node build/commandEntrypoint.js -- --reload"
+    "bot+reload": "node build/main.js -- --reload"
   },
   "prisma": {
     "seed": "node prisma/seed.cjs"

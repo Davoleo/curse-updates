@@ -1,5 +1,20 @@
 # Curse-Updates Changelog
 
+### 1.1.0
+- **Code Organization Changes**
+  - Refactored code to rely less on importing features from `main.js` (Logger is now a singleton)
+  - New singleton BotConfig representing custom bot config values read from the `config.json` file in the root directory
+    - See file in the repository for default values
+- **Configuration Changes**
+  - Per-Server Project limit is now configurable in `config.json` with a default value of 30 projects (limit can be disabled by setting it to -1)
+- **Slash Command changes**
+  - Internal command `updatestuff` has been removed
+  - Internal command `reload` has been added (used to reload Slash Commands on a running instance of the bot)
+  - Reloading slash commands is not mandatory when starting the bot
+    - Controlled via the --reload flag on the `main.js` script
+    - new NPM script to launch the bot whilst reloading Slash Commands `npm run bot+reload`
+    - old NPM script `npm run bot` now only starts the bot client
+
 ### 1.0.2
 - Improve cache cleanup operations
 - Fixed database data cleanup when the bot is removed from a server
