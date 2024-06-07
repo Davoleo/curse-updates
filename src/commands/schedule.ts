@@ -6,7 +6,7 @@ import {CommandPermission} from "../util/discord.js";
 import GuildService from "../services/GuildService.js";
 import {ErrorNotFound} from "node-curseforge/dist/objects/exceptions.js";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library.js";
-import {logger} from "../main.js";
+import {Logger} from "../util/log.js";
 
 const PROJECT_ID_KEY = 'project_id'
 
@@ -24,7 +24,7 @@ async function add(interaction: ChatInputCommandInteraction) {
             void interaction.reply({content: `:x: Error: ${error.message} ID=${projectID}`, ephemeral: true});
         }
         else if (error instanceof Error) {
-            void interaction.reply({content: `:x: ${error.name} Error: ${error.message}`, ephemeral: true});
+            void interaction.reply({content: `:x: ${error.name}: ${error.message}`, ephemeral: true});
         }
         else {
             void interaction.reply({content: `:x: ${error.name}!`, ephemeral: true});
@@ -46,7 +46,7 @@ async function remove(interaction: ChatInputCommandInteraction) {
         if (error instanceof PrismaClientKnownRequestError) {
             if (error.code === 'P2018' || error.code === 'P2025') {
                 void interaction.reply(":x: Couldn't find a project with `ID = " + projectID + "` in the bot schedule")
-                logger.error('schedule remove: ' + error.message)
+                Logger.I.error('schedule remove: ' + error.message)
             }
         }
         else throw error;

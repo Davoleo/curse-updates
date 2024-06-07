@@ -4,7 +4,7 @@ import {buildModEmbed} from "../discord/embedBuilder.js";
 import Command from "../model/Command.js";
 import {CommandScope} from "../model/CommandGroup.js";
 import {CommandPermission} from "../util/discord.js";
-import {logger} from "../main.js";
+import {Logger} from "../util/log.js";
 
 async function latest(interaction: ChatInputCommandInteraction) {
 
@@ -18,7 +18,7 @@ async function latest(interaction: ChatInputCommandInteraction) {
     catch (error) {
         if (error.code === 404) {
             void interaction.reply(":x: Project with id: `" + id + "` doesn't exist!")
-            logger.warn("latest: Project with id " + id + " not found!", error)
+            Logger.I.warn("latest: Project with id " + id + " not found!", error)
         }
         else 
             throw error

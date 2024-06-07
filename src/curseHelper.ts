@@ -1,7 +1,7 @@
 import {Curseforge, Mod, ModFile} from 'node-curseforge';
 import Environment from './util/Environment.js';
 import ModData from './model/ModData.js';
-import {logger} from "./main.js";
+import {Logger} from "./util/log.js";
 
 const CFAPI = new Curseforge(Environment.get().CurseForgeAPIKey);
 
@@ -49,7 +49,7 @@ async function queryModById(id: number): Promise<ModData> {
         changelog = await latestFile?.get_changelog();
     }
     catch (err) {
-        logger.warn("Changelog Request Error: ", err);
+        Logger.I.warn("Changelog Request Error: ", err);
     }
 
     //empty changelog string = no changelog

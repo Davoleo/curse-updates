@@ -36,7 +36,7 @@ CurseHelper.init().catch(err => {
 
 botClient.once(Events.ClientReady, () => {
 	assert(botClient.user)
-	logger.info(`Logged in as ${botClient.user.tag}!`);
+	Logger.I.info(`Logged in as ${botClient.user.tag}!`);
 
 	Utils.updateBotStatus(botClient.user, Environment.get().DevMode);
 });
@@ -73,43 +73,43 @@ botClient.on(Events.GuildDelete, async (guild: Guild) => {
 
 		//Remove server from DB
 		await GuildService.removeServer(guild.id);
-		logger.info(`guildDelete(${guild.name}) successful!`)
+		Logger.I.info(`guildDelete(${guild.name}) successful!`)
 	}
 	catch (err) {
-		logger.error(`guildDelete(${guild.name}) error: ${err}`);
+		Logger.I.error(`guildDelete(${guild.name}) error: ${err}`);
 		Utils.sendDMtoBotOwner(botClient, `guildDelete(${guild.name}) error: ${err}`)
 	}
 });
 
 botClient.on(Events.Error, (err) => {
-	logger.error("ERROR: " + err.name);
-	logger.error("message: " + err.message);
-	logger.error(err.stack ?? 'NO STACK')
+	Logger.I.error("ERROR: " + err.name);
+	Logger.I.error("message: " + err.message);
+	Logger.I.error(err.stack ?? 'NO STACK')
 });
 
 botClient.on(Events.ShardError, err => {
-	logger.error("SHARD ERROR: " + err.name);
-	logger.error("message: " + err.message);
-	logger.error(err.stack ?? 'NO STACK')
+	Logger.I.error("SHARD ERROR: " + err.name);
+	Logger.I.error("message: " + err.message);
+	Logger.I.error(err.stack ?? 'NO STACK')
 });
 
 /*- Node.js events -*/
 process.on('unhandledRejection', (reason, promise) => {
-	promise.catch(() => logger.error("Damn boi, how did this happen " + reason));
+	promise.catch(() => Logger.I.error("Damn boi, how did this happen " + reason));
 	throw reason;
 });
 
 process.on('uncaughtException', (error, origin) => {
 	Utils.sendDMtoBotOwner(botClient, "GENERIC ERROR - " + error.name + ": " + error.message)
-	logger.error("GENERIC ERROR - " + error.name + ": " + error.message);
+	Logger.I.error("GENERIC ERROR - " + error.name + ": " + error.message);
 	if (error.stack) {
-		logger.error(error.stack);
+		Logger.I.error(error.stack);
 	}
 
-	logger.error(origin);
+	Logger.I.error(origin);
 });
 
-process.on('warning', logger.warn);
+process.on('warning', Logger.I.warn);
 /*-------------------*/
 
 initScheduler();

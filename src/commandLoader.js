@@ -1,19 +1,19 @@
-import * as fs from 'fs';
-import {logger} from './main.js';
 import {Routes} from 'discord-api-types/v9'
 import {REST} from '@discordjs/rest';
 import Environment from './util/Environment.js';
+import {Logger} from "./util/log.js";
+import {readdirSync} from "fs";
 
 export async function loadCommandFiles() {
 
 	let commands = [];
 	
-	let files = fs.readdirSync('./build/commands');
+	let files = readdirSync('./build/commands');
 	files = files.filter(file => file.endsWith('.js'));
-	logger.info("Loading " + files.length + " commands");
+	Logger.I.info("Loading " + files.length + " commands");
 	for (const file of files) {
+		Logger.I.debug(file);
 		const script = await import('./commands/' + file);
-		//logger.info(script);
 		commands.push(script.command);
 	}
 
@@ -31,7 +31,7 @@ export function initCommands(commands) {
 	if (env.DevMode) {
 		for (let i = 0; i<env.TestingServers.length; i++) {
 			rest.put(Routes.applicationGuildCommands(env.BotId, env.TestingServers[i]), {body: jsonCommands})
-				.then(() => logger.info("Succesfully registered Slash Commands to Testing Server " + i))
+				.then(() => Logger.I.info("Succesfully registered Slash Commands to Testing Server " + i))
 				.catch(console.warn)
 		}
 	}
@@ -39,13 +39,13 @@ export function initCommands(commands) {
 
 		rest.put(Routes.applicationCommands(env.BotId), {body: jsonCommands})
 			.then(() => {
-				logger.info("Succesfully registered GLOBAL Slash Commands");
+				Logger.I.info("Succesfully registered GLOBAL Slash Commands");
 				//Cleanup guild commands
 				return Promise.all(env.TestingServers.map(server => {
 					return rest.put(Routes.applicationGuildCommands(env.BotId, server))
 				}));
 			})
-			.then(() => logger.info("Successfully cleaned up Guild Commands"))
+			.then(() => Logger.I.info("Successfully cleaned up Guild Commands"))
 			.catch(console.warn)
 	}
 }

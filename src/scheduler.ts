@@ -3,13 +3,14 @@ import {APIEmbed, DiscordAPIError, GuildChannel, Snowflake} from "discord.js";
 import {CurseHelper} from "./curseHelper.js";
 import {DBHelper} from "./data/dataHandler.js";
 import {buildModEmbed} from "./discord/embedBuilder.js";
-import {botClient, logger} from "./main.js";
+import {botClient} from "./main.js";
 import Environment from "./util/Environment.js";
 import ModData from "./model/ModData.js";
 import {Utils} from "./util/discord.js";
 import CacheService from "./services/CacheService.js";
 import GuildService from "./services/GuildService.js";
 import GameTag from "./model/GameTag.js";
+import {Logger} from "./util/log.js";
 
 export const SCHEDULER_CLEANUP_TRANSACTION = '$SCHEDULER_CLEANUP_TRANSACTION$';
 export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
@@ -37,11 +38,11 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 		const mod = updateData.mod;
 
 		if (mod) {
-			logger.debug("Project '" + mod.name + "': Checking for updates...");
+			Logger.I.debug("Project '" + mod.name + "': Checking for updates...");
 			const project = projects.filter(proj => proj.id === mod.id).pop();
 
 			if (!project) {
-				logger.error("Received update for a project that is not in the Cache..?? projId: " + mod.id);
+				Logger.I.error("Received update for a project that is not in the Cache..?? projId: " + mod.id);
 				continue;
 			}
 
@@ -53,7 +54,7 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 			}
 
 			if (project.fileId != latestFile.id) {
-				logger.info("Project '" + project.filename + "': found update '" + latestFile.fileName + "'");
+				Logger.I.info("Project '" + project.filename + "': found update '" + latestFile.fileName + "'");
 				CacheService.editProjectVersion(SCHEDULER_TRANSACTION_ID, project.id, { id: latestFile?.id, filename: latestFile?.fileName })
 				updateData.latestChangelog = await latestFile.get_changelog();
 				updates.push(updateData);
@@ -85,10 +86,10 @@ async function sendUpdateAnnouncements(channelId: Snowflake, announcements: APIE
 		}
 	}
 	catch (err) {
-		logger.error(`[scheduler.ts] ${err.name}: ${err.message} \n\n ${err?.stack}`);
+		Logger.I.error(`[scheduler.ts] ${err.name}: ${err.message} \n\n ${err?.stack}`);
 		Utils.sendDMtoBotOwner(botClient, `[scheduler.ts] ${err.name}: ${err.message}`);
 		if (err instanceof DiscordAPIError) {
-			logger.error(`[scheduler.ts] [DiscordDetails] channel:${channelId} \n\nbody:\n${err.requestBody}`)
+			Logger.I.error(`[scheduler.ts] [DiscordDetails] channel:${channelId} \n\nbody:\n${err.requestBody}`)
 		}
 	}
 }
@@ -178,7 +179,7 @@ async function prepareSendAnnouncements(updates: ModData[]) {
 
 export function initScheduler() {
 	setInterval(() => {
-		logger.info("Scheduler now checking for updates...")
+		Logger.I.info("Scheduler now checking for updates...")
 		queryCacheUpdates()
 		.then(updates => {
 			if (updates.length > 0) {
@@ -186,7 +187,7 @@ export function initScheduler() {
 			}
 			return Promise.resolve();
 		})
-		.catch(error => logger.error("There was an error when querying cached projects: ", error));
+		.catch(error => Logger.I.error("There was an error when querying cached projects: ", error));
 	
 	}, 1000 * 15 * 60);
 	// 15 Minutes

@@ -10,7 +10,7 @@ import {
 import UpdatesService from "../services/UpdatesService.js";
 import GameTag from "../model/GameTag.js";
 import GuildService from "../services/GuildService.js";
-import {logger} from "../main.js";
+import {Logger} from "../util/log.js";
 
 export interface Modal {
     readonly id: string
@@ -68,8 +68,8 @@ export class FilterModal implements Modal {
 
         const tagsString = interaction.fields.getField(FilterModal.TAGS_FILTER_INPUT, ComponentType.TextInput).value
         const projectsString = interaction.fields.getField(FilterModal.PROJECTS_FILTER_INPUT, ComponentType.TextInput).value;
-        logger.debug("setfilters (tags): " + tagsString);
-        logger.debug("setfilters (projects): " + projectsString);
+        Logger.I.debug("setfilters (tags): " + tagsString);
+        Logger.I.debug("setfilters (projects): " + projectsString);
 
         if (tagsString.length > 0) {
             const tags = tagsString?.split('|').map(stag => GameTag.fromString(stag));

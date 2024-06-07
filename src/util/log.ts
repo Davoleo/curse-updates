@@ -1,4 +1,5 @@
 import {createWriteStream, existsSync, mkdirSync, WriteStream} from 'fs';
+import Environment from "./Environment.js";
 
 export enum LogLevel {
 	ERROR,
@@ -19,6 +20,8 @@ const format = new Intl.DateTimeFormat('en-GB', {
 });
 
 export class Logger {
+
+	private static _INSTANCE: Logger;
 
 	private readonly filename: string;
 	private logStream: WriteStream;
@@ -41,6 +44,13 @@ export class Logger {
 		});
 		if (extras.length > 0)
 			this.logStream.write(JSON.stringify(extras) + '\n');
+	}
+
+	public static get I(): Logger {
+		if (!this._INSTANCE) {
+			this._INSTANCE = new Logger(Environment.get().LogLevel)
+		}
+		return this._INSTANCE;
 	}
 
 	private static getCurrentDateTime(): string {
@@ -92,11 +102,11 @@ export class Logger {
 	}
 
 
-	set level(value: LogLevel) {
+	public set level(value: LogLevel) {
 		this._level = value;
 	}
 
-	get level(): LogLevel {
+	public get level(): LogLevel {
 		return this._level;
 	}
 

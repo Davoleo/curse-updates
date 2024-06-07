@@ -7,7 +7,7 @@ import {CommandScope} from "../model/CommandGroup.js";
 import {CommandPermission} from "../util/discord.js";
 import {FilterModal} from "../discord/modals.js";
 import UpdatesService from "../services/UpdatesService.js";
-import {logger} from "../main.js";
+import {Logger} from "../util/log.js";
 
 //const ACCEPTED_CHANNEL_TYPES = [
 //    ChannelType.GuildNews, ChannelType.GuildNewsThread, ChannelType.GuildPrivateThread, ChannelType.GuildPublicThread, ChannelType.GuildText
@@ -122,7 +122,7 @@ async function setfilters(interaction: ChatInputCommandInteraction, externalConf
             await modalWrapper.handleSubmission(submitted);
     }
     catch (e) {
-        logger.error(e.message);
+        Logger.I.error(e.message);
     }
 }
 

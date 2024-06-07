@@ -1,5 +1,5 @@
 import {PrismaClient, PrismaPromise} from "@prisma/client";
-import {logger} from "../main.js";
+import {Logger} from "../util/log.js";
 
 const activeTransactions: Map<string, PrismaPromise<unknown>[]> = new Map();
 
@@ -26,19 +26,19 @@ export const dbclient = new PrismaClient({
 
 function init() {
     dbclient.$on('query', (event) => {
-        logger.debug('Query: ' + event.query);
-        logger.debug('Params: ' + event.params);
-        logger.debug('Duration: ' + event.duration + 'ms');
+        Logger.I.debug('Query: ' + event.query);
+        Logger.I.debug('Params: ' + event.params);
+        Logger.I.debug('Duration: ' + event.duration + 'ms');
     });
 
     dbclient.$on('info', (event) => {
-        logger.info(event.message);
+        Logger.I.info(event.message);
     });
     dbclient.$on('warn', (event) => {
-        logger.warn(event.message);
+        Logger.I.warn(event.message);
     });
     dbclient.$on('error', (event) => {
-        logger.error(event.message);
+        Logger.I.error(event.message);
     });
 }
 
@@ -62,7 +62,7 @@ async function runTransaction(id: string): Promise<unknown[]> {
         return dbclient.$transaction(transaction!);
     }
     else {
-        logger.warn("Attempted to run transaction for non-existent id: " + id);
+        Logger.I.warn("Attempted to run transaction for non-existent id: " + id);
         return Promise.reject('No active transaction for id: ' + id)
     }
     

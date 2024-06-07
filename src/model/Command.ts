@@ -6,10 +6,10 @@ import {
 } from "@discordjs/builders";
 import {CommandScope} from "./CommandGroup.js";
 import {AutocompleteInteraction, CommandInteraction} from "discord.js";
-import {logger} from "../main.js";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library.js";
 import UninitializedGuildError from "./UninitializedGuildError.js";
 import GuildService from "../services/GuildService.js";
+import {Logger} from "../util/log.js";
 
 type CommandHandler = (interaction: CommandInteraction) => Promise<void> | void;
 type AutocompleteHandler = (interaction: AutocompleteInteraction) => void;
@@ -48,7 +48,7 @@ export default class Command extends SlashCommandBuilder {
         }
 
         try {
-            logger.info("calling: ", interaction.commandName, subcommand)
+            Logger.I.info("calling: ", interaction.commandName, subcommand)
 
             if (this._actions.has(subcommand)) {
                 const action = this._actions.get(subcommand)!
@@ -59,29 +59,29 @@ export default class Command extends SlashCommandBuilder {
 
             if (error instanceof PrismaClientKnownRequestError) {
                 void interaction.reply({ content: ":x: Generic Data Error", ephemeral: true })
-                logger.error(`Prisma Error (${error.code}): ${error.message}`)
+                Logger.I.error(`Prisma Error (${error.code}): ${error.message}`)
             }
             else if (error instanceof UninitializedGuildError) {
-                logger.warn("Uninitialized guild " + interaction.guild?.name + ", now initializing...")
+                Logger.I.warn("Uninitialized guild " + interaction.guild?.name + ", now initializing...")
                 await GuildService.initServer({ id: interaction.guildId!, name: interaction.guild!.name })
                 void interaction.reply({content: ":x: Server config was not yet populated, **this is a one-time only error, please try again.**", ephemeral: true})
             }
             else if (error.code === 400) {
-                logger.error("Request Error (" + error.code + "): " + error.name);
-                logger.error(error.message);
+                Logger.I.error("Request Error (" + error.code + "): " + error.name);
+                Logger.I.error(error.message);
                 void interaction.reply(":x: **CurseForge Bad Request Error!**");
             }
             else if (error.code === 503 || error.code === 500) {
-                logger.error("CurseForge Server Error (" + error.code + "): " + error.name);
-                logger.error(error.message);
+                Logger.I.error("CurseForge Server Error (" + error.code + "): " + error.name);
+                Logger.I.error(error.message);
                 void interaction.reply(":x: CurseForge Error!")
             }
             else if (error instanceof Error) {
                 await interaction.reply({content: `Error: ${error.name} while running command \`${this.name } ${subcommand}\``});
                 void interaction.followUp(error.message);
             
-                logger.warn("Running command: " + this.name + " " + subcommand + "has failed!!");
-                logger.error(error.name + ': ' + error.message);
+                Logger.I.warn("Running command: " + this.name + " " + subcommand + "has failed!!");
+                Logger.I.error(error.name + ': ' + error.message);
             }
         }
     }
