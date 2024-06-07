@@ -14,7 +14,9 @@ import BotConfig from "./util/BotConfig.js";
 
 export const botClient = new Client({intents: 'Guilds'});
 
-const reloadCommands = process.argv[2] === 'reload';
+const reloadCommands = process.argv[3] === '--reload';
+//Logger.I.debug("" + reloadCommands);
+//Logger.I.debug("args: [" + process.argv.join(',') + ']')
 
 BotConfig.preLoad();
 DBHelper.init();
