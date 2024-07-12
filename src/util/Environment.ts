@@ -30,11 +30,18 @@ export default class Environment {
         this.DiscordToken = env.DISCORD_TOKEN!;
         this.OwnerId = env.OWNER_ID;
         this.BotId = env.BOT_ID!;
-        this.DevMode = env.DEV_MODE?.toUpperCase() === "TRUE"
-        if (env.TESTING_SERVER1 || env.TESTING_SERVER2)
-            this.TestingServers = utilFunctions.filterDefined([env.TESTING_SERVER1, env.TESTING_SERVER2])
+        this.DevMode = env.DEV_MODE?.toUpperCase() === "TRUE";
         this.LogLevel = Logger.logLevelByName(env.LOG_LEVEL as LogLevelNames | undefined) ?? LogLevel.DEBUG;
         this.CurseForgeAPIKey = env.CURSEFORGE_API_KEY!;
+
+        if (this.DevMode) {
+            if (env.TESTING_SERVER1 || env.TESTING_SERVER2) {
+                this.TestingServers = utilFunctions.filterDefined([env.TESTING_SERVER1, env.TESTING_SERVER2]);
+            }
+            else {
+                throw new Error("Dev Mode requires at least 1 Testing Server Id to be specified")
+            }
+        }
     }
 
     /**
