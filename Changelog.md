@@ -1,5 +1,9 @@
 # Curse-Updates Changelog
 
+### 1.1.1
+- Fixed internal updates config ID creation after PR[#28](https://github.com/Davoleo/curse-updates/pull/28) changes
+  - Included db fix migration script
+
 ### 1.1.0
 - **Code Organization Changes**
   - Refactored code to rely less on importing features from `main.js` (Logger is now a singleton)
