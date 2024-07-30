@@ -30,8 +30,11 @@ export default class UpdatesService {
             _max: {
                 id: true,
             },
+            where: {
+                serverId: serverId,
+            }
         });
-        const newId = max._max.id ? max._max.id+1 : 0;
+        const newId = max._max.id ? max._max.id+1 : 1;
 
         return this.updateConfigs.create({
             data: {
