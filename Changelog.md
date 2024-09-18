@@ -1,5 +1,9 @@
 # Curse-Updates Changelog
 
+### 1.1.2
+- Improved scheduler cache cleanup
+- Fixed secondary update configs being ignored after the first one
+
 ### 1.1.1
 - Fixed internal updates config ID creation after PR[#28](https://github.com/Davoleo/curse-updates/pull/28) changes
   - Included db fix migration script
