@@ -25,15 +25,15 @@ async function latest(interaction: ChatInputCommandInteraction) {
     }
 }
 
-export const command: Command = new Command(
+export const command = new Command(
     'latest', 
     'Queries CurseForge to get information regarding the latest version of a project',
     CommandScope.EVERYWHERE,
-    CommandPermission.USER
-).addIntegerOption(option => option
+    CommandPermission.USER)
+.setAction(latest)
+.addIntegerOption(option => option
     .setName('project_id')
     .setDescription('The id of the CurseForge Project to fetch')
     .setRequired(true)
     .setMinValue(1)
 )
-.setAction(latest)

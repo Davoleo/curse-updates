@@ -16,6 +16,7 @@ export const command = new Command(
     CommandScope.EVERYWHERE,
     CommandPermission.USER
 )
+.setAction(help)
 .addStringOption(option => option
     .setName('command')
     .setDescription("The Command you want to see help of")
@@ -29,4 +30,3 @@ export const command = new Command(
         value: "schedule"
     })
 )
-.setAction(help)
