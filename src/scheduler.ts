@@ -20,16 +20,20 @@ export const SCHEDULER_TRANSACTION_ID = '$SCHEDULER_TRANSACTION$';
 async function queryCacheUpdates(): Promise<ModData[]> {
 
 	const projects: CachedProject[] = await CacheService.getAllProjects()
-	const projectIds = projects.map(proj => proj.id).sort();
-	const curseData = await CurseHelper.queryMods(projectIds)
 
+	// project cache cleanup
 	let anyCleanedUp = false;
 	for (const project of projects) {
 		const cleaned = await CacheService.cleanupProject(project.id, SCHEDULER_CLEANUP_TRANSACTION);
 		anyCleanedUp ||= cleaned;
 	}
-	if (anyCleanedUp)
+	if (anyCleanedUp) {
+		Logger.I.info("cleaning up cache...");
 		await DBHelper.runTransaction(SCHEDULER_CLEANUP_TRANSACTION);
+	}
+
+	const projectIds = projects.map(proj => proj.id).sort();
+	const curseData = await CurseHelper.queryMods(projectIds)
 
 	const updates: ModData[] = [];
 
@@ -50,6 +54,7 @@ async function queryCacheUpdates(): Promise<ModData[]> {
 
 			//if the updated project doesn't have files or the file id is the same as the cached one -> Remove from schedule
 			if (!latestFile || project.fileId === latestFile.id) {
+				Logger.I.debug("skipping ... " + (!latestFile ? "Missing latestFile" : (project.fileId === latestFile.id ? "No New Version" : "WTF??")))
 				continue;
 			}
 
@@ -171,13 +176,14 @@ async function prepareSendAnnouncements(updates: ModData[]) {
 
 			const embeds = filteredUpdates.map(update => buildModEmbed(update!).data);
 
-			return await sendUpdateAnnouncements(updateConfig.channel, embeds, preprocessedMessage);
+			await sendUpdateAnnouncements(updateConfig.channel, embeds, preprocessedMessage);
 		}
 	}
 }
 
 
 export function initScheduler() {
+	Logger.I.info("Update checker initializing...")
 	setInterval(() => {
 		Logger.I.info("Scheduler now checking for updates...")
 		queryCacheUpdates()
