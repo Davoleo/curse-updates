@@ -110,19 +110,19 @@ export class Logger {
 		return this._level;
 	}
 
-	public debug(message: string, ...params: string[]): void {
+	public debug = (message: string, ...params: string[]): void => {
 		this.log(LogLevel.DEBUG, message, ...params);
-	}
+	};
 
-	public info(message: string, ...params: string[]): void {
+	public info = (message: string, ...params: string[]): void => {
 		this.log(LogLevel.INFO, message, ...params);
-	}
+	};
 
-	public warn(message: string, ...params: string[]): void {
+	public warn = (message: string, ...params: string[]): void => {
 		this.log(LogLevel.WARN, message, ...params);
-	}
+	};
 
-	public error(message: string, ...params: string[]): void {
+	public error = (message: string, ...params: string[]): void => {
 		this.log(LogLevel.ERROR, message, ...params);
-	}
+	};
 }
