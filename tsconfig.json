@@ -25,6 +25,7 @@
     },
     "exclude": [
         "./prisma/**/*",
-        "./build/**/*"
+        "./build/**/*",
+        "./eslint.config.js"
     ]
 }
